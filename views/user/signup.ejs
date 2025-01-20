@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            background-image: linear-gradient(135deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.1) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Adjusted to avoid full screen height */
+            height: auto;
+            padding-top: 40px; /* Added padding to prevent the container from touching the top */
+        }
+
+        .container {
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 80%;
+            max-width: 500px; /* Reduced max-width */
+            overflow: hidden;
+            padding: 15px; /* Reduced padding */
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 12px; /* Reduced margin */
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px; /* Reduced margin */
+            color: #333;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px; /* Reduced padding */
+            border: 1px solid #ddd;
+            border-radius: 15px;
+            font-size: 13px; /* Reduced font size */
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .inline-inputs {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .inline-inputs .form-group {
+            width: 48%; /* Reduced width */
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px; /* Reduced margin */
+            font-size: 14px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 8px; /* Reduced padding */
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 14px; /* Reduced font size */
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+        }
+
+        .submit-btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(37, 99, 235, 0.3);
+        }
+
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+            color: #666;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 45%;
+            height: 1px;
+            background: rgba(0,0,0,0.1);
+        }
+
+        .divider::before {
+            left: 0;
+        }
+
+        .divider::after {
+            right: 0;
+        }
+
+        .google-btn {
+            width: 100%;
+            padding: 8px; /* Reduced padding */
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .google-btn:hover {
+            background: #f8f9fa;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .signin-link {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin-top: 15px; /* Reduced margin */
+        }
+
+        .signin-link a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .signin-link a:hover {
+            color: #1d4ed8;
+        }
+
+        @media (max-width: 768px) {
+            .inline-inputs {
+                flex-direction: column;
+            }
+
+            .inline-inputs .form-group {
+                width: 100%;
+            }
+
+            .container {
+                padding: 10px; /* Further reduced padding for smaller screens */
+            }
+
+            .form-group input {
+                padding: 6px; /* Reduced padding for smaller screens */
+            }
+
+            .submit-btn {
+                padding: 6px; /* Reduced padding for smaller screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Welcome!</h1>
+            <p>Create your account to get started</p>
+        </div>
+        
+        <form id="signUpForm" >
+            <div class="inline-inputs">
+                <div class="form-group">
+                    <label for="firstName">First Name</label>
+                    <input type="text" id="firstName" required placeholder="Enter your first name">
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Last Name</label>
+                    <input type="text" id="lastName" required placeholder="Enter your last name">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="phoneNumber">Phone Number</label>
+                <input type="tel" id="phoneNumber" required placeholder="Enter your phone number">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" required placeholder="Enter your email">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required placeholder="Enter your password">
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" required placeholder="Confirm your password">
+            </div>
+
+            <button type="submit" class="submit-btn">Sign Up</button>
+            
+            <div class="divider">or</div>
+
+            <button type="button" class="google-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Continue with Google
+            </button>
+
+            <div class="signin-link">
+                Already have an account? <a href="#">Sign in</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+     
+// Function to validate the form
+function validateForm(event) {
+    event.preventDefault(); // Prevent form submission
+
+    // Retrieve input values
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const phoneNumber = document.getElementById('phoneNumber').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const confirmPassword = document.getElementById('confirmPassword').value.trim();
+
+    // Regex patterns
+    const namePattern = /^[a-zA-Z]{6,}$/; // Only letters, at least 6 characters
+    const phonePattern = /^[1-9][0-9]{9}$/; // Positive 10-digit number
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@hmail\.com$/; // Email ending with @hmail.com
+    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/; // Strong password
+
+    // Validation checks
+    if (!namePattern.test(firstName)) {
+        return Swal.fire('Invalid First Name', 'First Name must be at least 6 characters and contain only letters.', 'error');
+    }
+
+    if (!namePattern.test(lastName)) {
+        return Swal.fire('Invalid Last Name', 'Last Name must be at least 6 characters and contain only letters.', 'error');
+    }
+
+    if (!phonePattern.test(phoneNumber)) {
+        return Swal.fire('Invalid Phone Number', 'Phone Number must be a positive 10-digit number.', 'error');
+    }
+
+    if (!emailPattern.test(email)) {
+        return Swal.fire('Invalid Email', 'Email must be in the format sample@hmail.com.', 'error');
+    }
+
+    if (!passwordPattern.test(password)) {
+        return Swal.fire('Weak Password', 'Password must be at least 8 characters long, include uppercase and lowercase letters, a number, and a special character.', 'error');
+    }
+
+    if (password !== confirmPassword) {
+        return Swal.fire('Password Mismatch', 'Confirm Password must match the Password.', 'error');
+    }
+
+    // Success alert
+    Swal.fire('Success!', 'Your form has been submitted successfully!', 'success');
+}
+
+// Attach the validation function to the form
+const signUpForm = document.getElementById('signUpForm');
+signUpForm.addEventListener('submit', validateForm);
+
+    </script>
+
+</body>
+</html>
