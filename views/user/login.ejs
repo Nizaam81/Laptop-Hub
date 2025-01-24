@@ -283,17 +283,21 @@
                 <h1>Sign In</h1>
             </div>
             
-            <form id="loginForm">
+            <form id="loginForm"  method="post" action="/user/login">
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" id="email" required placeholder="Enter your email">
+                    <input type="email" name="email" id="email" required placeholder="Enter your email">
                 </div>
                 
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" required placeholder="Enter your password">
+                    <input type="password" name="password" id="password" required placeholder="Enter your password">
                 </div>
-                
+                <%   if(locals.message && message.length>0){ %>
+                    <div class="alert alert-danger text-centre">
+                        <%= message %>
+                    </div>
+                <%  }%>
                 <div class="remember-forgot">
                     <label class="remember-me">
                         <input type="checkbox" id="remember">
@@ -302,7 +306,7 @@
                     <a href="#" class="forgot-password">Forgot password?</a>
                 </div>
                 
-                <button type="submit" class="submit-btn">Sign In</button>
+                <button type="submit" class="submit-btn" id="singin">Sign In</button>
                 
                 <div class="divider">or</div>
                 
@@ -317,57 +321,41 @@
                 </button>
                 
                 <div class="signup-link">
-                    Don't have an account? <a href="#">Sign up</a>
+                    Don't have an account? <a href="signup">Sign up</a>
                 </div>
             </form>
         </div>
     </div>
 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const remember = document.getElementById('remember').checked;
-            
-            // Email validation regex
-            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-            
-            // Validate email
-            if (!emailRegex.test(email)) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Invalid Email',
-                    text: 'Please enter a valid email address (e.g., sample@gmail.com).',
-                });
-                return;
-            }
-            
-            // Validate password
-            if (password.length < 8) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Invalid Password',
-                    text: 'Password must be at least 8 characters long.',
-                });
-                return;
-            }
-            
-            // If validation passes, log the data
-            console.log({
-                email,
-                password,
-                remember
+      document.addEventListener('DOMContentLoaded', function() {
+    const loginForm = document.getElementById('loginForm');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    
+    loginForm.addEventListener('submit', function(event) {
+        // Basic client-side validation
+        if (!emailInput.value.trim()) {
+            event.preventDefault();
+            Swal2.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Please enter your email'
             });
-            
-            Swal.fire({
-                icon: 'success',
-                title: 'Login Successful',
-                text: 'You have successfully logged in!',
+            return;
+        }
+        
+        if (!passwordInput.value.trim()) {
+            event.preventDefault();
+            Swal2.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Please enter your password'
             });
-        });
-       
+            return;
+        }
+    });
+});
     </script>
 </body>
 </html>

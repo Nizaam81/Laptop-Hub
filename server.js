@@ -1,16 +1,39 @@
-const express = require('express')
-const app=express()
-const path = require('path')
-const env=require('dotenv').config()
-const connectDB=require('./config/db')
-connectDB()
 
-const user=require('./routes/userRoute')
-app.use(express.json())
-app.use(express.urlencoded({extended: true}))
-app.set('view engine', 'ejs')
-app.set('views',path.join(__dirname,"views"))
-app.use(express.static(path.join(__dirname, 'public')))
+const express = require('express');
+const path = require('path');
+const dotenv = require('dotenv').config();
+const session = require('express-session');
+const passport = require('./config/passport');
+const connectDB = require('./config/db');
 
-app.use("/user",user) //user is a router
-app.listen(3001, () => console.log('server is running'))
+const app = express();
+connectDB();
+
+const user = require('./routes/userRoute');
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET,
+        resave: false,
+        saveUninitialized: true,
+        cookie: {
+            secure: false, // Set to true in production with HTTPS
+            httpOnly: true,
+            maxAge: 72 * 60 * 60 * 1000, // 72 hours
+        },
+    })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use('/user', user);
+
+app.listen(3001, () => console.log('Server is running on port 3001'));
