@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laptop Hub</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* General styles */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #F3F3F3;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* Header styles */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #006CE1;
+      padding: 15px 30px;
+      color: #FFFFFF;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo img {
+      height: 50px;
+      margin-right: 15px;
+    }
+
+    .logo h1 {
+      font-size: 24px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .signin {
+      background-color: #FFFFFF;
+      color: #006CE1;
+      border: 2px solid #FFFFFF;
+    }
+
+    .signin:hover {
+      background-color: #F3F3F3;
+      transform: scale(1.05);
+    }
+
+    .signup {
+      background-color: #F3F3F3;
+      color: #006CE1;
+      border: 2px solid #006CE1;
+    }
+
+    .signup:hover {
+      background-color: #FFFFFF;
+      transform: scale(1.05);
+    }
+
+    /* Welcome section */
+    .welcome-section {
+      text-align: center;
+      padding: 50px;
+      flex: 1; /* Pushes the footer to the bottom */
+      animation: fadeIn 1.5s ease-out;
+    }
+
+    .welcome-section h2 {
+      color: #006CE1;
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+
+    .welcome-section p {
+      font-size: 18px;
+    }
+
+    /* Footer styles */
+    .footer {
+      text-align: center;
+      padding: 15px;
+      background-color: #006CE1;
+      color: #FFFFFF;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .btn {
+      animation: slideIn 1s ease-out;
+    }
+
+    @keyframes slideIn {
+      0% {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="logo">
+      <img src="/images/laptopHub.jpg"  alt="Laptop Hub Logo">
+      <h1>Laptop Hub</h1>
+    </div>
+    <nav class="nav">
+      <a href="login" class="btn signin">Sign In</a>
+      <a href="signup" class="btn signup">Sign Up</a>
+    </nav>
+  </header>
+
+  <main class="welcome-section">
+    <h2>Welcome to Laptop Hub</h2>
+    <p>Your one-stop destination for the best laptops at unbeatable prices!</p>
+  </main>
+
+  <footer class="footer">
+    <p>&copy; 2025 Laptop Hub. All rights reserved.</p>
+  </footer>
+</body>
+</html>

@@ -10,6 +10,7 @@ const app = express();
 connectDB();
 
 const user = require('./routes/userRoute');
+const admin =require('./routes/adminRoutes')
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -20,9 +21,9 @@ app.use(
         resave: false,
         saveUninitialized: true,
         cookie: {
-            secure: false, // Set to true in production with HTTPS
+            secure: false, 
             httpOnly: true,
-            maxAge: 72 * 60 * 60 * 1000, // 72 hours
+            maxAge: 72 * 60 * 60 * 1000, 
         },
     })
 );
@@ -35,5 +36,5 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/user', user);
-
+app.use('/admin',admin);
 app.listen(3001, () => console.log('Server is running on port 3001'));

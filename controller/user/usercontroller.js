@@ -85,15 +85,13 @@ const pageNotfound = async(req,res)=>{
 }
 
 
-
-const  loadHomepage = async(req,res)=>{
+const loadHomepage = async (req, res) => {
     try {
-       
-       return res.render('user/home')
+        res.render("user/home", { 
+        });
     } catch (error) {
-        console.log("home page is not founded");
-        res.status(500).send("Internal server error")
-        
+        console.error("Home page error:", error);
+        res.status(500).send("Internal Server Error");
     }
 }
 
@@ -333,6 +331,30 @@ const login = async (req, res) => {
     }
 };
 
+const welcome = async (req, res) => {
+    try {
+      return res.render('user/welcome'); 
+    } catch (error) {
+      console.error('Error rendering /user/welcome:', error);
+      res.render("user/pageNotfound"); 
+    }
+  };
+  const logout = async(req,res)=>{
+    try {
+        req.session.destroy((err)=>{
+           if(err){
+            console.log("session destruction error",err.message)
+            res.redirect("user/pageNotfound");
+           }
+           return res.redirect('/user/login')
+        })
+    } catch (error) {
+        console.log("logout error",error );
+        res.redirect("user/pageNotfound")
+    }
+  }
+  
+
 
 module.exports = {loadHomepage,loadlogin,loadsignup,pageNotfound,signup,loadverifyOtp, resendOTP,
-    verifyOTP,login}
+    verifyOTP,login,welcome,logout}

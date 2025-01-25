@@ -38,9 +38,12 @@ const userSchema = new Schema({
     isVerified: {
         type: Boolean,
         default: false
-    }
-})
-
+    },
+    isAdmin: {
+        type: Boolean,
+        default: false,
+    },
+},{ minimize: false }); // ensure all fields are entered database
 const user=mongoose.model("user",userSchema);
 
 module.exports=user;

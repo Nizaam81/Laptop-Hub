@@ -12,6 +12,9 @@ routes.post("/signup", usercontroller.signup);
 routes.get("/verifyOtp", usercontroller.loadverifyOtp);
 routes.post("/verifyOTP", usercontroller.verifyOTP);
 routes.post("/resend-otp", usercontroller.resendOTP);
+routes.get('/welcome',usercontroller.welcome)
+// routes.get('/logout',usercontroller.logout)
+routes.post('/logout',usercontroller.logout);
 
 routes.post('/login',usercontroller.login)
 // Google OAuth routes
