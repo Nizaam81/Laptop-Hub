@@ -6,6 +6,7 @@ const session = require('express-session');
 const passport = require('./config/passport');
 const connectDB = require('./config/db');
 
+
 const app = express();
 connectDB();
 
@@ -37,4 +38,5 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/user', user);
 app.use('/admin',admin);
+
 app.listen(3001, () => console.log('Server is running on port 3001'));

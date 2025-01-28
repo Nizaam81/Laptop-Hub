@@ -54,6 +54,21 @@ const loadhome = async(req,res)=>{
     
    
 }
+const logout = async(req,res)=>{
+    try {
+        req.session.destroy((err)=>{
+           if(err){
+            console.log("session destruction error",err.message)
+            res.redirect("user/pageNotfound");
+           }
+           return res.redirect('/admin/login')
+        })
+    } catch (error) {
+        console.log("logout error",error );
+        res.redirect("user/pageNotfound")
+    }
+  }
+  
 
 
-module.exports={loadlogin,loadhome,login};
+module.exports={loadlogin,loadhome,login,logout};

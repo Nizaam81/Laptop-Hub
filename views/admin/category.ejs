@@ -1,0 +1,300 @@
+<%- include("partials/header.ejs") %>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-left: 390px;
+        }
+        h1 {
+            color: #0653cc;
+            text-align: center;
+        }
+        .form-container {
+            display: none;
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #0653cc;
+            color: white;
+        }
+        button {
+            padding: 8px 16px;
+            font-size: 14px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        .add-btn {
+            background-color: #0653cc;
+            margin-bottom: 20px;
+        }
+        .list-btn {
+            background-color: #28a745;
+        }
+        .unlist-btn {
+            background-color: #dc3545;
+        }
+        .edit-btn {
+            background-color: #ffc107;
+            color: black;
+        }
+        .submit-btn {
+            background-color: #0653cc;
+        }
+        .pagination a {
+    text-decoration: none;
+    margin: 0 5px;
+}
+        .pagination .active button {
+    background-color: #043584;
+    cursor: not-allowed;
+}.pagination button {
+    background-color: #0653cc;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.delete-btn {
+    background-color: #dc3545;
+    color: white;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Category Management</h1>
+        <button class="add-btn" onclick="showAddForm()">Add Category</button>
+        
+        <!-- Add/Edit Form -->
+        <div id="categoryForm" class="form-container">
+            <h2 id="formTitle">Add Category</h2>
+            <form id="categoryForm" onsubmit="handleSubmit(event)">
+                <input type="hidden" id="categoryId">
+                <div class="form-group">
+                    <label for="name">Category Name:</label>
+                    <input type="text" id="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description:</label>
+                    <textarea id="description" required></textarea>
+                </div>
+                <button type="submit" class="submit-btn">Submit</button>
+            </form>
+        </div>
+
+        <!-- Categories Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Category Name</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="categoryTableBody">
+                <% categories.forEach(function(category) { %>
+                <tr data-id="<%= category._id %>">
+                    <td><%= category.name %></td>
+                    <td><%= category.description %></td>
+                    <td class="status"><%= category.isListed ? 'Active' : 'Inactive' %></td>
+                    <td>
+                        <button class="<%= category.isListed ? 'list-btn' : 'unlist-btn' %>" 
+                                onclick="toggleList('<%= category._id %>')">
+                            <%= category.isListed ? 'Unlist' : 'List' %>
+                        </button>
+                        <button class="edit-btn" onclick="showEditForm('<%= category._id %>')">Edit</button>
+                        <button class="delete-btn" onclick="deleteCategory('<%= category._id %>')">Delete</button>
+                    </td>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+
+       <!-- Pagination -->
+<div class="pagination">
+  <% for(let i = 1; i <= totalPages; i++) { %>
+      <a href="/admin/category?page=<%= i %>" 
+         class="<%= currentPage == i ? 'active' : '' %>">
+          <button <%= currentPage == i ? 'disabled' : '' %>>
+              <%= i %>
+          </button>
+      </a>
+  <% } %>
+</div>
+    <script>
+        function showAddForm() {
+            const form = document.getElementById('categoryForm');
+            document.getElementById('formTitle').textContent = 'Add Category';
+            document.getElementById('categoryId').value = '';
+            document.getElementById('name').value = '';
+            document.getElementById('description').value = '';
+            form.style.display = 'block';
+        }
+
+        function showEditForm(categoryId) {
+            const form = document.getElementById('categoryForm');
+            document.getElementById('formTitle').textContent = 'Edit Category';
+            document.getElementById('categoryId').value = categoryId;
+            
+            // Get category data from the table
+            const row = document.querySelector(`tr[data-id="${categoryId}"]`);
+            document.getElementById('name').value = row.cells[0].textContent;
+            document.getElementById('description').value = row.cells[1].textContent;
+            
+            form.style.display = 'block';
+        }
+
+        async function handleSubmit(event) {
+            event.preventDefault();
+            const categoryId = document.getElementById('categoryId').value;
+            const name = document.getElementById('name').value;
+            const description = document.getElementById('description').value;
+
+            try {
+                const url = categoryId ? '/admin/category/update' : '/admin/category/add';
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        id: categoryId,
+                        name,
+                        description
+                    }),
+                });
+
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    const data = await response.json();
+                    alert(data.error || 'Something went wrong');
+                }
+            } catch (error) {
+                alert('An error occurred');
+            }
+        }
+
+        async function toggleList(categoryId) {
+            try {
+                const response = await fetch('/admin/category/toggle-status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ id: categoryId }),
+                });
+
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Failed to update status');
+                }
+            } catch (error) {
+                alert('An error occurred');
+            }
+        }
+
+        function changePage(page) {
+            window.location.href = `/admin/category?page=${page}`;
+        }
+
+        async function deleteCategory(categoryId) {
+    const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#0653cc',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            const response = await fetch('/admin/category/delete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id: categoryId }),
+            });
+
+            if (response.ok) {
+                await Swal.fire({
+                    title: 'Deleted!',
+                    text: 'Category has been deleted.',
+                    icon: 'success',
+                    confirmButtonColor: '#0653cc'
+                });
+                window.location.reload();
+            } else {
+                const data = await response.json();
+                await Swal.fire({
+                    title: 'Error!',
+                    text: data.error || 'Failed to delete category',
+                    icon: 'error',
+                    confirmButtonColor: '#0653cc'
+                });
+            }
+        } catch (error) {
+            await Swal.fire({
+                title: 'Error!',
+                text: 'An error occurred',
+                icon: 'error',
+                confirmButtonColor: '#0653cc'
+            });
+        }
+    }
+}
+    </script>
+</body>
+</html>
+
+
+<%- include("partials/footer.ejs") %>

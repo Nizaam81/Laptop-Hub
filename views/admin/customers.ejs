@@ -1,0 +1,320 @@
+<%- include("partials/header.ejs") %>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+        }
+
+        /* Dashboard layout */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            width: 250px;
+            background-color: #1a1c23;
+            color: white;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            transform: translateX(-100%);
+            animation: slideIn 0.6s forwards;
+        }
+
+        /* Main content area */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+            background-color: #f0f2f5;
+        }
+
+        .content-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 52px;
+            margin-top: 32px;
+            margin-left: 40px;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        /* Search bar styles */
+        .search-bar {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .search-button {
+            padding: 8px 16px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .search-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Table styles */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            min-width: 800px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            color: #333;
+            font-weight: 600;
+        }
+
+        tr {
+            opacity: 0;
+            animation: fadeInRow 0.5s ease-in-out forwards;
+        }
+
+        tr:nth-child(1) { animation-delay: 0.2s; }
+        tr:nth-child(2) { animation-delay: 0.4s; }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* Button styles */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-block {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-unblock {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: scale(1.1);
+            opacity: 0.9;
+        }
+
+        /* Status styles */
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .status-active {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-blocked {
+            background-color: #ffebee;
+            color: #c62828;
+        }  .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .pagination button {
+        padding: 8px 16px;
+        border: 1px solid #ddd;
+        background-color: white;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+
+    .pagination button.active {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+
+    .pagination button:hover:not(.active) {
+        background-color: #f0f0f0;
+    }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+
+        @keyframes fadeInRow {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 10px;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .content-container {
+                margin-top: 10px;
+                padding: 15px;
+            }
+
+            .search-input {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="main-content">
+            <div class="content-container">
+                <h1>Customer Management System</h1>
+    
+                <!-- Search form -->
+                <form action="/admin/users" method="GET" class="search-bar">
+                    <input 
+                        type="text" 
+                        name="search" 
+                        class="search-input" 
+                        placeholder="Search customers by name, email, or phone"
+                        value="<%= search %>"
+                    >
+                    <button type="submit" class="search-button">Search</button>
+                </form>
+    
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone Number</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (users && users.length > 0) { %>
+                                <% users.forEach(user => { %>
+                                    <tr>
+                                        <td><%= user.FirstName %> <%= user.LastName %></td>
+                                        <td><%= user.email %></td>
+                                        <td><%= user.phone %></td>
+                                        <td>
+                                            <span class="status <%= user.isBlocked ? 'status-blocked' : 'status-active' %>">
+                                                <%= user.isBlocked ? 'Blocked' : 'Active' %>
+                                            </span>
+                                        </td>
+                                        <td class="action-buttons">
+                                            <% if (!user.isBlocked) { %>
+                                                <form action="/admin/block-user/<%= user._id %>" method="POST" style="display: inline;">
+                                                    <button type="submit" class="btn btn-block">Block</button>
+                                                </form>
+                                            <% } else { %>
+                                                <form action="/admin/unblock-user/<%= user._id %>" method="POST" style="display: inline;">
+                                                    <button type="submit" class="btn btn-unblock">Unblock</button>
+                                                </form>
+                                            <% } %>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="5" style="text-align: center;">No customers found</td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+    
+                <!-- Pagination -->
+                <div class="pagination">
+                    <% if (totalPages > 1) { %>
+                        <% if (currentPage > 1) { %>
+                            <a href="/admin/users?page=<%= currentPage - 1 %>&search=<%= search %>">
+                                <button>&laquo; Previous</button>
+                            </a>
+                        <% } %>
+                        
+                        <% for(let i = 1; i <= totalPages; i++) { %>
+                            <a href="/admin/users?page=<%= i %>&search=<%= search %>">
+                                <button class="<%= currentPage === i ? 'active' : '' %>"><%= i %></button>
+                            </a>
+                        <% } %>
+                        
+                        <% if (currentPage < totalPages) { %>
+                            <a href="/admin/users?page=<%= currentPage + 1 %>&search=<%= search %>">
+                                <button>Next &raquo;</button>
+                            </a>
+                        <% } %>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <%- include("partials/footer.ejs") %>
+
