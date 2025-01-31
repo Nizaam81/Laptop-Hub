@@ -3,7 +3,7 @@ const passport = require("passport");
 const routes = express.Router();
 const usercontroller = require("../controller/user/usercontroller");
 
-// Regular authentication routes
+
 routes.get("/pageNotfound", usercontroller.pageNotfound);
 routes.get("/home", usercontroller.loadHomepage);
 routes.get("/login", usercontroller.loadlogin);
@@ -13,8 +13,12 @@ routes.get("/verifyOtp", usercontroller.loadverifyOtp);
 routes.post("/verifyOTP", usercontroller.verifyOTP);
 routes.post("/resend-otp", usercontroller.resendOTP);
 routes.get('/welcome',usercontroller.welcome)
-// routes.get('/logout',usercontroller.logout)
+
 routes.post('/logout',usercontroller.logout);
+
+
+routes.get("/productsDetails",usercontroller.loadproductDetails)
+routes.get("/productView",usercontroller.loadproductView)
 
 routes.post('/login',usercontroller.login)
 // Google OAuth routes

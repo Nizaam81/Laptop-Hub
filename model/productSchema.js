@@ -1,59 +1,53 @@
-const mongoose=require("mongoose")
-const {Schema}=mongoose;
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
-const productSchema=new Schema({
-    productName:{
-        type:String,
-        required:true,
+const productSchema = new Schema({
+    name: {
+        type: String,
+        required: true,
     },
-    description:{
-        type:String,
-        required:true,
+    description: {
+        type: String,
+        required: true,
     },
-    brand:{
-        type:String,
-        required:true,
+    brand: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Brand',
+        required: true,
     },
-    category:{
-        type:Schema.Types.ObjectId,
-        ref:"category",
-        required:true,
+    category: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'category',
+        required: true,
     },
-    regularPrice:{
-        type:number,
-        required:true,
+    regularPrice: {
+        type: Number,
+        required: true,
     },
-    salePrice:{
-        type:Number,
-        required:true
+    salePrice: {
+        type: Number,
     },
-    productOffer:{
-        type:Number,
-        default:0,
+    productOffer: {
+        type: String,
     },
-    quantity:{
-        type:Number,
-        default:true
+    quantity: {
+        type: Number,
+        required: true,
     },
-    color:{
-        type:String,
-        required:true,
-    },
-    producrImage:{
-        type:[string],
-        required:true,
-    },
-    isBlock:{
-        type:Boolean,
-        default:false,
-    },
-    status:{
-        type:string,
-        enum:["availabe","out of stock","Discountinued"],
-        require:true,
-        default:"Available",
-    },
-    
-},{timestamp:true})
-const product=mongoose.model("product",productSchema)
-module.export=product;
+    images: [{
+        type: String,
+        required: true,
+    }],
+    variants: [{
+        color: String,
+        quantity: Number,
+    }],
+    isBlocked: {
+        type: Boolean,
+        default: false,
+    }
+ 
+},{timestamp:true});
+
+const Product = mongoose.model("Product", productSchema);
+module.exports = Product;

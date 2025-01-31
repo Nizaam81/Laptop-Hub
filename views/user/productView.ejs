@@ -1,0 +1,169 @@
+<%- include('partials/head') %>
+    
+<%- include('partials/header') %> 
+
+<style>
+    .product-images {
+      display: flex;
+      gap: 20px;
+    }
+    
+    .thumbnail-gallery {
+      width: 80px;
+    }
+    
+    .thumbnail-item img {
+      width: 100%;
+      border: 1px solid #ddd;
+      cursor: pointer;
+      transition: border-color 0.3s;
+    }
+    
+    .thumbnail-item img:hover {
+      border-color: #2874f0;
+    }
+    
+    .main-image-container {
+      flex-grow: 1;
+    }
+    
+    .main-product-image {
+      width: 100%;
+      max-width: 500px;
+    }
+    
+    .product-title {
+      font-size: 1.5rem;
+      color: #212121;
+    }
+    
+    .current-price {
+      font-size: 28px;
+      font-weight: 500;
+    }
+    
+    .offers-list {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .offer-item {
+      margin-bottom: 8px;
+    }
+    
+    .offer-item i {
+      margin-right: 8px;
+    }
+    
+    .action-buttons {
+      margin-top: 20px;
+    }
+    
+    .add-to-cart, .buy-now {
+      padding: 15px 45px;
+      font-size: 16px;
+      text-transform: uppercase;
+    }
+    </style>
+<% products.forEach(element => { %>
+    <div class="container-fluid mt-4">
+      <div class="breadcrumb">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item"><a href="/products">Products</a></li>
+            <li class="breadcrumb-item active" aria-current="page"><%= element.name %></li>
+          </ol>
+        </nav>
+      </div>
+    
+      <div class="row">
+        <!-- Left Column - Image Gallery -->
+        <div class="col-md-5">
+          <div class="product-images">
+            <!-- Thumbnail Gallery -->
+            <div class="thumbnail-gallery">
+              <% element.images.forEach((image, index) => { %>
+                <div class="thumbnail-item mb-2">
+                  <img src="<%= image %>" 
+                       alt="Product view <%= index + 1 %>"
+                       class="img-fluid thumbnail"
+                       onclick="updateMainImage(this.src)">
+                </div>
+              <% }) %>
+            </div>
+            
+            <!-- Main Image -->
+            <div class="main-image-container">
+              <img src="<%= element.images[0] %>" 
+                   id="mainImage"
+                   alt="<%= element.name %>"
+                   class="img-fluid main-product-image">
+            </div>
+          </div>
+        </div>
+    
+        <!-- Right Column - Product Details -->
+        <div class="col-md-7">
+          <div class="product-details ps-4">
+            <h1 class="product-title mb-2"><%= element.name %></h1>
+            
+            <!-- Ratings -->
+            <div class="ratings mb-3">
+              <span class="badge bg-success"><%= element.rating %> ★</span>
+              <span class="text-muted ms-2"><%= element.reviews %> Reviews</span>
+            </div>
+    
+            <!-- Price Section -->
+            <div class="pricing mb-4">
+              <h2 class="current-price">₹<%= element.salePrice %></h2>
+              <span class="original-price text-muted"><del>₹<%= element.regularPrice %></del></span>
+              <span class="discount text-success ms-2"><%= element.discount %>% off</span>
+            </div>
+    
+            <!-- Available Offers -->
+            <div class="offers-section mb-4">
+              <h6 class="text-muted">Available offers</h6>
+              <ul class="offers-list">
+                <li class="offer-item">
+                  <i class="fas fa-tag text-success"></i>
+                  <span>Bank Offer 5% Unlimited Cashback</span>
+                </li>
+                <li class="offer-item">
+                  <i class="fas fa-tag text-success"></i>
+                  <span>Special Price Get extra 10% off</span>
+                </li>
+              </ul>
+            </div>
+    
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+              <button class="btn btn-warning btn-lg me-2 add-to-cart">
+                <i class="fas fa-shopping-cart"></i> ADD TO CART
+              </button>
+              <button class="btn btn-success btn-lg buy-now">
+                <i class="fas fa-bolt"></i> BUY NOW
+              </button>
+            </div>
+    
+            <!-- Product Description -->
+            <div class="description mt-4">
+              <h6 class="text-muted">Description</h6>
+              <p><%= element.description %></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% }) %>
+
+    
+<script>
+    function updateMainImage(src) {
+      document.getElementById('mainImage').src = src;
+    }
+    </script
+
+
+
+<%- include('partials/footer') %>

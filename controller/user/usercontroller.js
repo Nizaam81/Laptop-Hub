@@ -2,6 +2,7 @@ const user=require('../../model/usersSchema')
 const nodemailer = require('nodemailer')
 const env=require('dotenv').config()
 const bcrypt = require('bcryptjs');
+const product = require("../../model/productSchema");
 
 
 
@@ -87,8 +88,10 @@ const pageNotfound = async(req,res)=>{
 
 const loadHomepage = async (req, res) => {
     try {
-        res.render("user/home", { 
-        });
+        const User=await user.findOne({_id:req.session.user})
+      const Products = await product.find({ isBlocked: false });
+        res.render('user/home', {User,Products});
+        console.log(User)
     } catch (error) {
         console.error("Home page error:", error);
         res.status(500).send("Internal Server Error");
@@ -309,7 +312,7 @@ const login = async (req, res) => {
         
         const findUser = await user.findOne({ isVerified: true,  email:  email });
         if (!findUser) {
-            return res.render("user/login", { message: "User not found" });
+            return res.render("user/login", { message: "User not found"  });
         }
         
         if (findUser.isBlocked) {
@@ -353,8 +356,30 @@ const welcome = async (req, res) => {
         res.redirect("user/pageNotfound")
     }
   }
+
+  const loadproductDetails = async(req,res)=>{
+    try {
+        const Products=await product.find({isBlocked:false})
+        const User=req.session.user
+       
+        res.render("user/ProductsDetails",{User,Products})
+    } catch (error) {
+        console.log("erro")
+    }
+  }
+
+  const loadproductView = async(req,res)=>{
+    try {
+        const products = await product.find({ isBlocked: false });
+        const User = req.session.user
+        res.render("user/productView",{User,products})
+    } catch (error) {
+        console.error(error.message)
+        res.render("user/pageNotfound")
+    }
+  } 
   
 
 
 module.exports = {loadHomepage,loadlogin,loadsignup,pageNotfound,signup,loadverifyOtp, resendOTP,
-    verifyOTP,login,welcome,logout}
+    verifyOTP,login,welcome,logout,loadproductDetails,loadproductView}
