@@ -13,15 +13,15 @@ const upload = require("../utils/multer/uploads");
 
 
 
-routes.get("/login",admincontroller.loadlogin)
-routes.post('/login',admincontroller.login)
+routes.get("/login",adminMiddleware.adminAuth,admincontroller.loadlogin)
+routes.post('/login',adminMiddleware.adminAuth,admincontroller.login)
 routes.get('/home',adminMiddleware.adminAuth,admincontroller.loadhome)
-routes.get('/logout',admincontroller.logout);
+routes.get('/logout',adminMiddleware.adminAuth,admincontroller.logout);
 
 // customer manegement 
 routes.get("/users",adminMiddleware.adminAuth,customerController.customerInfo)
-routes.post('/block-user/:userId', customerController.blockUser);
-routes.post('/unblock-user/:userId', customerController.unblockUser);
+routes.post('/block-user/:userId',adminMiddleware.adminAuth, customerController.blockUser);
+routes.post('/unblock-user/:userId',adminMiddleware.adminAuth, customerController.unblockUser);
 
 
 //category management

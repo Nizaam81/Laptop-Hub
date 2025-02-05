@@ -246,6 +246,14 @@
 
         .signup-link a:hover {
             color: #1d4ed8;
+        }  .toggle-password {
+            position: absolute;
+            right: 46px;
+            top: 42%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 18px;
+            color: #666;
         }
 
         @media (max-width: 768px) {
@@ -292,6 +300,7 @@
                 <div class="form-group">
                     <label for="password">Password</label>
                     <input type="password" name="password" id="password" required placeholder="Enter your password">
+                    <span class="toggle-password" onclick="togglePassword()">👁️</span>
                 </div>
                 <%   if(locals.message && message.length>0){ %>
                     <div class="alert alert-danger text-centre">
@@ -356,6 +365,18 @@
         }
     });
 });
+function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.querySelector('.toggle-password');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.textContent = '👁️‍🗨️';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.textContent = '👁️';
+            }
+        }
     </script>
 </body>
 </html>
