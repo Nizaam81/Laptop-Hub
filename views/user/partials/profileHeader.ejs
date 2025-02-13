@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #ffffff, #ffffff);
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: fixed;  /* ✅ Sidebar stays fixed */
+            left: 0;
+            top: 0;
+            bottom: 0;
+            overflow-y: auto; /* ✅ Enables scrolling if needed */
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #6200ea;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .username {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .menu {
+            width: 100%;
+            list-style: none;
+            padding: 0;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            text-decoration: none;
+            color: #333;
+            font-size: 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease-in-out;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
+        .option i {
+            margin-right: 12px;
+            font-size: 18px;
+        }
+
+        .option:hover {
+            background: #14203C;
+            color: white;
+        }
+
+        .logout {
+            background: #ff4d4d;
+            color: white;
+        }
+
+        .logout:hover {
+            background: #e60000;
+        }
+
+        /* Content Section */
+        .content {
+    flex: 1;
+    padding: 30px;
+    margin-left: 250px; /* Ensures content is pushed correctly */
+    color: rgb(0, 0, 0);
+    font-size: 24px;
+    width: calc(100% - 250px);
+    display: block; /* Change from flex to block */
+}
+
+
+        /* Mobile Responsive Sidebar */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+                padding: 10px;
+            }
+            .username {
+                display: none;
+            }
+            .option {
+                justify-content: center;
+                font-size: 0;
+            }
+            .option i {
+                font-size: 22px;
+                margin: 0;
+            }
+            .content {
+                margin-left: 70px; /* ✅ Adjust content width when sidebar is smaller */
+                width: calc(100% - 70px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="profile-header">
+            <div class="profile-image"><%= firstLetter %></div>
+            <div class="username"><%= users.FirstName %><%= users.LastName %></div>
+        </div>
+        <ul class="menu">
+            <li><a href="userprofile" class="option"><i class="fas fa-home"></i> Account</a></li>
+            <li><a href="address" class="option"><i class="fas fa-map-marker-alt"></i> Address</a></li>
+            <li><a href="#" class="option"><i class="fas fa-list"></i> Orders</a></li>
+            <li><a href="#" class="option"><i class="fas fa-heart"></i> Wishlist</a></li>
+            <li><a href="#" class="option"><i class="fas fa-lock"></i> Password</a></li>
+            <li><a href="#" class="option"><i class="fas fa-wallet"></i> Wallet</a></li>
+            <li><a href="#" class="option"><i class="fas fa-percent"></i> Coupons</a></li>
+            <li><a href="/user/logout" class="option logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+    </div>
+</body>
+</html>

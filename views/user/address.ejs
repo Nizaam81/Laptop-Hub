@@ -1,0 +1,258 @@
+<%- include("partials/profileHeader.ejs") %>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            background: #f5f6f8;
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            overflow-y: auto;
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #6200ea;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .username {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .menu {
+            width: 100%;
+            list-style: none;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            text-decoration: none;
+            color: #333;
+            font-size: 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease-in-out;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
+        .option i {
+            margin-right: 12px;
+            font-size: 18px;
+        }
+
+        .option:hover {
+            background: #14203C;
+            color: white;
+        }
+
+        .logout {
+            background: #ff4d4d;
+            color: white;
+        }
+
+        .logout:hover {
+            background: #e60000;
+        }
+
+        /* Content Section */
+        .content {
+            flex: 1;
+            padding: 30px;
+            margin-left: 250px; /* Push content to the right of sidebar */
+            width: calc(100% - 250px);
+        }
+
+        .container {
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            width: 100%;
+        }
+
+        .profile-card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .add-btn {
+            background-color: #14203C;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 14px;
+            width: 100%;
+            cursor: pointer;
+            text-align: center;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .add-btn:hover {
+            background-color: #101830;
+        }
+
+        .address-list {
+            margin-top: 20px;
+        }
+
+        .address-item {
+            background-color: white;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            position: relative;
+        }
+
+        .home-badge {
+            background-color: #e0e0e0;
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+
+        .address-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .address-contact {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .address-text {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .address-text strong {
+            color: black;
+        }
+
+        .menu {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            cursor: pointer;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+                padding: 10px;
+            }
+            .username {
+                display: none;
+            }
+            .option {
+                justify-content: center;
+                font-size: 0;
+            }
+            .option i {
+                font-size: 22px;
+                margin: 0;
+            }
+            .content {
+                margin-left: 70px;
+                width: calc(100% - 70px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        
+        <div class="profile-header">
+            <div class="profile-image"><%= firstLetter %></div>
+            <div class="username"><%= users.FirstName %> <%= users.LastName %></div>
+        </div>
+        <ul class="menu">
+            <li><a href="userprofile" class="option"><i class="fas fa-home"></i> Account</a></li>
+            <li><a href="address" class="option"><i class="fas fa-map-marker-alt"></i> Address</a></li>
+            <li><a href="#" class="option"><i class="fas fa-list"></i> Orders</a></li>
+            <li><a href="#" class="option"><i class="fas fa-heart"></i> Wishlist</a></li>
+            <li><a href="#" class="option"><i class="fas fa-lock"></i> Password</a></li>
+            <li><a href="#" class="option"><i class="fas fa-wallet"></i> Wallet</a></li>
+            <li><a href="#" class="option"><i class="fas fa-percent"></i> Coupons</a></li>
+            <li><a href="/user/logout" class="option logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <div class="container">
+            <div class="profile-card">
+                <h2>Manage Addresses</h2>
+                <a href="addAddress"><button class="add-btn">+ ADD A NEW ADDRESS</button></a>  
+                <div class="address-list">
+                    <div class="address-item">
+                        <span class="home-badge">HOME</span>
+                        <div class="menu">⋮</div>
+                        <div class="address-name">Nizam Ashraf <span class="address-contact">8943136698</span></div>
+                        <div class="address-text">
+                            Noora restaurant road, East Ottapalam, Ottapalam, Kerala - <strong>679101</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

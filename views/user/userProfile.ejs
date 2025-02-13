@@ -1,0 +1,87 @@
+<%- include("partials/profileHeader.ejs") %>
+    <title>User Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            background: #f8f9fc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .profile-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .profile-header {
+            font-size: 18px;
+            font-weight: 700; /* Bold */
+            text-align: left;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .profile-name {
+            font-size: 22px;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+        .profile-info {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        .profile-info i {
+            color: #333;
+        }
+        .buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .btn {
+            background: #1a2b50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.3s ease;
+        }
+        .btn:hover {
+            background: #14203c;
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <div class="profile-header">User Profile</div>
+     
+        <div class="profile-name"><%= users.FirstName %><%= users.LastName %></div>
+        <div class="profile-info">
+            <i class="fa fa-phone"></i>
+            <i class="fa fa-envelope"></i>  <%= users.email %>
+        </div>
+        <div class="buttons">
+            <button class="btn">Change Email</button>
+            <button class="btn">Change Password</button>
+        </div>
+    </div>
+</body>
+</html>

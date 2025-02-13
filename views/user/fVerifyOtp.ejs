@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            animation: fadeIn 1s ease-in-out;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 350px;
+            border: 2px solid #0056D2;
+            animation: fadeIn 1s ease-in-out;
+        }
+        .container img {
+            width: 80px;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+        .container h2 {
+            margin: 10px 0;
+            font-size: 22px;
+        }
+        input {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 18px;
+        }
+        .timer {
+            color: red;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        button {
+            background-color: #0056D2;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease-in-out;
+        }
+        button:hover {
+            background-color: #003f9a;
+        }
+        button:disabled {
+            background-color: gray;
+            cursor: not-allowed;
+        }
+        .back {
+            display: block;
+            margin-top: 10px;
+            color: #0056D2;
+            text-decoration: none;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://cdn-icons-png.flaticon.com/512/3064/3064197.png" alt="OTP Icon">
+        <h2>Verify OTP</h2>
+        
+        <p>Enter the 6-digit OTP sent to your email</p>
+        <form id="otpVerificationForm">
+            <input type="text" maxlength="6" placeholder="Enter OTP" id="otpInput" pattern="[0-9]{6}" required>
+            <div class="timer" id="timer">01:00</div>
+            <button type="submit" id="verifyBtn">Verify</button>
+            <button type="button" id="resendBtn" disabled>Resend OTP</button>
+        </form>
+        <a href="/user/login" class="back">Back to Login</a>
+    </div>
+   
+    <script>
+      let timeLeft = 60;
+const timerElement = document.getElementById('timer');
+const resendBtn = document.getElementById('resendBtn');
+const verifyBtn = document.getElementById('verifyBtn');
+const otpInput = document.getElementById('otpInput');
+const form = document.getElementById('otpVerificationForm');
+let timerInterval;
+
+function startTimer() {
+    clearInterval(timerInterval);
+    timeLeft = 60;
+    resendBtn.disabled = true;
+    
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            resendBtn.disabled = false;
+            timerElement.textContent = "Time expired!";
+            verifyBtn.disabled = true; // Disable verify button when OTP expires
+        }
+    }, 1000);
+}
+
+// Start timer when page loads
+startTimer();
+
+// Handle form submission
+form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const otp = otpInput.value.trim();
+
+    // Validate OTP format
+    if (!/^\d{6}$/.test(otp)) {
+        Swal.fire({
+            icon: "warning",
+            title: "Invalid OTP",
+            text: "Please enter a valid 6-digit OTP.",
+        });
+        return;
+    }
+
+    try {
+        const response = await fetch('/user/verifyreset-otp', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify({ otp })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            // Show success message and redirect
+            Swal.fire({
+                icon: "success",
+                title: "OTP Verified",
+                text: data.message,
+                confirmButtonText: "Proceed"
+            }).then(() => {
+                window.location.href = '/user/setPassword';
+            });
+        } else {
+            // Show error message
+            Swal.fire({
+                icon: "error",
+                title: "Verification Failed",
+                text: data.message
+            });
+
+            if (data.message.includes('expired')) {
+                // Clear input and disable verify button if OTP expired
+                otpInput.value = '';
+                verifyBtn.disabled = true;
+            }
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "An error occurred while verifying OTP. Please try again later."
+        });
+    }
+});
+
+// Handle resend button
+resendBtn.addEventListener('click', async () => {
+    try {
+        const response = await fetch('/user/resend-otp', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'same-origin'
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            Swal.fire({
+                icon: "success",
+                title: "OTP Resent",
+                text: "A new OTP has been sent successfully."
+            });
+            startTimer();
+            verifyBtn.disabled = false;
+            otpInput.value = '';
+        } else {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: data.message
+            });
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "An error occurred while resending OTP. Please try again."
+        });
+    }
+});
+
+// Enable verify button when OTP input is 6 digits
+otpInput.addEventListener('input', () => {
+    verifyBtn.disabled = !/^\d{6}$/.test(otpInput.value.trim());
+});
+
+    </script>
+</body>
+</html>

@@ -1,7 +1,6 @@
 <%- include('partials/head') %>
     
 <%- include('partials/header') %> 
-
 <style>
     .product-images {
       display: flex;
@@ -64,15 +63,49 @@
       font-size: 16px;
       text-transform: uppercase;
     }
+    .main-image-container { /*main image container */
+    position: relative;
+    width: 400px; 
+}
+
+.main-product-image {
+    width: 100%;
+}
+
+.zoom-lens {
+    position: absolute;
+    width: 100px; /* Adjust lens size */
+    height: 100px;
+    border: 2px solid #000;
+    background: rgba(255, 255, 255, 0.3);
+    pointer-events: none;
+    display: none;
+}
+
+.zoom-result {
+    width: 400px; /* Adjust size */
+    height: 400px;
+    border: 1px solid #ddd;
+    background-repeat: no-repeat;
+    display: none;
+    position: absolute;
+    left: calc(100% + 20px); /* Moves it to the right side */
+    top: 0;
+    z-index: 100;
+    background-color: white; /* Ensure the zoom background is clean */
+}
+
+
+
     </style>
-<% products.forEach(element => { %>
+
     <div class="container-fluid mt-4">
       <div class="breadcrumb">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/">Home</a></li>
             <li class="breadcrumb-item"><a href="/products">Products</a></li>
-            <li class="breadcrumb-item active" aria-current="page"><%= element.name %></li>
+            <li class="breadcrumb-item active" aria-current="page"><%= products.name %></li>
           </ol>
         </nav>
       </div>
@@ -83,7 +116,7 @@
           <div class="product-images">
             <!-- Thumbnail Gallery -->
             <div class="thumbnail-gallery">
-              <% element.images.forEach((image, index) => { %>
+              <% products.images.forEach((image, index) => { %>
                 <div class="thumbnail-item mb-2">
                   <img src="<%= image %>" 
                        alt="Product view <%= index + 1 %>"
@@ -95,46 +128,36 @@
             
             <!-- Main Image -->
             <div class="main-image-container">
-              <img src="<%= element.images[0] %>" 
+              <div class="zoom-lens"></div>
+              <img src="<%= products.images[0] %>" 
                    id="mainImage"
-                   alt="<%= element.name %>"
+                   alt="<%= products.name %>"
                    class="img-fluid main-product-image">
-            </div>
+              <div class="zoom-result"></div> <!-- Add this if missing -->
+          </div>
+          
           </div>
         </div>
     
         <!-- Right Column - Product Details -->
         <div class="col-md-7">
           <div class="product-details ps-4">
-            <h1 class="product-title mb-2"><%= element.name %></h1>
+            <h1 class="product-title mb-2"><%= products.name %></h1>
             
             <!-- Ratings -->
             <div class="ratings mb-3">
-              <span class="badge bg-success"><%= element.rating %> ★</span>
-              <span class="text-muted ms-2"><%= element.reviews %> Reviews</span>
+              <span class="badge bg-success"><%= products.rating %> ★</span>
+              <span class="text-muted ms-2"><%= products.reviews %> Reviews</span>
             </div>
     
             <!-- Price Section -->
             <div class="pricing mb-4">
-              <h2 class="current-price">₹<%= element.salePrice %></h2>
-              <span class="original-price text-muted"><del>₹<%= element.regularPrice %></del></span>
-              <span class="discount text-success ms-2"><%= element.discount %>% off</span>
+              <h2 class="current-price">₹<%= products.salePrice %></h2>
+              <del class="text-muted">₹<%= products.regularPrice %></del>
+              <span class="text-success ms-2"><%= products.discount %>% off</span>
             </div>
     
-            <!-- Available Offers -->
-            <div class="offers-section mb-4">
-              <h6 class="text-muted">Available offers</h6>
-              <ul class="offers-list">
-                <li class="offer-item">
-                  <i class="fas fa-tag text-success"></i>
-                  <span>Bank Offer 5% Unlimited Cashback</span>
-                </li>
-                <li class="offer-item">
-                  <i class="fas fa-tag text-success"></i>
-                  <span>Special Price Get extra 10% off</span>
-                </li>
-              </ul>
-            </div>
+           
     
             <!-- Action Buttons -->
             <div class="action-buttons">
@@ -148,20 +171,78 @@
     
             <!-- Product Description -->
             <div class="description mt-4">
-              <h6 class="text-muted">Description</h6>
-              <p><%= element.description %></p>
+              <h6>Description</h6>
+              <p class="mt-2"><%= products.description %></p>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <% }) %>
+
 
     
 <script>
     function updateMainImage(src) {
       document.getElementById('mainImage').src = src;
     }
+
+    //flipkart zoom like that
+ 
+function updateMainImage(src) {
+    const mainImage = document.getElementById('mainImage');
+    mainImage.src = src;
+    
+    // Update high-res image source
+    mainImage.setAttribute('data-highres', src);
+    
+    // Reset zoom display
+    const zoomLens = document.querySelector(".zoom-lens");
+    const zoomResult = document.querySelector(".zoom-result");
+    zoomLens.style.display = "none";
+    zoomResult.style.display = "none";
+}
+
+// Zoom functionality
+const mainImage = document.getElementById("mainImage");
+const zoomLens = document.querySelector(".zoom-lens");
+const zoomResult = document.querySelector(".zoom-result");
+
+function initZoom() {
+    mainImage.addEventListener("mousemove", function (e) {
+        zoomLens.style.display = "block";
+        zoomResult.style.display = "block";
+
+        let rect = mainImage.getBoundingClientRect();
+        let x = e.clientX - rect.left;
+        let y = e.clientY - rect.top;
+
+        let lensSize = 100;
+        let zoomLevel = 2;
+
+        // Prevent lens from going out of bounds
+        x = Math.max(0, Math.min(x - lensSize / 2, rect.width - lensSize));
+        y = Math.max(0, Math.min(y - lensSize / 2, rect.height - lensSize));
+
+        zoomLens.style.left = x + "px";
+        zoomLens.style.top = y + "px";
+
+        // Get current image source
+        let highResImage = mainImage.getAttribute("data-highres") || mainImage.src;
+
+        // Update zoom result
+        zoomResult.style.backgroundImage = `url(${highResImage})`;
+        zoomResult.style.backgroundSize = rect.width * zoomLevel + "px " + rect.height * zoomLevel + "px";
+        zoomResult.style.backgroundPosition = `-${x * zoomLevel}px -${y * zoomLevel}px`;
+    });
+
+    mainImage.addEventListener("mouseleave", function () {
+        zoomLens.style.display = "none";
+        zoomResult.style.display = "none";
+    });
+}
+
+// Initialize zoom when page loads
+document.addEventListener('DOMContentLoaded', initZoom);
     </script
 
 

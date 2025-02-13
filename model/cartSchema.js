@@ -1,39 +1,40 @@
-const mongoose=require("mongoose")
-const {Schema}=mongoose;
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
-const cartSchema=new Schema({
-    userId:{
-        type:Schema.Types.ObjectId,
-        ref:"User",
-        required:true,
+const cartSchema = new Schema({
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
     },
-    items:[{
-        producrId:{
-            type:SchemaTypes.Types.ObjectId,
-            ref:"products",
-            required:true,
+    items: [{
+        productId: {  // Fixed typo (producrId → productId)
+            type: Schema.Types.ObjectId,  // Fixed incorrect SchemaTypes.Types.ObjectId
+            ref: "products",
+            required: true,
         },
-        quantity:{
-            type:Number,
-            default:1
+        quantity: {
+            type: Number,  // Fixed incorrect lowercase "number"
+            default: 1
         },
-        price:{
-            type:number,
-            required:true
+        price: {
+            type: Number,  // Fixed incorrect lowercase "number"
+            required: true
         },
-        totalPrice:{
-            type:number,
-            required:true
+        totalPrice: {
+            type: Number,  // Fixed incorrect lowercase "number"
+            required: true
         },
-        status:{
-            type:string,
-            default:"[laced"
+        status: {
+            type: String,  // Fixed incorrect lowercase "string"
+            default: "Placed"  // Fixed typo "[laced"
         },
-        cancellationReason:{
-            type:string,
-            defult:"none"
+        cancellationReason: {
+            type: String,  // Fixed incorrect lowercase "string"
+            default: "none"  // Fixed typo (defult → default)
         }
     }]
-})
-const cart=mongoose.model("cart",cartSchema)
-module.exports=cart;
+});
+
+const Cart = mongoose.model("Cart", cartSchema);  // Changed variable name to start with uppercase (convention)
+module.exports = Cart;

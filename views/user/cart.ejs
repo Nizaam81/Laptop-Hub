@@ -1,0 +1,192 @@
+<%- include("partials/profileHeader.ejs") %>
+    <title>Shopping Cart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8fdf9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .cart-container {
+            width: 60%;
+            margin: auto;
+        }
+
+        h2 {
+            text-align: left;
+        }
+
+        .cart-items {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            background: #fff;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .cart-item img {
+            width: 80px;
+            height: 80px;
+            border-radius: 5px;
+            margin-right: 15px;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-details h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .item-details p {
+            margin: 5px 0;
+            color: gray;
+        }
+
+        .price {
+            font-size: 18px;
+            color: black;
+        }
+
+        .quantity {
+            display: flex;
+            align-items: center;
+        }
+
+        .quantity button {
+            padding: 5px 10px;
+            border: none;
+            background: lightgray;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .quantity input {
+            width: 30px;
+            text-align: center;
+            border: none;
+            font-size: 16px;
+            margin: 0 5px;
+        }
+
+        .remove-btn {
+            background: red;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .price-details {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .price-details p {
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .total-price {
+            color: blue;
+            font-weight: bold;
+        }
+
+        .checkout-btn, .back-btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            font-size: 16px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .checkout-btn {
+            background: black;
+            color: white;
+        }
+
+        .back-btn {
+            background: white;
+            border: 1px solid black;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div class="cart-container">
+        <h2>Your Cart</h2>
+        
+        <div class="cart-items">
+            <div class="cart-item">
+                <img src="watch1.jpg" alt="Silverton Watch">
+                <div class="item-details">
+                    <h3>Silverton Watch</h3>
+                    <p>678adc82bb2f637a0043312a | Rolex</p>
+                    <p class="price">₹ 400</p>
+                </div>
+                <div class="quantity">
+                    <button>-</button>
+                    <input type="text" value="1">
+                    <button>+</button>
+                </div>
+                <button class="remove-btn">Remove</button>
+            </div>
+
+            <div class="cart-item">
+                <img src="watch2.jpg" alt="TELEON">
+                <div class="item-details">
+                    <h3>TELEON</h3>
+                    <p>678adc82bb2f637a0043312a | TATA</p>
+                    <p class="price">₹ 7500</p>
+                </div>
+                <div class="quantity">
+                    <button>-</button>
+                    <input type="text" value="1">
+                    <button>+</button>
+                </div>
+                <button class="remove-btn">Remove</button>
+            </div>
+
+            <div class="cart-item">
+                <img src="watch3.jpg" alt="Casio Youth">
+                <div class="item-details">
+                    <h3>Casio Youth</h3>
+                    <p>678adc82bb2f637a0043312a | Rolex</p>
+                    <p class="price">₹ 1560</p>
+                </div>
+                <div class="quantity">
+                    <button>-</button>
+                    <input type="text" value="4">
+                    <button>+</button>
+                </div>
+                <button class="remove-btn">Remove</button>
+            </div>
+        </div>
+
+        <div class="price-details">
+            <h3>PRICE DETAILS</h3>
+            <p>Shipping: <span>Free Shipping</span></p>
+            <p>Total: <span class="total-price">₹ 9460</span></p>
+            <button class="checkout-btn">Proceed To Checkout</button>
+        </div>
+
+        <button class="back-btn">Go Back to Shopping</button>
+    </div>
+</body>
+</html>

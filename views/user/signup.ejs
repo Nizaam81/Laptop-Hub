@@ -389,9 +389,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (isFnameValid && isLnameValid && isPhoneValid && isEmailValid && isPasswordValid ) {
             Swal.fire({
-                icon: "success",
-                title: "Sign Up Successful",
-                text: "Your account has been created!",
+                icon: "verify",
+                title: "Verify",
+                text: "verify Your Account!",
                 confirmButtonText: "Okay",
             }).then(() => {
                 signUpForm.submit(); // Submit the form if everything is valid

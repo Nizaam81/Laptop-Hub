@@ -2,8 +2,50 @@
     <%- include('partials/head') %>
     
     <%- include('partials/header') %> 
-    
+     <!-- banner bg main start -->
+ <div class="banner_bg_main">
+   <!-- header top section start -->
   
+   <!-- header top section start -->
+   <!-- logo section start -->
+   <div class="logo_section">
+      <div class="container">
+         <div class="row">
+            <div class="col-sm-12">
+               <div class="logo"><a href="index.html"><img src="/images/logoL.png" style="width:66px;"></a></div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <!-- logo section end -->
+   <!-- header section start -->
+  
+   <!-- header section end -->
+   <!-- banner section start -->
+   <div class="banner_section layout_padding">
+      <div class="container">
+         <div id="my_slider" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner">
+               <div class="carousel-item active">
+                  <div class="row">
+                     <div class="col-sm-12">
+                        <h1 class="banner_taital">Get Start <br>Your favriot shoping</h1>
+                        <div class="buynow_bt"><a href="/user/ProductsDetails">Buy Now</a></div>
+                     </div>
+                  </div>
+               </div>
+               
+               
+            </div>
+           
+         </div>
+      </div>
+   </div>
+   <!-- banner section end -->
+</div>
+<!-- banner bg main end -->
+  
+    
       <!-- laptop section start -->
       <div class="fashion_section">
         <div id="main_slider" class="carousel slide" data-ride="carousel">
@@ -20,8 +62,8 @@
                                  <p class="price_text">Price  <span style="color: #262626;"><%= element.salePrice %></span></p>
                                  <div class="tshirt_img"><img src="<%=  element.images[0] %>"></div>
                                  <div class="btn_main">
-                                    <div class="buy_bt"><a href="#">Buy Now</a></div>
-                                    <div class="seemore_bt"><a href="#">See More</a></div>
+                                    <div class="buy_bt"><a href="/user/ProductsDetails">Buy Now</a></div>
+                                    <div class="seemore_bt"><a href="/user/ProductsDetails">See More</a></div>
                                  </div>
                               </div>
                            </div>

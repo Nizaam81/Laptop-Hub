@@ -2,6 +2,9 @@ const express = require("express");
 const passport = require("passport");
 const routes = express.Router();
 const usercontroller = require("../controller/user/usercontroller");
+const userProfileController= require("../controller/user/userProfileController")
+const addressController = require("../controller/user/addressController")
+const cartController = require("../controller/user/cartContoller")
 
 
 routes.get("/pageNotfound", usercontroller.pageNotfound);
@@ -14,7 +17,7 @@ routes.post("/verifyOTP", usercontroller.verifyOTP);
 routes.post("/resend-otp", usercontroller.resendOTP);
 routes.get('/welcome',usercontroller.welcome)
 
-routes.post('/logout',usercontroller.logout);
+routes.get('/logout',usercontroller.logout);
 
 
 routes.get("/productsDetails",usercontroller.loadproductDetails)
@@ -43,4 +46,33 @@ routes.get(
     res.redirect("/user/home");
   }
 );
+
+
+//forgort password
+routes.get("/forgotPassword",usercontroller.loadForgotpassword)
+routes.post('/forgotpassword',usercontroller.forgotPassword);
+routes.post('/verifyreset-otp',usercontroller.verifyForgotPasswordOTP);
+routes.post('/resetpassword',usercontroller.resetPassword);
+routes.get("/setPassword",usercontroller.newPassword)
+routes.get("/fVerifyOtp",usercontroller.loadOtp)
+
+
+//profile route
+routes.get("/profile",usercontroller.profile)
+
+//user profile 
+routes.get("/userprofile",userProfileController.userprofile)
+
+
+//address route
+routes.get("/address",addressController.loadAddress)
+routes.get("/addAddress",addressController.addAddres)
+
+
+
+//cart route
+routes.get("/cart",cartController.loadCart)
+
+
+
 module.exports = routes;

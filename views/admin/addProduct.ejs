@@ -1,0 +1,358 @@
+<%- include("partials/header.ejs") %>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+
+    <style>
+        /* Base styles */
+        body {
+            background-color: #f8f9fa;
+        }
+        .card {
+            max-width: 700px;
+            margin: auto;
+        }
+
+        /* Image preview styles */
+        .image-preview {
+            width: 100%;
+            height: 150px;
+            background-color: #e9ecef;
+            border: 2px dashed #ced4da;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Fixed modal styles */
+        #cropperModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            padding: 20px;
+        }
+
+        .cropper-container {
+            position: relative;
+            width: 90%;
+            max-width: 800px;
+            margin: 30px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .cropper-wrapper {
+            position: relative;
+            height: 60vh;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px 0;
+        }
+
+        /* Hide file input's default appearance */
+        .image-input {
+            margin-bottom: 10px;
+        }
+    </style>
+
+    <div class="container mt-5">
+        <h2 class="text-center">Add New Product</h2>
+        <div class="card p-4">
+            <form id="addProductForm" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label class="form-label">Product Name</label>
+                    <input type="text" class="form-control" id="product" placeholder="Enter product name">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Product Description</label>
+                    <textarea class="form-control" rows="3" id="description" placeholder="Enter product description"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Brand</label>
+                    <select class="form-select" id="brand">
+                        <option class="d-none">Select Brand</option>
+                        <% brands.forEach(element => { %>
+                         <option value="<%= element._id %>"><%= element.brandName %></option>
+                        <% }) %>
+                       
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Category</label>
+                    <select class="form-select" id="category">
+                      <option value="" class="d-none">Select Category</option>
+                      <% categories.forEach(element => { %>
+                       <option value="<%= element._id %>"><%= element.name %></option>
+                      <% }) %>
+                    </select>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <label class="form-label">Regular Price ($)</label>
+                        <input type="number" class="form-control" placeholder="Enter price" id="regularPrice">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Sale Price ($)</label>
+                        <input type="number" class="form-control" placeholder="Enter sale price" id="salePrice">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Quantity</label>
+                        <input type="number"  value="0" class="form-control" placeholder="Enter quantity" id="quantity">
+                    </div>
+                </div>
+
+                <div class="mb-3 mt-3">
+                    <label class="form-label">Upload Images</label>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <input type="file" class="image-input" name="images" accept="image/*" data-preview="preview1" >
+                            <div class="image-preview" id="preview1"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="file" class="image-input" name="images" accept="image/*" data-preview="preview2" >
+                            <div class="image-preview" id="preview2"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="file" class="image-input" name="images" accept="image/*" data-preview="preview3" >
+                            <div class="image-preview" id="preview3"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 mt-3">Submit Product</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Fixed Cropper Modal -->
+    <div id="cropperModal">
+        <div class="cropper-container">
+            <div class="cropper-wrapper">
+                <img id="cropperImage" src="" style="max-width: 100%;">
+            </div>
+            <div class="button-container">
+                <button type="button" class="btn btn-success" id="saveCrop">Save Crop</button>
+                <button type="button" class="btn btn-secondary" id="cancelCrop">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let cropper = null;
+    let currentInput = null;
+    let selectedFilename = ''; // Store the filename
+    const modal = document.getElementById('cropperModal');
+    const cropperImage = document.getElementById('cropperImage');
+
+    // Handle file selection
+    document.querySelectorAll('.image-input').forEach(input => {
+        input.addEventListener('change', handleFileSelect);
+    });
+
+    // Handle save crop
+    document.getElementById('saveCrop').addEventListener('click', saveCrop);
+
+    // Handle cancel
+    document.getElementById('cancelCrop').addEventListener('click', closeModal);
+
+    // Close modal when clicking outside
+    modal.addEventListener('click', function (e) {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+
+    function handleFileSelect(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Validate file
+        if (!file.type.startsWith('image/')) {
+            alert('Please select an image file');
+            return;
+        }
+
+        if (file.size > 5000000) { // 5MB limit
+            alert('Image size should be less than 5MB');
+            return;
+        }
+
+        currentInput = e.target;
+        selectedFilename = file.name; // Store the filename
+
+        const reader = new FileReader();
+        reader.onload = function (event) {
+            cropperImage.src = event.target.result;
+            modal.style.display = 'block';
+
+            // Initialize cropper
+            if (cropper) {
+                cropper.destroy();
+            }
+
+            cropper = new Cropper(cropperImage, {
+                aspectRatio: 1,
+                viewMode: 2,
+                dragMode: 'move',
+                autoCropArea: 0.8,
+                restore: false,
+                guides: true,
+                center: true,
+                highlight: true,
+                cropBoxMovable: true,
+                cropBoxResizable: true,
+                toggleDragModeOnDblclick: false,
+            });
+        };
+
+        reader.readAsDataURL(file);
+    }
+
+    function saveCrop() {
+        if (!cropper) return;
+
+        const canvas = cropper.getCroppedCanvas({
+            width: 400,
+            height: 400,
+            imageSmoothingEnabled: true,
+            imageSmoothingQuality: 'high'
+        });
+
+        if (canvas) {
+            const previewId = currentInput.dataset.preview;
+            const previewContainer = document.getElementById(previewId);
+            previewContainer.innerHTML = `<img src="${canvas.toDataURL('image/jpeg', 0.9)}">`;
+
+            // Update file input field with filename only
+            const fileLabel = document.createElement("span");
+            fileLabel.innerText = selectedFilename;
+            fileLabel.style.fontSize = "14px";
+            fileLabel.style.color = "#555";
+            fileLabel.style.marginLeft = "10px";
+
+            if (currentInput.nextSibling) {
+                currentInput.parentNode.removeChild(currentInput.nextSibling);
+            }
+            currentInput.insertAdjacentElement("afterend", fileLabel);
+        }
+
+        closeModal();
+    }
+
+    function closeModal() {
+        modal.style.display = 'none';
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+        cropperImage.src = '';
+
+        // Do not reset file input, only hide modal
+        currentInput = null;
+    }
+
+
+    document.getElementById('addProductForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const formData = new FormData();
+
+    // Append text fields
+    formData.append("product", document.getElementById('product').value);
+    formData.append("description", document.getElementById('description').value);
+    formData.append("brand", document.getElementById('brand').value);
+    formData.append("category", document.getElementById('category').value);
+    formData.append("regularPrice" , document.getElementById('regularPrice').value);
+    formData.append("salePrice", document.getElementById('salePrice').value);
+    formData.append("quantity", document.getElementById('quantity').value);
+
+    // Append multiple files (Check if a file is selected before adding)
+    const fileInputs = document.querySelectorAll('.image-input');
+fileInputs.forEach(input => {
+    if (input.files.length > 0) {
+        formData.append("images", input.files[0]);
+    }
+});
+
+    // Send request
+    const response = await fetch('/admin/add-product', {            
+        method: "POST",
+        body: formData  
+    });
+
+    const result = await response.json();
+    if(result.error){
+     Swal.fire({
+     title: "Fill?",
+     text: result.error,
+      icon: "warning"
+});
+    }
+    if(result.imageError){
+        Swal.fire({
+     title: "Fill?",
+     text: result.imageError,
+      icon: "warning"
+});
+    }
+    if(result.existError){
+        Swal.fire({
+     title: "Exist?",
+     text: result.existError,
+      icon: "warning"
+});
+    }
+    if(result.minusQty){
+        Swal.fire({
+     title: "Not Possible?",
+     text: result.minusQty,
+      icon: "warning"
+}); 
+    }
+    if(result.success){
+        Swal.fire({
+     title: "Saved",
+     text: result.success,
+      icon: "success"
+   }); 
+    event.target.submit()
+    }
+    
+});
+
+        })
+
+
+
+    </script>
+</body>
+</html
