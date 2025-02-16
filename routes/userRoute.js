@@ -67,12 +67,26 @@ routes.get("/userprofile",userProfileController.userprofile)
 //address route
 routes.get("/address",addressController.loadAddress)
 routes.get("/addAddress",addressController.addAddres)
+routes.post("/addAddress",userProfileController.Addaddress)
 
 
 
 //cart route
 routes.get("/cart",cartController.loadCart)
+routes.post("/add-Cart",cartController.AddCart)
+
+
+//chnage email in userProfile  and password 
+
+routes.post("/updatemail",userProfileController.updateEmail)
+routes.post("/changePassword", userProfileController.updatePassword);
+
+
+//editAddress
+routes.get("/editAddress/:id", addressController.editAddress);
+routes.post("/updateAddress", addressController.updateAddress);
 
 
 
-module.exports = routes;
+
+module.exports = routes; 

@@ -7,7 +7,6 @@ const cartSchema = new Schema({
         ref: "User",
         required: true,
     },
-    items: [{
         productId: {  // Fixed typo (producrId → productId)
             type: Schema.Types.ObjectId,  // Fixed incorrect SchemaTypes.Types.ObjectId
             ref: "products",
@@ -33,7 +32,6 @@ const cartSchema = new Schema({
             type: String,  // Fixed incorrect lowercase "string"
             default: "none"  // Fixed typo (defult → default)
         }
-    }]
 });
 
 const Cart = mongoose.model("Cart", cartSchema);  // Changed variable name to start with uppercase (convention)

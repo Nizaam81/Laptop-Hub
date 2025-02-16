@@ -60,8 +60,8 @@ const resendOTP = async (req, res) => {
             });
         }
 
-        // Store new OTP and timestamp
-        req.session.userOtp = newOTP;  // Fixed: using newOTP instead of otp
+       
+        req.session.userOtp = newOTP;  
         req.session.otpTimestamp = Date.now();
         
         return res.status(200).json({
@@ -127,7 +127,7 @@ const signup = async (req, res) => {
     console.log(req.body);
 
     try {
-        // Validation checks
+       
         if (!Fname || !Lname || !phone || !email || !password || !cpassword) {
             return res.status(400).json({ 
                 status: 'error',
@@ -144,7 +144,7 @@ const signup = async (req, res) => {
             });
         }
 
-        // Email format validation
+     
         const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
         if (!emailRegex.test(email)) {
             return res.status(400).json({ 
@@ -154,7 +154,7 @@ const signup = async (req, res) => {
             });
         }
 
-        // Phone number validation
+     
         const phoneRegex = /^[1-9][0-9]{9}$/;
         if (!phoneRegex.test(phone)) {
             return res.status(400).json({ 
@@ -164,7 +164,7 @@ const signup = async (req, res) => {
             });
         }
 
-        // Check if user already exists
+      
         const existingUser = await user.findOne({
             $or: [
                 { email: email },
@@ -201,21 +201,20 @@ const emailSent = await sendVerificationEmail(email, otp);
             });
         }
 
-        // Store user data and OTP in session
+       
         req.session.userOtp = otp;
         req.session.userData = {
             Fname,
             Lname,
             phone,
             email,
-            password: password // Will be hashed after OTP verification
+            password: password 
         };
 
-        // Log OTP for development purposes only
+        
         console.log("OTP sent", otp);
         
-        // Redirect to OTP verification page
-        return res.render("user/verifyOtp");
+      
 
     } catch (error) {
         console.error("Detailed error:", error);
@@ -569,6 +568,7 @@ const resetPassword = async (req, res) => {
     }
   }
 
+  
 
 module.exports = {loadHomepage,loadlogin,loadsignup,pageNotfound,signup,loadverifyOtp, resendOTP,
     verifyOTP,login,welcome,logout,loadproductDetails,loadproductView,forgotPassword, profile,resetPassword,verifyForgotPasswordOTP,loadForgotpassword,loadOtp,newPassword}

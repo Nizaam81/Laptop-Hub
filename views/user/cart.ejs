@@ -133,50 +133,27 @@
         <h2>Your Cart</h2>
         
         <div class="cart-items">
-            <div class="cart-item">
-                <img src="watch1.jpg" alt="Silverton Watch">
-                <div class="item-details">
-                    <h3>Silverton Watch</h3>
-                    <p>678adc82bb2f637a0043312a | Rolex</p>
-                    <p class="price">₹ 400</p>
+            <% Cart.forEach(element => { %>
+                <div class="cart-item">
+                    <img src="<%= element.productDetails[0].images[0] %>" alt="Silverton Watch">
+                    <div class="item-details">
+                        <h3><%= element.productDetails[0].name %></h3>
+                        <p><%= element.categoryDetails[0].name %> | <%= element.brandDetails[0].brandName %> </p>
+                        <p class="price"><%= element.price%></p>
+                    </div>
+                    <div class="quantity">
+                        <button class="decrement">-</button>
+                        <input class="stocks" type="text" value="<%= element.quantity %>">
+                        <input  type="hidden" value="<%= element.productDetails[0].quantity %>" class="availableQty">
+                        <button class="increment">+</button>
+                    </div>
+                    <button class="remove-btn">Remove</button>
                 </div>
-                <div class="quantity">
-                    <button>-</button>
-                    <input type="text" value="1">
-                    <button>+</button>
-                </div>
-                <button class="remove-btn">Remove</button>
-            </div>
+            <% }) %>
+          
 
-            <div class="cart-item">
-                <img src="watch2.jpg" alt="TELEON">
-                <div class="item-details">
-                    <h3>TELEON</h3>
-                    <p>678adc82bb2f637a0043312a | TATA</p>
-                    <p class="price">₹ 7500</p>
-                </div>
-                <div class="quantity">
-                    <button>-</button>
-                    <input type="text" value="1">
-                    <button>+</button>
-                </div>
-                <button class="remove-btn">Remove</button>
-            </div>
 
-            <div class="cart-item">
-                <img src="watch3.jpg" alt="Casio Youth">
-                <div class="item-details">
-                    <h3>Casio Youth</h3>
-                    <p>678adc82bb2f637a0043312a | Rolex</p>
-                    <p class="price">₹ 1560</p>
-                </div>
-                <div class="quantity">
-                    <button>-</button>
-                    <input type="text" value="4">
-                    <button>+</button>
-                </div>
-                <button class="remove-btn">Remove</button>
-            </div>
+           
         </div>
 
         <div class="price-details">
@@ -189,4 +166,29 @@
         <button class="back-btn">Go Back to Shopping</button>
     </div>
 </body>
+
+<script>
+ 
+    
+    
+    document.querySelectorAll('.increment').forEach((button,index)=>{
+        button.addEventListener('click', () => {
+        const maxQt=document.querySelectorAll('.availableQty')[index].value;
+        if(document.querySelectorAll('.stocks')[index].value > maxQty){
+            
+        }
+        document.querySelectorAll('.stocks')[index].value++
+    
+    });
+})
+document.querySelectorAll('.decrement').forEach((button,index)=>{
+        button.addEventListener('click', () => {
+        
+        document.querySelectorAll('.stocks')[index].value--
+    
+    });
+})
+ 
+
+</script>
 </html>

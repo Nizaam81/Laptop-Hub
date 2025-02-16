@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
-const { Schema } = mongoose; // ✅ Corrected import
+const { Schema } = mongoose;
 
-const addressSchema = new Schema({ // ✅ Use Schema instead of schema
+const addressSchema = new Schema({ 
     userId: {
-        type: Schema.Types.ObjectId, // ✅ Corrected reference
+        type: Schema.Types.ObjectId, 
         ref: "user",
         required: true 
     },

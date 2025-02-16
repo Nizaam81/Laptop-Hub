@@ -55,7 +55,7 @@ const { log } = require("console");
 const updateProduct = async (req, res) => {
     try {
        
-      //  console.log(req.body)
+
  
         const {productId,product,description,brand,category,regularPrice,salePrice,quantity}=req.body
         const existproduct=await Product.findOne({name:product})
