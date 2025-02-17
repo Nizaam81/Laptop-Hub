@@ -136,7 +136,8 @@
     
         <button type="submit">Submit</button>
     </form>
-    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
     document.getElementById("addAddress").addEventListener("submit", async (event) => {
         event.preventDefault();
@@ -174,8 +175,25 @@
             });
     
             if (response.ok) {
-                alert("Address added successfully!");
-            } else {
+    Swal.fire({
+        title: "Success!",
+        text: "Address Added Successfully",
+        icon: "success",
+        showConfirmButton: true
+    }).then(()=>{ 
+        if (document.referrer.includes("/checkout")) {
+        // If the referrer is the checkout page, redirect to checkout
+        window.location.href = "/user/checkout"; 
+    } else {
+        // If the referrer is not checkout page, stay on the address page
+        window.location.href = "/user/address"; 
+    }
+    })
+
+
+   
+
+        } else {
                 alert("Failed to add address.");
             }
         } catch (error) {

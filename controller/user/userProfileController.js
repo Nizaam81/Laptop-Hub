@@ -16,39 +16,37 @@ const userprofile=async(req,res)=>{
     }
 }
 
-const updateEmail = async (req, res) => {
+const updatePhone = async (req, res) => {
     try {
-        const { email, userId } = req.body; 
-      
+        const { phone, userId } = req.body;
 
-       
-        if (!email || !userId) {
-            return res.status(400).json({ error: "Email and userId are required" });
+        if (!phone || !userId) {
+            return res.status(400).json({ error: "Phone and userId are required" });
         }
 
-        const existingUser = await user.findOne({ email: email.toLowerCase() });
+        const existingUser = await user.findOne({ phone });
         if (existingUser) {
-            return res.status(400).json({ existError: "This email already exists" });
+            return res.status(400).json({ existError: "This phone number already exists" });
         }
 
-    
         const updatedUser = await user.findByIdAndUpdate(
             userId, 
-            { email: email.toLowerCase() }, 
-            { new: true, runValidators: true } 
+            { phone }, 
+            { new: true, runValidators: true }
         );
 
         if (!updatedUser) {
             return res.status(404).json({ error: "User not found" });
         }
 
-        return res.status(200).json({ success: "Email updated successfully", user: updatedUser });
+        return res.status(200).json({ success: "Phone number updated successfully", user: updatedUser });
 
     } catch (error) {
-        console.error("Error updating email:", error);
+        console.error("Error updating phone number:", error);
         return res.status(500).json({ error: "Internal server error" });
     }
 };
+
 
 
  
@@ -147,7 +145,7 @@ const Addaddress = async (req, res) => {
 
 module.exports={
     userprofile,
-    updateEmail,
+    updatePhone,
     updatePassword,
     Addaddress
 }

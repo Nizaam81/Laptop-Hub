@@ -38,10 +38,6 @@ const productSchema = new Schema({
         type: String,
         required: true,
     }],
-    variants: [{
-        color: String,
-        quantity: Number,
-    }],
     isBlocked: {
         type: Boolean,
         default: false,

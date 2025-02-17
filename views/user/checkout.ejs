@@ -1,0 +1,140 @@
+<%- include("partials/profileHeader.ejs") %>
+
+    <title>Checkout</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f8f8;
+            color: black;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+            margin-left: 245px;
+        }
+        .checkout-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #fff;
+            font-size: 20px;
+            font-weight: bold;
+            color: black;
+        }
+        .checkout-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .left-section, .right-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .left-section {
+            width: 60%;
+        }
+        .right-section {
+            width: 35%;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .add-address {
+            color: red;
+            cursor: pointer;
+        }
+        .payment-method label {
+            display: block;
+            margin: 10px 0;
+        }
+        .price-details {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        button {
+            background-color: black;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #333;
+        }.add-address-btn {
+    width: 120px;
+    height: 40px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.add-address-btn:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+.add-address-btn:active {
+    background-color: #004099;
+    transform: scale(0.98);
+}
+
+    </style>
+</head>
+<body>
+    <div class="checkout-header">
+       
+
+    </div>
+    <div class="container">
+        <div class="checkout-section">
+            <div class="left-section">
+                <div class="section-title">Shipping Address</div>
+                <a href="addAddress">
+                    <button class="add-address-btn">+ Add Address</button>
+                </a>
+                
+                
+                <div class="section-title">Payment Method</div>
+                <div class="payment-method">
+                    <label><input type="radio" name="payment" value="cod"> COD</label>
+                    <label><input type="radio" name="payment" value="wallet"> Wallet</label>
+                </div>
+            </div>
+            <div class="right-section">
+                <div class="section-title">Order Summary</div>
+                <div>
+                    <img src="camera.jpg" alt="Sony ZV-1F Vlog Camera" width="50">
+                    <span>Sony ZV-1F Vlog Camera</span>
+                    <p>₹36565.50 <del>₹38499</del> <span style="color:green;">5% OFF</span></p>
+                    <p>Qty: 1</p>
+                </div>
+                <div class="price-details">
+                    <p>Subtotal: ₹38490.00</p>
+                    <p>Shipping: Free</p>
+                    <hr>
+                    <p>Total: ₹36565.50</p>
+                </div>
+                <button>Proceed to Checkout</button>
+                <button style="background: white; color: black; border: 2px solid black;">Go Back to Shopping</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

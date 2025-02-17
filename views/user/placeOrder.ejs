@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Success</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .success-icon {
+            font-size: 50px;
+            color: green;
+        }
+        .order-id {
+            background: black;
+            color: white;
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .order-details {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            text-align: left;
+            margin-top: 20px;
+            padding: 10px;
+            background: #f1f1f1;
+            border-radius: 5px;
+        }
+        .order-details div {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        @media (min-width: 600px) {
+            .order-details div {
+                width: 48%;
+            }
+        }
+        .product {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .product img {
+            width: 100%;
+            max-width: 80px;
+            margin-right: 10px;
+        }
+        .btn {
+            background: black;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-icon">✔</div>
+        <h2>Thank You For Your Order!</h2>
+        <p>Order ID: <span class="order-id">ORD-1234567890</span></p>
+        <p>Your order is confirmed and will be shipped soon.</p>
+        
+        <div class="order-details">
+            <div>
+                <h3>Shipping Address</h3>
+                <p><strong>John Doe</strong><br>123 Main Street<br>Kerala - 679101<br>📞 9876543210</p>
+            </div>
+            <div>
+                <h3>Order Information</h3>
+                <p>Order ID: ORD-1234567890</p>
+                <p>Payment Method: COD</p>
+                <p>Payment Status: <span style="color: orange;">Unpaid</span></p>
+                <p>Order Date: 02/17/2025</p>
+            </div>
+        </div>
+        
+        <div class="product">
+            <img src="https://via.placeholder.com/80" alt="Product">
+            <div>
+                <h3>Sony ZV-1F Vlog Camera</h3>
+                <p>Price: ₹38,490.00 | Quantity: 1</p>
+            </div>
+        </div>
+        
+        <h3>Subtotal: ₹38,490.00</h3>
+        <h3>Discount: -₹1,924.50</h3>
+        <h2>Final Amount: ₹36,565.50</h2>
+        
+        <button class="btn">Continue Shopping</button>
+    </div>
+</body>
+</html>

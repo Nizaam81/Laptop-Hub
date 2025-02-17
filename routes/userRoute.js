@@ -5,10 +5,11 @@ const usercontroller = require("../controller/user/usercontroller");
 const userProfileController= require("../controller/user/userProfileController")
 const addressController = require("../controller/user/addressController")
 const cartController = require("../controller/user/cartContoller")
-
+const checkout = require("../controller/user/checkoutController")
+const userAuth = require("../middlware/userAuth")
 
 routes.get("/pageNotfound", usercontroller.pageNotfound);
-routes.get("/home", usercontroller.loadHomepage);
+routes.get("/home", userAuth.userAuth, usercontroller.loadHomepage);
 routes.get("/login", usercontroller.loadlogin);
 routes.get("/signup", usercontroller.loadsignup);
 routes.post("/signup", usercontroller.signup);
@@ -20,8 +21,8 @@ routes.get('/welcome',usercontroller.welcome)
 routes.get('/logout',usercontroller.logout);
 
 
-routes.get("/productsDetails",usercontroller.loadproductDetails)
-routes.get("/productView",usercontroller.loadproductView)
+routes.get("/productsDetails",userAuth.userAuth,usercontroller.loadproductDetails)
+routes.get("/productView",userAuth.userAuth,usercontroller.loadproductView)
 
 routes.post('/login',usercontroller.login)
 // Google OAuth routes
@@ -58,33 +59,39 @@ routes.get("/fVerifyOtp",usercontroller.loadOtp)
 
 
 //profile route
-routes.get("/profile",usercontroller.profile)
+routes.get("/profile",userAuth.userAuth,usercontroller.profile)
 
 //user profile 
-routes.get("/userprofile",userProfileController.userprofile)
+routes.get("/userprofile",userAuth.userAuth,userProfileController.userprofile)
 
 
-//address route
-routes.get("/address",addressController.loadAddress)
-routes.get("/addAddress",addressController.addAddres)
-routes.post("/addAddress",userProfileController.Addaddress)
-
+//address route &&  editAddress && addressDelete
+routes.get("/address",userAuth.userAuth,addressController.loadAddress)
+routes.get("/addAddress",userAuth.userAuth,addressController.addAddres)
+routes.post("/addAddress",userAuth.userAuth,userProfileController.Addaddress)
+routes.get("/editAddress/:id",userAuth.userAuth,addressController.editAddress);
+routes.post("/updateAddress",userAuth.userAuth,addressController.updateAddress);
+routes.post("/address/delete",userAuth.userAuth,addressController.deleteAddress);
 
 
 //cart route
-routes.get("/cart",cartController.loadCart)
-routes.post("/add-Cart",cartController.AddCart)
+routes.get("/cart",userAuth.userAuth,cartController.loadCart)
+routes.post("/add-Cart",userAuth.userAuth,cartController.AddCart)
+routes.post("/Cart/remove",userAuth.userAuth,cartController.deleteCart)
 
 
 //chnage email in userProfile  and password 
 
-routes.post("/updatemail",userProfileController.updateEmail)
-routes.post("/changePassword", userProfileController.updatePassword);
+routes.post("/updatPhone",userAuth.userAuth,userProfileController.updatePhone)
+routes.post("/changePassword",userAuth.userAuth,userProfileController.updatePassword);
 
 
-//editAddress
-routes.get("/editAddress/:id", addressController.editAddress);
-routes.post("/updateAddress", addressController.updateAddress);
+//checkout routes
+routes.get("/checkout",userAuth.userAuth,checkout.loadcheckout)
+
+
+
+
 
 
 

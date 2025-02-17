@@ -139,7 +139,8 @@
                     <div class="item-details">
                         <h3><%= element.productDetails[0].name %></h3>
                         <p><%= element.categoryDetails[0].name %> | <%= element.brandDetails[0].brandName %> </p>
-                        <p class="price"><%= element.price%></p>
+                        <p class="price" value="<%= element.price  %>"><%= element.price%></p>
+                        <p class="availablePrice">Available Stock: <%= element.productDetails[0].quantity%> </p>
                     </div>
                     <div class="quantity">
                         <button class="decrement">-</button>
@@ -147,7 +148,10 @@
                         <input  type="hidden" value="<%= element.productDetails[0].quantity %>" class="availableQty">
                         <button class="increment">+</button>
                     </div>
-                    <button class="remove-btn">Remove</button>
+                    <button class="remove-btn" onclick="deletecart('<%= element._id %>')">Remove</button>
+
+                   
+
                 </div>
             <% }) %>
           
@@ -157,38 +161,149 @@
         </div>
 
         <div class="price-details">
+
             <h3>PRICE DETAILS</h3>
-            <p>Shipping: <span>Free Shipping</span></p>
-            <p>Total: <span class="total-price">₹ 9460</span></p>
-            <button class="checkout-btn">Proceed To Checkout</button>
+            
+            <p>Total: <span class="total-price" id="total"></span></p>
+           <a href="checkout"> <button class="checkout-btn">Proceed To Checkout</button></a>
         </div>
 
-        <button class="back-btn">Go Back to Shopping</button>
+       <a href="ProductsDetails"> <button class="back-btn">Go Back to Shopping</button></a>
     </div>
 </body>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
  
     
     
     document.querySelectorAll('.increment').forEach((button,index)=>{
         button.addEventListener('click', () => {
-        const maxQt=document.querySelectorAll('.availableQty')[index].value;
-        if(document.querySelectorAll('.stocks')[index].value > maxQty){
-            
+        const value= document.querySelectorAll('.stocks')[index].value
+        var maxQty=document.querySelectorAll('.availableQty')[index].value;
+   
+        if(document.querySelectorAll('.stocks')[index].value >= maxQty){
+          
+            Swal.fire({
+                title: "Not Possible!",
+                text: "Quantity Not Increased upto Available Quantity",
+                icon: "warning",
+                confirmButtonText: "OK"
+});
+        }else{
+            let sum=0;
+            const priceElements = document.querySelectorAll('.price');
+            document.querySelectorAll('.stocks')[index].value++
+            const quantityElements = document.querySelectorAll('.stocks');
+            for (let i = 0; i < totalData.length; i++) {  
+                let price = parseFloat(priceElements[i].textContent.trim()); 
+                let quantity = parseInt(quantityElements[i].value); 
+                sum += quantity * price;
+                }  
+            document.getElementById('total').innerText=sum
+
         }
-        document.querySelectorAll('.stocks')[index].value++
+       
     
     });
 })
 document.querySelectorAll('.decrement').forEach((button,index)=>{
         button.addEventListener('click', () => {
-        
-        document.querySelectorAll('.stocks')[index].value--
+        if( document.querySelectorAll('.stocks')[index].value <= 1){
+            Swal.fire({
+                title: "Not Possible!",
+                text: "Quantity Not Possible less that 1",
+                icon: "warning",
+                confirmButtonText: "OK"
+});
+        }else{
+            let sum=0;
+            const priceElements = document.querySelectorAll('.price');  
+           
+            document.querySelectorAll('.stocks')[index].value--
+            const quantityElements = document.querySelectorAll('.stocks');
+            for (let i = 0; i < totalData.length; i++) {  
+                let price = parseFloat(priceElements[i].textContent.trim()); 
+                let quantity = parseInt(quantityElements[i].value); 
+                sum += quantity * price;
+                }  
+            document.getElementById('total').innerText=sum
+        }
     
     });
 })
- 
+
+const totalData = document.querySelectorAll(".decrement");  
+const priceElements = document.querySelectorAll('.price');  
+const quantityElements = document.querySelectorAll('.stocks');  
+
+let sum = 0;
+
+for (let i = 0; i < totalData.length; i++) {  
+    let price = parseFloat(priceElements[i].textContent.trim()); 
+    let quantity = parseInt(quantityElements[i].value); 
+    sum += quantity * price;
+}  
+
+document.getElementById('total').innerText = sum.toFixed(2); 
+
+async function deletecart(cartId) {
+    const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#0653cc',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            const response = await fetch('/user/Cart/remove', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id: cartId }),
+            });
+
+            if (!response.ok) {
+                let errorMessage = 'Failed to remove cart';
+                try {
+                    const data = await response.json();
+                    if (data.error) errorMessage = data.error;
+                } catch (err) {
+                    console.error('Error parsing response:', err);
+                }
+                await Swal.fire({
+                    title: 'Error!',
+                    text: errorMessage,
+                    icon: 'error',
+                    confirmButtonColor: '#0653cc'
+                });
+                return;
+            }
+
+            await Swal.fire({
+                title: 'Deleted!',
+                text: 'Cart has been removed.',
+                icon: 'success',
+                confirmButtonColor: '#0653cc'
+            });
+            window.location.reload();
+
+        } catch (error) {
+            console.error('Fetch error:', error);
+            await Swal.fire({
+                title: 'Error!',
+                text: 'An error occurred',
+                icon: 'error',
+                confirmButtonColor: '#0653cc'
+            });
+        }
+    }
+}
+
 
 </script>
 </html>

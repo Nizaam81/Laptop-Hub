@@ -1,7 +1,7 @@
 const cart = require("../../model/cartSchema")
 const user = require("../../model/usersSchema")
 const mongoose = require('mongoose');
-const ObjectId = mongoose.Types.ObjectId; // ✅ Correct way to get ObjectId
+const ObjectId = mongoose.Types.ObjectId; 
 
 
 const loadCart = async(req,res)=>{
@@ -32,7 +32,7 @@ const loadCart = async(req,res)=>{
             as:"brandDetails"
         }
     }])
-        console.log(Cart)
+        
         
        
         res.render("user/cart",{firstLetter:"",users:"",Cart})
@@ -63,7 +63,28 @@ const loadCart = async(req,res)=>{
  }
 
 
+ const deleteCart = async (req, res) => {
+    const { id } = req.body;
+    try {
+        const cartItem = await cart.findById(id);
+        if (!cartItem) {
+            return res.status(404).json({ error: "Cart item not found" });
+        }
+
+        await cart.findByIdAndDelete(id);
+
+        return res.status(200).json({
+            message: "Cart item deleted successfully"
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+
 module.exports={
     loadCart,
-    AddCart
+    AddCart,
+    deleteCart
 }

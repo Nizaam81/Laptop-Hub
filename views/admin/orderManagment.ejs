@@ -1,0 +1,156 @@
+<%- include("partials/header.ejs") %>
+
+
+    <title>Order Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #FFF;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            color: black;
+            margin-left: 285px;
+            margin-top: 50px;
+        }
+        .search-box {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .search-box input, .search-box select {
+            padding: 8px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #006CE1;
+            color: white;
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            display: inline-block;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+        .delivered { background: green; color: white; }
+        .processing { background: yellow; color: black; }
+        .onTheWay { background: gray; color: white; }
+        .return { background: red; color: white; }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+    <script>
+        function updateStatus(selectElement) {
+            const statusClasses = ['delivered', 'processing', 'onTheWay', 'return'];
+            selectElement.className = 'status';
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            selectElement.classList.add(selectedOption.className);
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>Order Management</h2>
+        <div class="search-box">
+            <input type="text" placeholder="Search by Invoice Number...">
+            <select>
+                <option>Select Status</option>
+                <option>Packing</option>
+                <option>On The Way</option>
+                <option>Delivered</option>
+                <option>Processing</option>
+                <option>Return</option>
+            </select>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Invoice Number</th>
+                    <th>Client Name</th>
+                    <th>Product Name</th>
+                    <th>Rate</th>
+                    <th>Status</th>
+                    <th>View</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="fade-in">
+                    <td>2025-02-16</td>
+                    <td>INV-67b1ed752a4d02800921b55c</td>
+                    <td>PRANAV RAJ</td>
+                    <td>Semiya Payasam</td>
+                    <td>45.00</td>
+                    <td>
+                        <select class="status delivered" onchange="updateStatus(this)">
+                            <option class="delivered" selected>Delivered</option>
+                            <option class="processing">Processing</option>
+                            <option class="onTheWay">On The Way</option>
+                            <option class="return">Return</option>
+                        </select>
+                    </td>
+                    <td><button>View</button></td>
+                </tr>
+                <tr class="fade-in">
+                    <td>2025-02-15</td>
+                    <td>INV-67b0b5962a4d02800921b33b</td>
+                    <td>Sangeeth</td>
+                    <td>Vegetable Biriyani</td>
+                    <td>45.00</td>
+                    <td>
+                        <select class="status onTheWay" onchange="updateStatus(this)">
+                            <option class="onTheWay" selected>On The Way</option>
+                            <option class="delivered">Delivered</option>
+                            <option class="processing">Processing</option>
+                            <option class="return">Return</option>
+                        </select>
+                    </td>
+                    <td><button>View</button></td>
+                </tr>
+                <tr class="fade-in">
+                    <td>2025-02-15</td>
+                    <td>INV-67b0b3f02a4d02800921b204</td>
+                    <td>Sangeeth</td>
+                    <td>Semiya Payasam</td>
+                    <td>45.00</td>
+                    <td>
+                        <select class="status processing" onchange="updateStatus(this)">
+                            <option class="processing" selected>Processing</option>
+                            <option class="delivered">Delivered</option>
+                            <option class="onTheWay">On The Way</option>
+                            <option class="return">Return</option>
+                        </select>
+                    </td>
+                    <td><button>View</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

@@ -100,11 +100,44 @@ const updateAddress = async (req, res) => {
 
 
 
+const deleteAddress = async (req, res) => {
+    const { id } = req.body;
+    const userId = req.session.user; // Get user ID from session
+
+ 
+
+    if (!id) {
+        return res.status(400).json({ error: "Address ID is missing" });
+    }
+
+    try {
+       
+        const updatedAddress = await Address.findOneAndUpdate(
+            { userId: userId }, 
+            { $pull: { address: { _id: id } } }, 
+            { new: true }
+        );
+
+        
+
+        if (!updatedAddress) {
+            return res.status(404).json({ error: "Address not found" });
+        }
+
+        return res.status(200).json({ message: "Address deleted successfully" });
+    } catch (error) {
+        console.error("Delete error:", error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+
 
 
 module.exports={
     loadAddress,
     addAddres,
     editAddress,
-    updateAddress
+    updateAddress,
+    deleteAddress
 }

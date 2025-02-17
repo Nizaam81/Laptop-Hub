@@ -62,7 +62,7 @@
             <i class="fa fa-envelope"></i> <%= users.email %>
         </div>
         <div class="buttons">
-            <!-- <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#emailModal">Change Email</button> -->
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#emailModal">Change Phone</button>
             <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#passwordModal">Change Password</button>
         </div>
     </div>
@@ -72,13 +72,13 @@
 <div class="modal fade" id="emailModal" tabindex="-1" aria-labelledby="emailModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form id="changeEmail"> <!-- Move the form tag to wrap the entire modal -->
-                <!-- <div class="modal-header">
-                    <h5 class="modal-title" id="emailModalLabel">Change Email</h5>
+            <form id="changePhone"> <!-- Move the form tag to wrap the entire modal -->
+                <div class="modal-header">
+                    <h5 class="modal-title" id="emailModalLabel">Change phone </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div> -->
+                </div>
                 <div class="modal-body">
-                    <input type="email" class="form-control" placeholder="New Email" id="email" value="<%= users.email %>">
+                    <input type="phone" class="form-control" placeholder="New phone" id="phone"  value="<%= users.phone %>">
                     <input type="hidden" name="userId" value="<%= users._id %>" id="userId">
 
                 </div>
@@ -116,26 +116,26 @@
     </div>
 </body>
 <script>
-    document.getElementById("changeEmail").addEventListener("submit", async (event) => { 
+    document.getElementById("changePhone").addEventListener("submit", async (event) => { 
         event.preventDefault(); 
     
-        const email = document.getElementById("email").value.trim();
+        const phone = document.getElementById("phone").value.trim();
         const userId = document.getElementById("userId").value.trim(); 
     
         try {
-            const response = await fetch("/user/updatemail", {
+            const response = await fetch("/user/updatPhone", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ email: email, userId: userId }) // Include userId
+                body: JSON.stringify({ phone,userId}) // Include userId
             });
     
             if (response.ok) {
                 Swal.fire({
                     icon: "success",
                     title: "Success!",
-                    text: "Email updated successfully!",
+                    text: "Phone Number updated successfully!",
                     showConfirmButton: false,
                     timer: 2000
                 }).then(() => {
@@ -145,7 +145,7 @@
                 Swal.fire({
                     icon: "error",
                     title: "Oops...",
-                    text: "Error updating email. Please try again!"
+                    text: "Error updating Phone Number. Please try again!"
                 });
             }
         } catch (error) {
