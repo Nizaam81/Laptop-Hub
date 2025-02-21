@@ -1,0 +1,376 @@
+<%- include("partials/header.ejs") %>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <title>Variant Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h2 {
+            color: #0056b3;
+            text-align: center;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            margin-left: 290px;
+        }
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        .btn-add {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-edit {
+            background-color: #ffc107;
+            color: black;
+        }
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-status {
+            background-color: green;
+            color: white;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #0056b3;
+            color: white;
+        }
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 40%;
+            text-align: center;
+            border-radius: 8px;
+        }
+        .close {
+            float: right;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        input, select {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }.list-btn {
+    background-color: #dc3545; /* Red color for unlist */
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.unlist-btn {
+    background-color: #28a745; /* Green color for list */
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Variant Management</h2>
+    <button class="btn btn-add">Add Variant</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Variant RAM</th>
+                <th>Variant Price</th>
+                <th>Variant Quantity</th>
+                
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% varients.forEach(element => { %>
+                <tr>
+                    <td><%= element.productDetails[0].name %></td>
+                    <td><%= element.ramSize %></td>
+                    <td>₹<%= element.price %></td>
+                    <td><%= element.quantity %></td>
+                    <td>
+                        <button class="<%= element.isAvailable ? 'list-btn' : 'unlist-btn' %>" 
+                            onclick="toggleList('<%= element._id %>', event)">
+                        <%= element.isAvailable ? 'Unlist' : 'List' %>
+                    </button>
+                  
+                   <button class="btn btn-edit" onclick="handleEdit(event)">Edit</button>
+
+                       
+                    </td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal -->
+<div class="modal">
+    <form action="" id="addVariant">
+        <div class="modal-content">
+            
+            <span class="close">&times;</span>
+            <h3>Add Variant</h3>
+            <input type="text" readonly placeholder="Enter Product Name" value="<%= products.name %>">
+            <select id="Variant" required>
+                <option value="8GB">8GB</option>
+                <option value="16GB">16GB</option>
+                <option value="32GB">32GB</option>
+            </select>
+            <input type="number" placeholder="Enter Variant Price" id="variantPrice" required>
+            <input type="number" placeholder="Enter Variant Quantity" id="Quantity" required>
+            <input type="hidden" id="ProductId" value="<%= products._id %>">
+            <button type="submit" class="btn btn-add">Add</button> <!-- Explicitly set type="submit" -->
+        </div>
+    </form>
+</div>
+
+
+<!-- Edit Modal -->
+<div class="modal" id="editModal">
+    <form id="editVariant">
+        <div class="modal-content">
+            <span class="close" id="closeEditModal">&times;</span>
+            <h3>Edit Variant</h3>
+            
+            <input type="text" readonly placeholder="Enter Product Name" id="editProductName" value="<%= products.name %>">
+            <select id="editVariant" required>
+                <option value="8GB">8GB</option>
+                <option value="16GB">16GB</option>
+                <option value="32GB">32GB</option>
+            </select>
+            <input type="hidden" id="variantId" value="<%= varients._id %>">
+            <input type="number" placeholder="Enter Variant Price" id="editVariantPrice" required value="<%= varients.price %>">
+            <input type="number" placeholder="Enter Variant Quantity" id="editQuantity" required value="<%= varients.quantity %>">
+            <input type="hidden" id="editProductId">
+            <button type="submit" class="btn btn-edit">Update</button>
+        </div>
+    </form>
+</div>
+
+
+
+<script>
+    
+    const addVariantBtn = document.querySelector(".btn-add");
+    const modal = document.querySelector(".modal");
+    const closeModalBtn = document.querySelector(".close");
+
+
+
+   
+    addVariantBtn.addEventListener("click", () => {
+        modal.style.display = "block";
+    });
+
+   
+    closeModalBtn.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
+
+   
+    window.addEventListener("click", (event) => {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    });
+
+  
+    document.getElementById("addVariant").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    
+    const productId = document.getElementById("ProductId").value.trim();
+    const ramSize = document.getElementById("Variant").value.trim();  // Use "ramSize" instead of "variantType"
+    const variantPrice = parseFloat(document.getElementById("variantPrice").value.trim());
+    const variantQuantity = parseInt(document.getElementById("Quantity").value.trim());
+
+    if (!ramSize || isNaN(variantPrice) || isNaN(variantQuantity) || variantPrice <= 0 || variantQuantity <= 0) {
+        Swal.fire({
+            title: "Error",
+            text: "All fields are required and must be valid numbers!",
+            icon: "error",
+        });
+        return;
+    }
+
+    try {
+        const response = await fetch("/admin/add-varient", {  
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ productId, ramSize, variantPrice, variantQuantity }) // Use "ramSize"
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to add variant");
+        }
+
+        const data = await response.json();
+
+        if (data.message) {
+            Swal.fire({
+                title: "Success",
+                text: data.message,
+                icon: "success",
+            });
+
+            document.querySelector(".modal").style.display = "none";
+            document.getElementById("addVariant").reset();
+        }
+
+    } catch (error) {
+        Swal.fire({
+            title: "Error",
+            text: error.message,
+            icon: "error",
+        });
+    }
+});
+
+
+
+function handleEdit(event) {
+    const editModal = document.getElementById("editModal");
+    const row = event.target.closest("tr");
+    
+   
+    document.getElementById("editProductName").value = row.cells[0].textContent;
+    document.getElementById("editVariant").value = row.cells[1].textContent;
+    document.getElementById("editVariantPrice").value = row.cells[2].textContent.replace("₹", "");
+    document.getElementById("editQuantity").value = row.cells[3].textContent;
+    
+    
+    editModal.style.display = "block";
+}
+
+
+const editModal = document.getElementById("editModal");
+const closeEditModalBtn = document.getElementById("closeEditModal");
+
+closeEditModalBtn.addEventListener("click", () => {
+    editModal.style.display = "none";
+});
+
+
+window.addEventListener("click", (event) => {
+    if (event.target === modal) {
+        modal.style.display = "none";
+    }
+    if (event.target === editModal) {
+        editModal.style.display = "none";
+    }
+});
+
+async function toggleList(variantId, event) {    
+    try {
+        const response = await fetch('/admin/variant/toggle-status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id: variantId }),
+        });
+
+        if (response.ok) {
+            const button = event.target;
+            if (button.classList.contains('list-btn')) {
+                button.classList.remove('list-btn');
+                button.classList.add('unlist-btn');
+                button.textContent = 'List';
+            } else {
+                button.classList.remove('unlist-btn');
+                button.classList.add('list-btn');
+                button.textContent = 'Unlist';
+            }
+        } else {
+            alert('Failed to update status');
+        }
+    } catch (error) {
+        alert('An error occurred');
+    }
+}
+
+
+document.getElementById("editVariant").addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const productName = document.getElementById("editProductName").value.trim();
+    const editVariant = document.getElementById("editVariant").value.trim();
+    const editVariantPrice = document.getElementById("editVariantPrice").value.trim();
+    const quantity = document.getElementById("editQuantity").value.trim();
+    const variantId = document.getElementById("variantId").value.trim();
+
+    
+
+    try {
+        const response = await fetch('/admin/edit-variant', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ productName, editVariant, editVariantPrice, quantity, variantId }),
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to update variant.");
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+            Swal.fire("Updated!", "Variant updated successfully.", "success");
+            document.getElementById("editVariant").reset();
+            document.getElementById("editModal").style.display = "none";
+            location.reload(); // Refresh the page to show updated data
+        }
+    } catch (error) {
+        Swal.fire("Error", error.message, "error");
+    }
+});
+
+
+
+</script>
+
+</body>
+</html>

@@ -96,7 +96,31 @@
     top: 0;
     z-index: 100;
     background-color: white; /* Ensure the zoom background is clean */
-}
+} 
+    .variant-btn {
+      padding: 10px 20px;
+      margin: 5px;
+      border: 1px solid #ddd;
+      background-color: white;
+      cursor: pointer;
+    }
+    .variant-btn:hover, .variant-btn.active {
+      border-color: #2874f0;
+      color: #fff;
+      background-color: #2874f0;
+    }
+    
+    .quantity-btn {
+      width: 40px;
+      height: 40px;
+      border: 1px solid #ddd;
+      background: white;
+      cursor: pointer;
+    }
+    .quantity-btn:hover {
+      background-color: #f0f0f0;
+    }
+  
 
 
 
@@ -155,11 +179,23 @@
     
             <!-- Price Section -->
             <div class="pricing mb-4">
-              <h2 class="current-price" id="salePrice" >₹<%= products.salePrice %></h2>
-              <del class="text-muted">₹<%= products.regularPrice %></del>
-              <span class="text-danger ms-2" id="quantity  ><%= products.quantity %> stocks avalable</span><br>
-              <label for="">quantity</label>
-              <input type="number" id="quantity" class="form-control" style="width:150px" min="1" value="1" max="<%= products.quantity %>">
+              <input type="text" id="variantId" value="<%= Variants._id %>">
+
+                <h2 class="current-price" id="salePrice" >₹ <%= Variants.price %></h2>
+                 <h3>Available Stock<%= Variants.quantity %></h3>
+             
+              <div class="product-variants mb-3">
+                <label class="fw-bold">System Memory:</label>
+                <div class="variant-options">
+                  <% varient.forEach(element => { %>
+                    <button class="variant-btn" data-variant="8GB" onclick="window.location.href='/user/productView?productId=<%= products._id %>&varientId=<%= element._id  %>'"><%= element.ramSize %></button>
+                  <% }) %>
+             
+               
+                </div>
+              </div>
+           
+             
 
             </div>
     
@@ -179,41 +215,87 @@
             <div class="description mt-4">
               <h6>Description</h6>
               <p class="mt-2"><%= products.description %></p>
-              <input type="hidden" id="ProductId" value="<%= products._id %>">
+              <input type="text" id="ProductId" value="<%= products._id %>">
             </div>
           </div>
         </div>
       </div>
     </div>
-
-
+  
+ 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+  document.getElementById("addToCart").addEventListener("click", async function(){
+   console.log("hai")
 
+    const productId = document.getElementById("ProductId").value
+    const varientId = document.getElementById("variantId").value
+        const response = await fetch("/user/add-Cart", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ productId, varientId })  // Ensure both fields are sent
+        });
 
+        if (!response.ok) {
+            throw new Error("Failed to add item to cart");
+        }
+
+        const data = await response.json();
+
+        if (data.message) {
+            Swal.fire({
+                title: "Success",
+                text: data.message,
+                icon: "success",
+            });
+        }
+});
+
+document.querySelectorAll('.variant-btn').forEach(button => {
+      button.addEventListener('click', function() {
+        document.querySelectorAll('.variant-btn').forEach(btn => btn.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+    
+    document.getElementById('increaseQty').addEventListener('click', function() {
+      let quantityInput = document.getElementById('quantity');
+      if (parseInt(quantityInput.value) < parseInt(quantityInput.max)) {
+        quantityInput.value = parseInt(quantityInput.value) + 1;
+      }
+    });
+    
+    document.getElementById('decreaseQty').addEventListener('click', function() {
+      let quantityInput = document.getElementById('quantity');
+      if (parseInt(quantityInput.value) > parseInt(quantityInput.min)) {
+        quantityInput.value = parseInt(quantityInput.value) - 1;
+      }
+    });
 
     function updateMainImage(src) {
       document.getElementById('mainImage').src = src;
     }
 
-    //flipkart zoom like that
+   
  
 function updateMainImage(src) {
     const mainImage = document.getElementById('mainImage');
     mainImage.src = src;
     
-    // Update high-res image source
+  
     mainImage.setAttribute('data-highres', src);
     
-    // Reset zoom display
+   
     const zoomLens = document.querySelector(".zoom-lens");
     const zoomResult = document.querySelector(".zoom-result");
     zoomLens.style.display = "none";
     zoomResult.style.display = "none";
 }
 
-// Zoom functionality
+
 const mainImage = document.getElementById("mainImage");
 const zoomLens = document.querySelector(".zoom-lens");
 const zoomResult = document.querySelector(".zoom-result");
@@ -252,45 +334,10 @@ function initZoom() {
     });
 }
 
-// Initialize zoom when page loads
-document.addEventListener('DOMContentLoaded', initZoom);
 
-document.getElementById("addToCart").addEventListener("click", async (event) => {
-    event.preventDefault();
 
-    const productId = document.getElementById("ProductId").value.trim();
-    const quantity = document.getElementById("quantity").value.trim();
-    const price = document.getElementById("salePrice").innerText.replace("₹", "").trim();
-    const totalPrice = quantity * price;
 
-    try {
-        const response = await fetch("/user/add-Cart", {
-            method: "POST",  // Specify method
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ productId, quantity, price, totalPrice })
-        });
 
-        if (!response.ok) {
-            throw new Error("Failed to add item to cart");
-        }
-
-        const data = await response.json();
-
-        if(data.message){
-          Swal.fire({
-            title: "Success",
-            text: data.message,
-            icon: "success",
-        });
-        }
-     
-
-    } catch (error) {
-        console.error("Error:", error);
-    }
-});
 
 
     </script>

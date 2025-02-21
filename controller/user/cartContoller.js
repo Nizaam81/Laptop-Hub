@@ -1,57 +1,84 @@
-const cart = require("../../model/cartSchema")
-const user = require("../../model/usersSchema")
-const mongoose = require('mongoose');
-const ObjectId = mongoose.Types.ObjectId; 
+const cart = require("../../model/cartSchema");
+const user = require("../../model/usersSchema");
+const variant = require("../../model/varient");
+const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId;
 
-
-const loadCart = async(req,res)=>{
+const loadCart = async (req, res) => {
     try {
-        const userid = req.session.user
-       
-    
-        const Cart=await cart.aggregate([{$match:{userId:new ObjectId(userid)}},{
-            $lookup:{
-                from:"products",
-                localField:"productId",
-                foreignField:"_id",
-                as:"productDetails"
+        const userid = req.session.user;
+
+        if (!userid) {
+            return res.redirect("/login");
+        }
+
+        const Cart = await cart.aggregate([
+            { $match: { userId: new ObjectId(userid) } },
+            { $unwind: "$items" }, // If cart has an items array
+            {
+                $lookup: {
+                    from: "products",
+                    localField: "items.productId",
+                    foreignField: "_id",
+                    as: "productDetails"
+                }
+            },
+            {
+                $lookup: {
+                    from: "categories",
+                    localField: "productDetails.category",
+                    foreignField: "_id",
+                    as: "categoryDetails"
+                }
+            },
+            {
+                $lookup: {
+                    from: "brands",
+                    localField: "productDetails.brand",
+                    foreignField: "_id",
+                    as: "brandDetails"
+                }
+            },
+            {
+                $lookup: {
+                    from: "variants", // Corrected collection name
+                    localField: "productDetails.variant",
+                    foreignField: "_id",
+                    as: "variantDetails"
+                }
             }
-        }
-    ,{
-        $lookup:{
-            from:"categories",
-            localField:"productDetails.category",
-            foreignField:"_id",
-            as:"categoryDetails"
-        }
-    },{
-        $lookup:{
-            from:"brands",
-            localField:"productDetails.brand",
-            foreignField:"_id",
-            as:"brandDetails"
-        }
-    }])
-        
-        
-       
-        res.render("user/cart",{firstLetter:"",users:"",Cart})
+        ]);
+
+        console.log(Cart);
+
+        const users = await user.findById(userid);
+
+        res.render("user/cart", {
+            firstLetter: users ? users.name.charAt(0).toUpperCase() : "",
+            users,
+            Cart
+        });
     } catch (error) {
-        console.log("error in loadcart contoller");
-        
+        console.error("Error in loadCart controller:", error);
+        res.status(500).send("Internal Server Error");
     }
-}
+};
+
+
 
  const  AddCart = async(req,res)=>{
       try {
+        console.log("haaiiiiiiii addcart is woking ")
+        const {productId,varientId }=req.body
+       const  varientDetails = await variant.find({_id:varientId})
+        
+        console.log("add cart controller ",varientDetails)
         const userid=req.session.user
-       const {productId, quantity, price, totalPrice}=req.body
+      
       const Newcart = new cart({
         userId:userid,
         productId:productId,
-        quantity:quantity,
-        price:price,
-        totalPrice:totalPrice,
+       
 
       })
       await Newcart.save()

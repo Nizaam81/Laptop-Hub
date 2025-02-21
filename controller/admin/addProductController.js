@@ -17,9 +17,9 @@ const loadpage=async(req,res)=>{
 
 const addProduct=async(req,res)=>{
     try {
-        const {product,description,brand,category,regularPrice,salePrice,quantity}=req.body;
+        const {product,description,brand,category,regularPrice,salePrice}=req.body;
         const [file1,file2,file3]=req.files;
-        if(!product || !description || !brand || !category || !regularPrice || !salePrice || !quantity){
+        if(!product || !description || !brand || !category || !regularPrice || !salePrice ){
             return res.json({error:"Please Fill All The Field"})
         }
         if(req.files.length!=3){
@@ -29,9 +29,7 @@ const addProduct=async(req,res)=>{
         if(existproduct){
             return res.json({existError:"This productname Already Exist"})
         }
-        if(quantity < 0){
-            return res.json({minusQty:"Quantity Less than 0 Is Not Possible"})
-        }
+      
         let images=[]
        
         for(let i=0;i<3;i++){
@@ -44,7 +42,6 @@ const addProduct=async(req,res)=>{
             category,
             regularPrice,
             salePrice,
-            quantity,
             images
         })
         await newProduct.save()

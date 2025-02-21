@@ -365,7 +365,7 @@ async function deleteBrand(brandId) {
 }
 
 async function addBrand(event) {
-    event.preventDefault(); // Prevent form submission from refreshing the page
+    event.preventDefault(); 
     
     const brandName = document.getElementById('newBrandName').value.trim();
     
@@ -381,12 +381,12 @@ async function addBrand(event) {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
-            body: JSON.stringify({ brandName: brandName }) // Make sure to use brandName as the key
+            body: JSON.stringify({ brandName: brandName }) 
         });
 
         const data = await response.json();
         
-        if (response.ok) { // Check if response was successful
+        if (response.ok) { 
             closeAddModal();
             window.location.reload();
         } else {

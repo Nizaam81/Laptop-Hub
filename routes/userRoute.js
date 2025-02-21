@@ -82,8 +82,7 @@ routes.post("/Cart/remove",userAuth.userAuth,cartController.deleteCart)
 
 //chnage email in userProfile  and password 
 
-routes.post("/updatPhone",userAuth.userAuth,userProfileController.updatePhone)
-routes.post("/changePassword",userAuth.userAuth,userProfileController.updatePassword);
+routes.post("/updateProfile",userAuth.userAuth,userProfileController.changeProfile)
 
 
 //checkout routes

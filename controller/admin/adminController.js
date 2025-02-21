@@ -5,10 +5,10 @@ const bcrypt = require('bcryptjs');
 const loadlogin = async (req, res) => {
     try {
         if (req.session.admin) {
-            // Redirect to admin dashboard if admin is already logged in
+
             return res.redirect('/admin/home');
         }
-        // Render the Admin Login page if no session exists
+    
         return res.render('admin/AdminLogin');
     } catch (error) {
         console.error("Error loading admin login page:", error.message);
@@ -34,7 +34,7 @@ const login = async (req, res) => {
         req.session.admin = admin;
         res.status(200).json({ 
             message: "Login successful", 
-            redirectUrl: "/admin/home"  // Add redirect URL to JSON response
+            redirectUrl: "/admin/home"  
         });
         
     } catch (error) {

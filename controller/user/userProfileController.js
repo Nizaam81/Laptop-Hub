@@ -8,6 +8,7 @@ const userprofile=async(req,res)=>{
     try {
         const userid =req.session.user
         const users= await user.findOne({_id:userid});
+      
 
       res.render("user/userProfile",{users,firstLetter:""})  
     } catch (error) {
@@ -16,74 +17,58 @@ const userprofile=async(req,res)=>{
     }
 }
 
-const updatePhone = async (req, res) => {
+const changeProfile = async (req, res) => {
     try {
-        const { phone, userId } = req.body;
+        const { userId, fname, lname, phone, currentpassword, NewPassword, Cpassword } = req.body;
 
-        if (!phone || !userId) {
-            return res.status(400).json({ error: "Phone and userId are required" });
-        }
-
-        const existingUser = await user.findOne({ phone });
-        if (existingUser) {
-            return res.status(400).json({ existError: "This phone number already exists" });
-        }
-
-        const updatedUser = await user.findByIdAndUpdate(
-            userId, 
-            { phone }, 
-            { new: true, runValidators: true }
-        );
-
-        if (!updatedUser) {
-            return res.status(404).json({ error: "User not found" });
-        }
-
-        return res.status(200).json({ success: "Phone number updated successfully", user: updatedUser });
-
-    } catch (error) {
-        console.error("Error updating phone number:", error);
-        return res.status(500).json({ error: "Internal server error" });
-    }
-};
-
-
-
- 
-const updatePassword = async (req, res) => {
-    try {
-        console.log("Update function is working");
-        const { currentPassword, newPassword, userId } = req.body;
-        console.log("Received data:", req.body);
-
-       
+        // Find user by ID
         const User = await user.findById(userId);
         if (!User) {
-            return res.status(404).json({ message: "User not found!" });
+            return res.status(404).json({ success: false, message: "User not found" });
         }
 
-       
-        const isMatch = await bcrypt.compare(currentPassword, User.password);
-        if (!isMatch) {
-            return res.status(400).json({ message: "Current password is incorrect!" });
+        // Validate phone number (must be 10 digits)
+        const phoneRegex = /^[0-9]{10}$/;
+        if (!phoneRegex.test(phone)) {
+            return res.status(400).json({ success: false, message: "Invalid phone number. Must be 10 digits." });
         }
 
-     
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        // Check if the user wants to change the password
+        if (currentpassword || NewPassword || Cpassword) {
+            if (!currentpassword || !NewPassword || !Cpassword) {
+                return res.status(400).json({ success: false, message: "All password fields are required." });
+            }
 
-       
-        User.password = hashedPassword;
+            // Check if the current password is correct
+            const passwordMatch = await bcrypt.compare(currentpassword, User.password);
+            if (!passwordMatch) {
+                return res.status(401).json({ success: false, message: "Current password is incorrect." });
+            }
+
+            // Ensure new password and confirm password match
+            if (NewPassword !== Cpassword) {
+                return res.status(400).json({ success: false, message: "New password and confirm password do not match." });
+            }
+
+            // Hash and update new password
+            const salt = await bcrypt.genSalt(10);
+            User.password = await bcrypt.hash(NewPassword, salt);
+        }
+
+        // Update name and phone number
+        User.FirstName = fname;
+        User.LastName = lname;
+        User.phone = phone;
+
+        // Save the updated user data
         await User.save();
 
-      
-        res.status(200).json({ message: "Password updated successfully!" });
-
+        return res.status(200).json({ success: true, message: "Profile updated successfully!" });
     } catch (error) {
-        console.error("Error updating password:", error);
-        res.status(500).json({ message: "Server error. Please try again later." });
+        console.error("Error updating profile:", error);
+        return res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
-
 
 
 
@@ -145,7 +130,6 @@ const Addaddress = async (req, res) => {
 
 module.exports={
     userprofile,
-    updatePhone,
-    updatePassword,
-    Addaddress
+    Addaddress,
+    changeProfile
 }

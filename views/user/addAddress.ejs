@@ -139,9 +139,10 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+ 
     document.getElementById("addAddress").addEventListener("submit", async (event) => {
         event.preventDefault();
-    
+
         const addressType = document.getElementById("addressType").value.trim();
         const name = document.getElementById("name").value.trim();
         const city = document.getElementById("city").value.trim();
@@ -151,8 +152,33 @@
         const phone = document.getElementById("phone").value.trim();
         const altPhone = document.getElementById("alternatePhone").value.trim();
         const userId = document.getElementById("userid").value.trim();
-        console.log("User ID before sending:", userId);
 
+        // Validation Patterns
+        const alphabetPattern = /^[A-Za-z\s]+$/;  // Only alphabets and spaces
+        const pincodePattern = /^[1-9][0-9]{5}$/; // 6-digit positive number, cannot start with 0
+        const phonePattern = /^[6-9]\d{9}$/;      // 10-digit number, starts with 6-9
+
+        if (!addressType || !name || !city || !state || !pincode || !phone) {
+            return Swal.fire("Error!", "All fields except Alternate Phone are required.", "error");
+        }
+
+        if (!alphabetPattern.test(addressType) || !alphabetPattern.test(name) || !alphabetPattern.test(city) || !alphabetPattern.test(state) || (landmark && !alphabetPattern.test(landmark))) {
+            return Swal.fire("Error!", "Address Type, Name, City, Landmark, and State should contain only alphabets.", "error");
+        }
+
+        if (!pincodePattern.test(pincode)) {
+            return Swal.fire("Error!", "Pincode must be a 6-digit positive number.", "error");
+        }
+
+        if (!phonePattern.test(phone)) {
+            return Swal.fire("Error!", "Phone number must be a 10-digit positive number starting with 6-9.", "error");
+        }
+
+        if (altPhone && !phonePattern.test(altPhone)) {
+            return Swal.fire("Error!", "Alternate Phone must be a 10-digit positive number starting with 6-9.", "error");
+        }
+
+        // If all validations pass, send the data
         const data = {
             address_type: addressType,
             name: name,
@@ -162,9 +188,9 @@
             pincode: pincode,
             phone: phone,
             alt_phone: altPhone,
-            userId: userId 
+            userId: userId
         };
-    
+
         try {
             const response = await fetch("/user/addAddress", {
                 method: "POST",
@@ -173,34 +199,30 @@
                 },
                 body: JSON.stringify(data)
             });
-    
+
             if (response.ok) {
-    Swal.fire({
-        title: "Success!",
-        text: "Address Added Successfully",
-        icon: "success",
-        showConfirmButton: true
-    }).then(()=>{ 
-        if (document.referrer.includes("/checkout")) {
-        // If the referrer is the checkout page, redirect to checkout
-        window.location.href = "/user/checkout"; 
-    } else {
-        // If the referrer is not checkout page, stay on the address page
-        window.location.href = "/user/address"; 
-    }
-    })
-
-
-   
-
-        } else {
-                alert("Failed to add address.");
+                Swal.fire({
+                    title: "Success!",
+                    text: "Address Added Successfully",
+                    icon: "success",
+                    showConfirmButton: true
+                }).then(() => {
+                    if (document.referrer.includes("/checkout")) {
+                        window.location.href = "/user/checkout";
+                    } else {
+                        window.location.href = "/user/address";
+                    }
+                });
+            } else {
+                Swal.fire("Error!", "Failed to add address. Please try again.", "error");
             }
         } catch (error) {
             console.error("Error:", error);
-            alert("Something went wrong.");
+            Swal.fire("Error!", "Something went wrong.", "error");
         }
     });
+
+
     </script>
     
 </html>

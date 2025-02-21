@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Variant = require("./varient");
 const { Schema } = mongoose;
 
 const cartSchema = new Schema({
@@ -7,32 +8,37 @@ const cartSchema = new Schema({
         ref: "User",
         required: true,
     },
-        productId: {  // Fixed typo (producrId → productId)
-            type: Schema.Types.ObjectId,  // Fixed incorrect SchemaTypes.Types.ObjectId
+        productId: { 
+            type: Schema.Types.ObjectId, 
             ref: "products",
             required: true,
         },
         quantity: {
-            type: Number,  // Fixed incorrect lowercase "number"
+            type: Number, 
             default: 1
         },
         price: {
-            type: Number,  // Fixed incorrect lowercase "number"
+            type: Number,  
             required: true
         },
         totalPrice: {
-            type: Number,  // Fixed incorrect lowercase "number"
+            type: Number,  
             required: true
         },
         status: {
-            type: String,  // Fixed incorrect lowercase "string"
-            default: "Placed"  // Fixed typo "[laced"
+            type: String,  
+            default: "Placed" 
+        },
+        VariantId:{
+      type:Schema.Types.ObjectId,
+      ref:"variants",
+      require:true,
         },
         cancellationReason: {
-            type: String,  // Fixed incorrect lowercase "string"
-            default: "none"  // Fixed typo (defult → default)
+            type: String,  
+            default: "none" 
         }
 });
 
-const Cart = mongoose.model("Cart", cartSchema);  // Changed variable name to start with uppercase (convention)
+const Cart = mongoose.model("Cart", cartSchema);  
 module.exports = Cart;

@@ -110,18 +110,7 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-md-4">
-                        <label class="form-label">Regular Price ($)</label>
-                        <input type="number" class="form-control" placeholder="Enter price" id="regularPrice">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Sale Price ($)</label>
-                        <input type="number" class="form-control" placeholder="Enter sale price" id="salePrice">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Quantity</label>
-                        <input type="number"  value="0" class="form-control" placeholder="Enter quantity" id="quantity">
-                    </div>
+                   
                 </div>
 
                 <div class="mb-3 mt-3">
@@ -291,10 +280,8 @@
     formData.append("description", document.getElementById('description').value);
     formData.append("brand", document.getElementById('brand').value);
     formData.append("category", document.getElementById('category').value);
-    formData.append("regularPrice" , document.getElementById('regularPrice').value);
-    formData.append("salePrice", document.getElementById('salePrice').value);
-    formData.append("quantity", document.getElementById('quantity').value);
-
+  
+  
     // Append multiple files (Check if a file is selected before adding)
     const fileInputs = document.querySelectorAll('.image-input');
 fileInputs.forEach(input => {

@@ -57,7 +57,7 @@ const editAddress = async (req, res) => {
 };
 const updateAddress = async (req, res) => {
     try {
-        console.log("hAI")
+      
         const {
             userId,
             addressId,

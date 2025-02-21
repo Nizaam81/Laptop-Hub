@@ -1,13 +1,23 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <link rel="stylesheet" href="/styles.css">
-</head>
-<%- include('partials/header') %> 
+
+<%- include('partials/header') %>
+<%- include('partials/head') %>
     
 <div class="container mt-4">
-    <div class="product-container mb-3">
-        <div class="sorting">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <button class="btn btn-dark d-flex align-items-center">
+            <i class="bi bi-funnel"></i> Filter Products
+        </button>
+        <div class="input-group search-bar" style="width: 300px;">
+            <input type="text" class="form-control" placeholder="Search for products...">
+            <button class="btn btn-outline-secondary"><i class="bi bi-search"></i> Search</button>
+        </div>
+        <div class="d-flex align-items-center">
+            <span class="me-2">Sort By :</span>
             <select class="form-select w-auto">
+                <option>Default</option>
                 <option>Popularity</option>
                 <option>Price: Low to High</option>
                 <option>Price: High to Low</option>
@@ -16,43 +26,46 @@
     </div>
     
     <div class="row">
-        <% Products.forEach(element => { %>
-          <div class="col-md-3 mb-4">
-            <div class="card text-center p-2"> <!-- Centering content and adding padding -->
-                <div class="wishlist-container text-end p-2"> <!-- Positioned wishlist icon -->
-                    <span class="wishlist" onclick="toggleWishlist(this)">&#10084;</span>
+        <% Products.forEach(product => { %>
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                <div class="card p-2 position-relative shadow-lg" style="border-radius: 12px; transition: transform 0.3s ease-in-out;">
+                    <div class="wishlist-container position-absolute top-0 end-0 p-2">
+                        <span class="wishlist" onclick="toggleWishlist(this)">&#10084;</span>
+                    </div>
+                    <form action="/user/productView">
+                        <button class="btn border-0 w-100 p-0">
+                            <img src="<%= product.images[0] %>" class="card-img-top" style="height: 150px; width: 100%; object-fit: cover; border-radius: 10px;" alt="Product Image">
+                            <div class="card-body text-center">
+                                <input type="hidden" value="<%= product._id %>" name="productId">
+                                <input type="hidden" value="" name="varientId">
+                                <h6 class="card-title mb-1"><%= product.name %></h6>
+                                <% if (product.stock === 0) { %>
+                                    <p class="text-danger fw-bold">Out of Stock</p>
+                                <% } %>
+                                <p class="text-muted mb-1"><del>₹<%= product.regularPrice %></del></p>
+                                <p class="text-dark fw-bold">₹<%= product.salePrice %> <span class="badge bg-success">5% OFF</span></p>
+                                <div class="rating text-warning">⭐ (4.5)</div>
+                            </div>
+                        </button>
+                    </form>
                 </div>
-                <form action="/user/productView">
-                    <button class="btn border-0 w-100"> <!-- Ensured button does not break layout -->
-                        <img src="<%= element.images[0] %>" style="height: 150px; width:100%" class="card-img-top product-img" alt="Product Image">
-                        <div class="card-body">
-                            <input type="hidden" value="<%= element._id %>" name="productId">
-                            <h5 class="card-title"><%= element.name%></h5>
-                            <p class="card-text text-muted"><del><%= element.regularPrice %></del></p>
-                            <p class="card-text text-danger fw-bold"><%= element.salePrice %></p>
-                            <a href="#" class="btn btn-primary">View Details</a>
-                        </div>
-                    </button>
-                </form>
             </div>
-        </div>
         <% }) %>
     </div>
 </div>
 
 <style>
-    .wishlist-container {
-        position: absolute;
-        right: 10px; /* Move to left by setting left: 10px */
-        top: 10px;
-    }
     .wishlist {
-        font-size: 24px;
+        font-size: 20px;
         color: grey;
         cursor: pointer;
     }
     .wishlist.active {
         color: red;
+    }
+    .card:hover {
+        transform: scale(1.05);
+        box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
     }
 </style>
 
@@ -60,6 +73,40 @@
     function toggleWishlist(element) {
         element.classList.toggle('active');
     }
+    // Add this script after your existing toggleWishlist function
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.querySelector('.search-bar input');
+    const searchButton = document.querySelector('.search-bar button');
+    const productCards = document.querySelectorAll('.card');
+
+    function performSearch() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        
+        productCards.forEach(card => {
+            const productName = card.querySelector('.card-title').textContent.toLowerCase();
+            const productContainer = card.closest('.col-lg-3');
+            
+            if (productName.includes(searchTerm)) {
+                productContainer.style.display = '';
+            } else {
+                productContainer.style.display = 'none';
+            }
+        });
+
+        // Clear the search input after search
+        searchInput.value = '';
+    }
+
+    // Search when clicking the search button
+    searchButton.addEventListener('click', performSearch);
+
+    // Search when pressing Enter key
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            performSearch();
+        }
+    });
+});
 </script>
-</body>
-</html>
+<%- include('partials/footer.ejs') %>

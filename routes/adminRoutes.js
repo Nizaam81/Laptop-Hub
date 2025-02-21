@@ -9,6 +9,7 @@ const brandController = require("../controller/admin/brandController")
 const productController = require("../controller/admin/productController")
 const addProductController = require("../controller/admin/addProductController")
 const orderController = require("../controller/admin/orderManagmentController")
+const varientController = require("../controller/admin/variantController")
 const upload = require("../utils/multer/uploads");
 
 
@@ -53,7 +54,11 @@ routes.put('/products/toggleProductBlock',productController.toggleProductBlock);
 //Order Managment Route
 routes.get("/OrderManagment",orderController.loadOrder)
 
-
+// varient 
+routes.get("/varient/:id",varientController.loadvarient)
+routes.post("/add-varient",varientController.addVarient)
+routes.post("/variant/toggle-status",varientController.toggleStatus);
+routes.post("/edit-variant",varientController.updatevariant)
 
 
 

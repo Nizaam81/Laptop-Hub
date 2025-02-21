@@ -1,27 +1,20 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
 
-    <%- include('partials/head') %>
-    
-    <%- include('partials/header') %> 
-     <!-- banner bg main start -->
- <div class="banner_bg_main">
-   <!-- header top section start -->
-  
-   <!-- header top section start -->
-   <!-- logo section start -->
+<!-- Banner Section -->
+<div class="banner_bg_main">
    <div class="logo_section">
       <div class="container">
          <div class="row">
-            <div class="col-sm-12">
-               <div class="logo"><a href="index.html"><img src="/images/logoL.png" style="width:66px;"></a></div>
+            <div class="col-sm-12 text-center">
+               <div class="logo">
+                  <a href="index.html"><img src="/images/logoL.png" style="width:66px;"></a>
+               </div>
             </div>
          </div>
       </div>
    </div>
-   <!-- logo section end -->
-   <!-- header section start -->
-  
-   <!-- header section end -->
-   <!-- banner section start -->
+   <!-- Banner Content -->
    <div class="banner_section layout_padding">
       <div class="container">
          <div id="my_slider" class="carousel slide" data-ride="carousel">
@@ -29,60 +22,92 @@
                <div class="carousel-item active">
                   <div class="row">
                      <div class="col-sm-12">
-                        <h1 class="banner_taital">Get Start <br>Your favriot shoping</h1>
-                        <div class="buynow_bt"><a href="/user/ProductsDetails">Buy Now</a></div>
+                        <h1 class="banner_taital">Get Start <br>Your favorite shopping</h1>
+                        <div class="buynow_bt"><a href="/user/ProductsDetails.ejs">Buy Now</a></div>
                      </div>
                   </div>
                </div>
-               
-               
             </div>
-           
          </div>
       </div>
    </div>
-   <!-- banner section end -->
 </div>
-<!-- banner bg main end -->
-  
-    
-      <!-- laptop section start -->
-      <div class="fashion_section">
-        <div id="main_slider" class="carousel slide" data-ride="carousel">
-           <div class="carousel-inner">
-              <div class="carousel-item active">
-                 <div class="container">
-                    <h1 class="fashion_taital">Laptops</h1>
-                    <div class="fashion_section_2">
-                       <div class="row">
-                        <% Products.forEach(element => { %>
-                           <div class="col-lg-4 col-sm-4">
-                              <div class="box_main">
-                                 <h4 class="shirt_text"><%= element.name %></h4>
-                                 <p class="price_text">Price  <span style="color: #262626;"><%= element.salePrice %></span></p>
-                                 <div class="tshirt_img"><img src="<%=  element.images[0] %>"></div>
-                                 <div class="btn_main">
-                                    <div class="buy_bt"><a href="/user/ProductsDetails">Buy Now</a></div>
-                                    <div class="seemore_bt"><a href="/user/ProductsDetails">See More</a></div>
-                                 </div>
-                              </div>
-                           </div>
 
-                         
-                        <% }) %>
-                         
-                         
-                          
-                       </div>
-                    </div>
-                 </div>
-              </div>
-              
-              
-           </div>
-          
-        </div>
-     </div>
-    
-     <%- include('partials/footer') %>
- 
+<!-- Featured Laptops Section -->
+<div class="featured_laptops">
+   <div class="container">
+      <h2 class="section_title"><strong>Featured Laptops</strong></h2>
+      <div class="row">
+         <div class="col-lg-4 col-sm-6">
+            <div class="featured_box">
+               <img src="/images/static1.jpg" class="img-fluid animated-image">
+            </div>
+         </div>
+         <div class="col-lg-4 col-sm-6">
+            <div class="featured_box">
+               <img src="/images/static2.jpg" class="img-fluid animated-image">
+            </div>
+         </div>
+         <div class="col-lg-4 col-sm-6">
+            <div class="featured_box">
+               <img src="/images/static4.jpg" class="img-fluid animated-image">
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+
+<!-- Laptops Section -->
+<div class="fashion_section">
+   <div class="container">
+      <h1 class="fashion_taital">Laptops</h1>
+      <div class="row">
+         <% Products.forEach(element => { %>
+         <div class="col-lg-4 col-sm-6">
+            <div class="box_main animated-box">
+               <h4 class="shirt_text"><%= element.name %></h4>
+               <p class="price_text">Price: <span><%= element.salePrice %></span></p>
+               <div class="tshirt_img">
+                  <img src="<%= element.images[0] %>" class="img-fluid">
+               </div>
+               <div class="btn_main">
+                  <div class="buy_bt"><a href="/user/ProductsDetails">Buy Now</a></div>
+                  <div class="seemore_bt"><a href="/user/ProductsDetails">See More</a></div>
+               </div>
+            </div>
+         </div>
+         <% }) %>
+      </div>
+   </div>
+</div>
+
+<%- include('partials/footer') %>
+
+<style>
+   .animated-box {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+   }
+   .animated-box:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+   }
+   .btn_main a:hover {
+      background-color: #ff6600;
+      color: #fff;
+      transition: 0.3s;
+   }
+   .featured_box {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 20px;
+   }
+   .animated-image {
+      width: 100%;
+      border-radius: 15px;
+      transition: transform 0.3s ease;
+   }
+   .animated-image:hover {
+      transform: scale(1.1);
+   }
+</style>

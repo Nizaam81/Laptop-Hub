@@ -3,6 +3,7 @@ const nodemailer = require('nodemailer')
 const env=require('dotenv').config()
 const bcrypt = require('bcryptjs');
 const product = require("../../model/productSchema");
+const variant = require("../../model/varient")
 
 
 
@@ -324,7 +325,7 @@ const login = async (req, res) => {
         console.log(passwordMatch)
         
         if (!passwordMatch) {
-            console.log("haii this function is working")
+        
             return res.render("user/login", { message: "Incorrect password" });
         }
         
@@ -367,17 +368,30 @@ const welcome = async (req, res) => {
        
         res.render("user/ProductsDetails",{User,Products})
     } catch (error) {
-        console.log("erro")
+        console.log("error")
     }
   }
 
   const loadproductView = async(req,res)=>{
     try {
+        const varientId = req.query.varientId
         const productId=req.query.productId
-        const User = req.session.user 
-        const products = await product.findOne({ _id: productId });
+        let Variants;
+      
+        const varient = await variant.find({product:productId})
         
-        res.render("user/productView",{products})
+
+        const User = req.session.user 
+
+        const products = await product.findOne({ _id: productId });
+  if(varientId==""){
+    Variants=await variant.findOne({product:productId})
+  }else{
+    Variants = await variant.findOne({_id:varientId})
+  }
+  
+
+        res.render("user/productView",{products,varient,Variants})
     } catch (error) {
         console.error(error.message)
         res.render("user/pageNotfound")
