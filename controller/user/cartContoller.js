@@ -6,88 +6,83 @@ const ObjectId = mongoose.Types.ObjectId;
 
 const loadCart = async (req, res) => {
     try {
-        const userid = req.session.user;
+        const userId = req.session.user;
 
-        if (!userid) {
-            return res.redirect("/login");
-        }
-
-        const Cart = await cart.aggregate([
-            { $match: { userId: new ObjectId(userid) } },
-            { $unwind: "$items" }, // If cart has an items array
+        const carts = await cart.aggregate([
+            {
+                $match: { userId: userId } // Filter carts by userId
+            },
             {
                 $lookup: {
                     from: "products",
-                    localField: "items.productId",
+                    localField: "productId", // Assuming productId is the correct field in the cart schema
                     foreignField: "_id",
-                    as: "productDetails"
+                    as: "productDetails",
                 }
             },
             {
                 $lookup: {
-                    from: "categories",
-                    localField: "productDetails.category",
+                    from: "variants",
+                    localField: "variantId", // Assuming variantId is the correct field in the cart schema
                     foreignField: "_id",
-                    as: "categoryDetails"
-                }
-            },
-            {
-                $lookup: {
-                    from: "brands",
-                    localField: "productDetails.brand",
-                    foreignField: "_id",
-                    as: "brandDetails"
-                }
-            },
-            {
-                $lookup: {
-                    from: "variants", // Corrected collection name
-                    localField: "productDetails.variant",
-                    foreignField: "_id",
-                    as: "variantDetails"
+                    as: "variantDetails",
                 }
             }
         ]);
-
-        console.log(Cart);
-
-        const users = await user.findById(userid);
-
-        res.render("user/cart", {
-            firstLetter: users ? users.name.charAt(0).toUpperCase() : "",
-            users,
-            Cart
-        });
+console.log(" what is inside",carts)
+        res.render("user/cart", { carts });
     } catch (error) {
-        console.error("Error in loadCart controller:", error);
-        res.status(500).send("Internal Server Error");
+        console.log("Error in loadCart");
+        console.error(error);
     }
 };
 
 
 
- const  AddCart = async(req,res)=>{
-      try {
-        console.log("haaiiiiiiii addcart is woking ")
-        const {productId,varientId }=req.body
-       const  varientDetails = await variant.find({_id:varientId})
-        
-        console.log("add cart controller ",varientDetails)
-        const userid=req.session.user
-      
-      const Newcart = new cart({
-        userId:userid,
-        productId:productId,
-       
 
-      })
-      await Newcart.save()
-      return res.json({message:"Addedd SuccessFully"})
-      } catch (error) {
-         console.error(error)
-         console.log("error in AddCart post request path controller l userl CartController")
-      }
- }
+const AddCart = async (req, res) => {
+    try {
+        const userId = req.session.user;
+        const { productId, varientId } = req.body;
+
+      
+        const existingCartItem = await cart.findOne({ userId, VariantId: varientId });
+
+        if (existingCartItem) {
+            return res.json({ existingCartItem: "This variant is already in your cart." });
+        }
+
+       
+        const variantDetails = await variant.findOne({ _id: varientId });
+        if (!variantDetails) {
+            return res.json({ variantDetails: "Variant not found." });
+        }
+
+        const { price, quantity } = variantDetails;
+        const TotalPrice = quantity * price;
+
+       
+        let NewCart = new cart({
+            userId: userId,
+            productId: productId,
+            quantity: quantity,
+            price: price,
+            totalPrice: TotalPrice,
+            VariantId: varientId
+        });
+
+        await NewCart.save();
+
+        return res.json({ success: "Cart Added Successfully" });
+
+    } catch (error) {
+        console.log("Error in addCart controller:", error);
+        return res.status(500).json({Wrong: "Something went wrong" });
+    }
+};
+
+
+
 
 
  const deleteCart = async (req, res) => {

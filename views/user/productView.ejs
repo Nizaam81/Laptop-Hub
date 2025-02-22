@@ -179,7 +179,7 @@
     
             <!-- Price Section -->
             <div class="pricing mb-4">
-              <input type="text" id="variantId" value="<%= Variants._id %>">
+              <input type="hidden" id="variantId" value="<%= Variants._id %>">
 
                 <h2 class="current-price" id="salePrice" >₹ <%= Variants.price %></h2>
                  <h3>Available Stock<%= Variants.quantity %></h3>
@@ -215,7 +215,7 @@
             <div class="description mt-4">
               <h6>Description</h6>
               <p class="mt-2"><%= products.description %></p>
-              <input type="text" id="ProductId" value="<%= products._id %>">
+              <input type="hidden" id="ProductId" value="<%= products._id %>">
             </div>
           </div>
         </div>
@@ -226,8 +226,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-  document.getElementById("addToCart").addEventListener("click", async function(){
-   console.log("hai")
+  document.getElementById("addToCart").addEventListener("click", async function(event){
+ event.preventDefault
 
     const productId = document.getElementById("ProductId").value
     const varientId = document.getElementById("variantId").value
@@ -245,12 +245,26 @@
 
         const data = await response.json();
 
-        if (data.message) {
+        if (data.success) {
             Swal.fire({
                 title: "Success",
-                text: data.message,
+                text: data.success,
                 icon: "success",
             });
+        }
+        if(data.existingCartItem){
+          swal.fire({
+            title:"ERROR",
+            text:data.existingCartItem,
+            icon:"warning",
+          })
+        }
+        if(data.variantDetails){
+          swal.fire({
+            title:"Not Founded",
+            text:data.variantDetails,
+            icon:"error",
+          })
         }
 });
 
