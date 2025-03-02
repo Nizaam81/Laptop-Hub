@@ -22,56 +22,63 @@
         .navbar {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             background: #222;
             padding: 15px 40px;
             color: white;
+            height: 55px;
         }
 
-        .logo img {
-            height: 50px; /* Adjust logo size */
-            width: auto;
-        }
-
-        .nav-left {
+        .nav-left, .nav-right {
             display: flex;
             align-items: center;
             gap: 20px;
         }
 
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-left: auto; /* Pushes icons to the right */
-        }
-
-        .nav-left a {
+        .nav-left a, .nav-right a {
             color: white;
             text-decoration: none;
             font-size: 1.1rem;
-            padding: 5px 10px;
-        }
-
-        .nav-left a:hover {
-            text-decoration: underline;
-        }
-
-        .nav-right a {
-            color: white;
-            text-decoration: none;
-            font-size: 0.9rem;
             display: flex;
             align-items: center;
             gap: 5px;
+            padding: 8px 12px;
+            transition: all 0.3s ease;
+            border-radius: 5px;
+        }
+
+        .nav-left a:hover, .nav-right a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
         }
 
         .nav-right .logout {
             color: red;
         }
 
+        .nav-right a i {
+            transition: transform 0.3s ease;
+        }
+
+        .nav-right a:hover i {
+            transform: scale(1.2);
+        }
+
         @media (max-width: 768px) {
             .navbar {
+                flex-direction: column;
+                align-items: flex-start;
+                height: auto;
                 padding: 15px 20px;
+            }
+            .nav-left, .nav-right {
+                flex-direction: column;
+                align-items: flex-start;
+                width: 100%;
+                gap: 10px;
+            }
+            .nav-right {
+                margin-left: 0;
             }
         }
     </style>
@@ -87,6 +94,9 @@
             <a href="cart">
                 <i class="fa fa-shopping-cart" aria-hidden="true"></i>
                 <span>Cart</span>
+            </a>
+            <a href="/user/wishlist" class="wishlist">
+                <i class="fa fa-heart" aria-hidden="true"></i>
             </a>
             <a href="profile">
                 <i class="fa fa-user" aria-hidden="true"></i>

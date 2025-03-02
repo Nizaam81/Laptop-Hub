@@ -62,8 +62,7 @@
 </body>
 <script>
   async function deleteCategory(addressId) {
-    console.log("Trying to delete address with ID:", addressId); // Debugging
-
+    console.log("Trying to delete address with ID:", addressId); 
     const result = await Swal.fire({
         title: 'Are you sure?',
         text: "You won't be able to revert this!",

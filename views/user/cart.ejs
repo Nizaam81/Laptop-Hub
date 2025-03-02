@@ -1,8 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ 
     <title>Shopping Cart</title>
     <style>
         body {
@@ -68,6 +64,19 @@
         .quantity button:hover {
             background: #e68900;
         }
+        .remove-btn {
+            background-color: #ff4d4d;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-left: 20px;
+        }
+        .remove-btn:hover {
+            background-color: #cc0000;
+        }
         .summary {
             background: #f4f4f4;
             padding: 15px;
@@ -92,30 +101,169 @@
 <body>
     <div class="cart-container">
         <div class="cart-header">
-            <h2>Shopping Cart (1 Item)</h2>
-            <button class="clear-btn">Clear All</button>
+            <h2>Shopping Cart</h2>
         </div>
+       <% carts.forEach(element => { %>
         <div class="cart-item">
-            <img src="https://via.placeholder.com/100" alt="Product">
+            <img src="<%=element.productDetails[0].images[0]  %>" alt="Product">
             <div class="info">
-                <h3>Sony ZV-1F Vlog Camera</h3>
-                <p>Price: ₹38,490 <span style="color: green;">-5% OFF</span></p>
+                <h3><%= element.productDetails[0].name %></h3>
+                <p>Type : <%= element.variantDetails[0].ramSize %></p> 
+                <p>Stock : <%=element.variantDetails[0].quantity  %></p>
+                <p>Price: <%= element.variantDetails[0].price %> ₹ <span style="color: green;"></span></p>
             </div>
             <div class="quantity">
-                <button>-</button>
-                <span style="margin: 0 10px;">1</span>
-                <button>+</button>
+                <button onclick="decreaseQuantity('<%=element._id%>', '<%= element.variantDetails[0].price %>')">-</button>
+                <span id="quantity-<%=element._id%>" style="margin: 0 10px;"><%= element.quantity %></span>
+                <button onclick="updateQuantity('<%=element._id%>', '<%= element.variantDetails[0].price %>', '<%= element.variantDetails[0].quantity %>')">+</button>
             </div>
-            <h3><%=  %></h3>
+            <button class="remove-btn" onclick="deleteCart('<%=element._id %>')">Remove</button>
         </div>
+        
+        
+       <% }) %>
         <div class="summary">
-            <h3>Price Details</h3>
-            <p>Subtotal: ₹38,490</p>
-            <p>Discount: <span style="color: orange;">₹1,924.50</span></p>
-            <p>Shipping: Free</p>
-            <h2>Total: ₹36,565.5</h2>
-            <button class="checkout-btn">Check Out</button>
+          
+
+           <a href="/user/checkout"><button class="checkout-btn">Check Out</button></a> 
         </div>
     </div>
+    <!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    <script>
+          async function deleteCart(CartId) {
+    const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#0653cc',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            const response = await fetch('/user/cart-delete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id: CartId }),
+            });
+
+            if (response.ok) {
+                await Swal.fire({
+                    title: 'Deleted!',
+                    text: 'Category has been deleted.',
+                    icon: 'success',
+                    confirmButtonColor: '#0653cc'
+                });
+                window.location.reload();
+            } else {
+                const data = await response.json();
+                await Swal.fire({
+                    title: 'Error!',
+                    text: data.error || 'Failed to delete category',
+                    icon: 'error',
+                    confirmButtonColor: '#0653cc'
+                });
+            }
+        } catch (error) {
+            await Swal.fire({
+                title: 'Error!',
+                text: 'An error occurred',
+                icon: 'error',
+                confirmButtonColor: '#0653cc'
+            });
+        }
+    }
+}
+
+
+function updateQuantity(elementId, price, maxQuantity) {
+    let quantitySpan = document.getElementById(`quantity-${elementId}`);
+    let totalPriceSpan = document.getElementById(`total-price`);
+    let currentQuantity = parseInt(quantitySpan.innerText);
+    let newQuantity = currentQuantity + 1; 
+    
+    if (newQuantity > maxQuantity) {
+        Swal.fire({
+            icon: "warning",
+            title: "Stock limit reached!",
+            text: "You cannot add more of this item.",
+        });
+        return;
+    }
+
+    quantitySpan.innerText = newQuantity;
+
+   
+    let totalPrice = parseFloat(totalPriceSpan.innerText.replace("₹", "").trim());
+    totalPrice += price;
+    totalPriceSpan.innerText = `₹${totalPrice.toFixed(2)}`;
+
+    
+    fetch(`/update-cart`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            cartId: elementId,
+            newQuantity: newQuantity
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Updated successfully", data);
+    })
+    .catch(error => {
+        console.error("Error updating quantity:", error);
+    });
+}
+
+function decreaseQuantity(elementId, price) {
+    let quantitySpan = document.getElementById(`quantity-${elementId}`);
+    let totalPriceSpan = document.getElementById(`total-price`);
+    let currentQuantity = parseInt(quantitySpan.innerText);
+    
+    if (currentQuantity <= 1) return; 
+    
+    let newQuantity = currentQuantity - 1;
+    quantitySpan.innerText = newQuantity;
+
+    
+    let totalPrice = parseFloat(totalPriceSpan.innerText.replace("₹", "").trim());
+    totalPrice -= price;
+    totalPriceSpan.innerText = `₹${totalPrice.toFixed(2)}`;
+
+   
+    fetch(`/update-cart`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            cartId: elementId,
+            newQuantity: newQuantity
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Updated successfully", data);
+    })
+    .catch(error => {
+        console.error("Error updating quantity:", error);
+    });
+}  
+
+
+
+ 
+    </script>
 </body>
 </html>

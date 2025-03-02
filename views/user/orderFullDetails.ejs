@@ -1,0 +1,204 @@
+
+    <title>Order Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f7f5;
+            margin: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-button {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .back-button:hover {
+            text-decoration: underline;
+        }
+
+        .order-header {
+            background: linear-gradient(90deg, #0033cc, #0052cc);
+            color: white;
+            padding: 15px;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .order-header span {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .order-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-top: 15px;
+        }
+
+        .product-section {
+            flex: 1;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .product {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .product img {
+            width: 80px;
+            border-radius: 5px;
+        }
+
+        .order-summary {
+            width: 250px;
+            background: #eef1f6;
+            padding: 15px;
+            border-radius: 8px;
+            align-self: flex-start; /* Ensures it stays at the top */
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .summary-total {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .status {
+            display: inline-block;
+            background: #ffeb99;
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .section {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 8px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .cancel-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .download-btn {
+            background-color: #007bff;
+            color: white;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Back Button -->
+        <a href="order" class="back-button">← Back to Orders</a>
+
+        <div class="order-header">
+            <h3>Order Details</h3>
+            <!-- <span>Order ID: 67b96b5380ae9fa82b3ea2f6</span> -->
+            <!-- <span>22/2/2025</span> -->
+        </div>
+
+        <div class="order-content">
+            <!-- Product Section -->
+             <% orders.forEach(element => { %>
+                <div class="product-section">
+                    <h4>Products</h4>
+                    <div class="product">
+                        <img src="<%= element.productDetails[0].images[0] %>" alt="Book">
+                        <div>
+                            <p><strong><%= element.productDetails[0].name %></strong></p>
+                            <p>Price :₹ <%= element.orderItem.price %></p>
+                            <p><strong>Total: ₹ <%= totalPrice %></strong></p>
+                        </div>
+                    </div>
+                </div>
+             <% }) %>
+          
+
+            <!-- Order Summary -->
+            <!-- <div class="order-summary">
+                <h4>Order Summary</h4>
+                <div class="summary-item"><span>Subtotal</span> <span>₹600.00</span></div>
+                <div class="summary-item"><span>Discount</span> <span>-₹0.00</span></div>
+                <div class="summary-item"><span>Shipping</span> <span>₹40.00</span></div>
+                <div class="summary-item summary-total"><span>Amount</span> <span>₹640</span></div>
+            </div> -->
+        </div>
+
+        <% Addres.address.forEach(element => { %>
+            <div class="section">
+                <h4>Shipping Address</h4>
+                <p><strong><%= element.name %></strong></p>
+                <p><%= element.addressType %></p>
+                <p><%= element.state %></p>
+                <p><%= element.city %></p>
+                <p><%= element.phone %></p>
+                <p>Alt. Phone: altPhone</p>
+            </div>
+        <% }) %>
+       
+
+        <div class="section">
+            <h4>Order Status</h4>
+            <span class="status">PENDING</span>
+        </div>
+
+        <div class="buttons">
+            <!-- <button class="btn cancel-btn">Cancel Order</button> -->
+            <button class="btn download-btn">📥 Download Invoice</button>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -33,29 +33,29 @@ const changeProfile = async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid phone number. Must be 10 digits." });
         }
 
-        // Check if the user wants to change the password
+       
         if (currentpassword || NewPassword || Cpassword) {
             if (!currentpassword || !NewPassword || !Cpassword) {
                 return res.status(400).json({ success: false, message: "All password fields are required." });
             }
 
-            // Check if the current password is correct
+          
             const passwordMatch = await bcrypt.compare(currentpassword, User.password);
             if (!passwordMatch) {
                 return res.status(401).json({ success: false, message: "Current password is incorrect." });
             }
 
-            // Ensure new password and confirm password match
+            
             if (NewPassword !== Cpassword) {
                 return res.status(400).json({ success: false, message: "New password and confirm password do not match." });
             }
 
-            // Hash and update new password
+           
             const salt = await bcrypt.genSalt(10);
             User.password = await bcrypt.hash(NewPassword, salt);
         }
 
-        // Update name and phone number
+     
         User.FirstName = fname;
         User.LastName = lname;
         User.phone = phone;

@@ -179,8 +179,8 @@
             color: #1d4ed8;
         }.toggle-password {
             position: absolute;
-            right: 445px;
-            top: 57%;
+            right: 545px;
+            top: 50%;
             transform: translateY(-50%);
             cursor: pointer;
             font-size: 18px;
@@ -208,15 +208,15 @@
             }
     
             .container {
-                padding: 10px; /* Further reduced padding for smaller screens */
+                padding: 10px; 
             }
     
             .form-group input {
-                padding: 6px; /* Reduced padding for smaller screens */
+                padding: 6px; 
             }
     
             .submit-btn {
-                padding: 6px; /* Reduced padding for smaller screens */
+                padding: 6px; 
             }
         }
     </style>
@@ -324,7 +324,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function LnameValidateChecking() {
         const Lname = document.getElementById("lastName");
         const nameval = Lname.value.trim();
-        const namepattern = /^[A-Za-z]{3,}(?: [A-Za-z]+)*$/;
+        const namepattern = /^[A-Za-z]{1,}(?: [A-Za-z]+)*$/;
 
         if (nameval === "") {
             showAlert("Please enter a valid last name.");

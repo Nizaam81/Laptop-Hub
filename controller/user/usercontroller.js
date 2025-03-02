@@ -214,6 +214,7 @@ const emailSent = await sendVerificationEmail(email, otp);
 
         
         console.log("OTP sent", otp);
+        res.render('user/verifyOTP')
         
       
 
@@ -246,7 +247,11 @@ const emailSent = await sendVerificationEmail(email, otp);
 };
 const verifyOTP = async (req, res) => {
     try {
-        
+        console.log(req.body)
+        console.log(req.session.userData)
+        console.log(req.session.userOtp)
+        console.log(req.session.otpTimestamp)
+
         const { otp } = req.body;
         const storedOTP = req.session.userOtp;
         const userData = req.session.userData;
@@ -263,15 +268,16 @@ const verifyOTP = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(userData.password, salt);
 
-        const newUser = new user({
+        const newUser =new user({
             FirstName: userData.Fname,
             LastName: userData.Lname,
             phone: userData.phone,
             email: userData.email,
             password: hashedPassword,
-            isVerified: true
-        });
-
+            isVerified: true,
+            googleId: userData.email + '_local' 
+          });
+      
         await newUser.save();
 
         // Clear session data
@@ -297,7 +303,7 @@ const verifyOTP = async (req, res) => {
 const loadverifyOtp =async(req,res)=>{
     try {
 
-         res.render('user/verifyOtp')
+         res.render("user/verifyOTP")
     } catch (error) {
           res.status(500).send("Internal server error")
         console.log("verification  page is not founded");
@@ -361,17 +367,109 @@ const welcome = async (req, res) => {
     }
   }
 
-  const loadproductDetails = async(req,res)=>{
+  const loadproductDetails = async (req, res) => {
     try {
-        const Products=await product.find({isBlocked:false})
-        const User=req.session.user
-       
-        res.render("user/ProductsDetails",{User,Products})
-    } catch (error) {
-        console.log("error")
-    }
-  }
+        const page = parseInt(req.query.page) || 1; // Get page number from query, default to 1
+        const limit = 6; // Number of products per page
+        const skip = (page - 1) * limit;
 
+        const value = req.query.value || "default"; // Default value if not provided
+
+        let Products = [];
+        let totalProducts;
+
+        if (value === "default") {
+            totalProducts = await variant.countDocuments();
+            Products = await variant.aggregate([
+                {
+                    $lookup: {
+                        from: "products",
+                        localField: "product",
+                        foreignField: "_id",
+                        as: "productDetails",
+                    },
+                },
+                { $skip: skip },
+                { $limit: limit }
+            ]);
+        } else if (value === "ltoH") {
+            totalProducts = await variant.countDocuments();
+            Products = await variant.aggregate([
+                {
+                    $lookup: {
+                        from: "products",
+                        localField: "product",
+                        foreignField: "_id",
+                        as: "productDetails",
+                    },
+                },
+                { $sort: { price: 1 } }, // Sorting price Low to High
+                { $skip: skip },
+                { $limit: limit }
+            ]);
+        } else if (value === "htoL") {
+            totalProducts = await variant.countDocuments();
+            Products = await variant.aggregate([
+                {
+                    $lookup: {
+                        from: "products",
+                        localField: "product",
+                        foreignField: "_id",
+                        as: "productDetails",
+                    },
+                },
+                { $sort: { price: -1 } }, // Sorting price High to Low
+                { $skip: skip },
+                { $limit: limit }
+            ]);
+        } else if (value === "atoZ") {
+            totalProducts = await variant.countDocuments();
+            Products = await variant.aggregate([
+                {
+                    $lookup: {
+                        from: "products",
+                        localField: "product",
+                        foreignField: "_id",
+                        as: "productDetails",
+                    },
+                },
+                { $sort: { "productDetails.name": 1 } }, // Sorting name A to Z
+                { $skip: skip },
+                { $limit: limit }
+            ]);
+        } else if (value === "ztoA") {
+            totalProducts = await variant.countDocuments();
+            Products = await variant.aggregate([
+                {
+                    $lookup: {
+                        from: "products",
+                        localField: "product",
+                        foreignField: "_id",
+                        as: "productDetails",
+                    },
+                },
+                { $sort: { "productDetails.name": -1 } }, // Sorting name Z to A
+                { $skip: skip },
+                { $limit: limit }
+            ]);
+        }
+
+        const totalPages = Math.ceil(totalProducts / limit);
+        const User = req.session.user;
+
+        res.render("user/ProductsDetails", {
+            User,
+            Products,
+            currentPage: page,
+            totalPages,
+            value,
+        });
+
+    } catch (error) {
+        console.log("error", error);
+        res.status(500).send("Internal Server Error");
+    }
+};
   const loadproductView = async(req,res)=>{
     try {
         const varientId = req.query.varientId
@@ -456,7 +554,7 @@ const verifyForgotPasswordOTP = async (req, res) => {
     try {
         const { otp } = req.body;
         
-        // Check if OTP exists in session
+      
         if (!req.session.resetPasswordOtp || !req.session.otpTimestamp) {
             return res.status(400).json({
                 status: 'error',
@@ -464,7 +562,7 @@ const verifyForgotPasswordOTP = async (req, res) => {
             });
         }
 
-        // Verify OTP
+       
         if (otp !== req.session.resetPasswordOtp) {
             return res.status(400).json({
                 status: 'error',
@@ -472,10 +570,10 @@ const verifyForgotPasswordOTP = async (req, res) => {
             });
         }
 
-        // Check OTP expiry (1 minute)
+      
         const otpAge = Date.now() - req.session.otpTimestamp;
         if (otpAge > 60000) { // 1 minute in milliseconds
-            // Clear expired OTP
+            
             req.session.resetPasswordOtp = null;
             req.session.otpTimestamp = null;
             
@@ -485,7 +583,7 @@ const verifyForgotPasswordOTP = async (req, res) => {
             });
         }
 
-        // Clear OTP from session but keep email for password reset
+       
         req.session.resetPasswordOtp = null;
         req.session.otpTimestamp = null;
 
@@ -530,17 +628,17 @@ const resetPassword = async (req, res) => {
             });
         }
 
-        // Hash new password
+      
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-        // Update user password
+       
         await user.findOneAndUpdate(
             { email },
             { password: hashedPassword }
         );
 
-        // Clear session data
+       
         req.session.resetPasswordEmail = null;
 
         return res.status(200).json({

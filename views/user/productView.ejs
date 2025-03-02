@@ -5,14 +5,17 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
 <style>
-    .product-images {
-      display: flex;
-      gap: 20px;
-    }
-    
-    .thumbnail-gallery {
-      width: 80px;
-    }
+   .product-images {
+    display: flex;
+    gap: 20px;
+    position: relative; /* Add this */
+}
+.thumbnail-gallery {
+    width: 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
     
     .thumbnail-item img {
       width: 100%;
@@ -26,13 +29,19 @@
     }
     
     .main-image-container {
-      flex-grow: 1;
-    }
+    position: relative;
+    width: 500px; /* Increased from 400px */
+    height: 500px; /* Added fixed height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
     
-    .main-product-image {
-      width: 100%;
-      max-width: 500px;
-    }
+.main-product-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
     
     .product-title {
       font-size: 1.5rem;
@@ -66,37 +75,36 @@
       font-size: 16px;
       text-transform: uppercase;
     }
-    .main-image-container { /*main image container */
+    .main-image-container {
     position: relative;
-    width: 400px; 
+    width: 400px;
+    height: 400px;
 }
 
 .main-product-image {
     width: 100%;
-}
-
-.zoom-lens {
-    position: absolute;
-    width: 100px; /* Adjust lens size */
-    height: 100px;
-    border: 2px solid #000;
-    background: rgba(255, 255, 255, 0.3);
-    pointer-events: none;
-    display: none;
+    height: 100%;
+    object-fit: contain;
 }
 
 .zoom-result {
-    width: 400px; /* Adjust size */
-    height: 400px;
+    position: fixed;
+    width: 800px;
+    height: 800px;
+    left: 45%; /* Adjust this value based on your layout */
+    top: 50%;
+    transform: translateY(-50%);
     border: 1px solid #ddd;
     background-repeat: no-repeat;
     display: none;
-    position: absolute;
-    left: calc(100% + 20px); /* Moves it to the right side */
-    top: 0;
-    z-index: 100;
-    background-color: white; /* Ensure the zoom background is clean */
-} 
+    z-index: 1000;
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}.zoom-lens {
+    display: none;
+}
+
+
     .variant-btn {
       padding: 10px 20px;
       margin: 5px;
@@ -138,10 +146,10 @@
       </div>
     
       <div class="row">
-        <!-- Left Column - Image Gallery -->
+       
         <div class="col-md-5">
           <div class="product-images">
-            <!-- Thumbnail Gallery -->
+           
             <div class="thumbnail-gallery">
               <% products.images.forEach((image, index) => { %>
                 <div class="thumbnail-item mb-2">
@@ -153,20 +161,20 @@
               <% }) %>
             </div>
             
-            <!-- Main Image -->
+            
             <div class="main-image-container">
               <div class="zoom-lens"></div>
               <img src="<%= products.images[0] %>" 
                    id="mainImage"
                    alt="<%= products.name %>"
                    class="img-fluid main-product-image">
-              <div class="zoom-result"></div> <!-- Add this if missing -->
+              <div class="zoom-result"></div> 
           </div>
           
           </div>
         </div>
     
-        <!-- Right Column - Product Details -->
+      
         <div class="col-md-7">
           <div class="product-details ps-4">
             <h1 class="product-title mb-2"><%= products.name %></h1>
@@ -190,10 +198,15 @@
                   <% varient.forEach(element => { %>
                     <button class="variant-btn" data-variant="8GB" onclick="window.location.href='/user/productView?productId=<%= products._id %>&varientId=<%= element._id  %>'"><%= element.ramSize %></button>
                   <% }) %>
-             
+                  <div class="quantity">
+                    <button class="btn btn-info">-</button>
+                    <span id="quantities" style="margin: 0 10px;" data-max="<%= Variants.quantity %>">1</span>
+                    <button class="btn btn-info">+</button>
+                </div>
                
                 </div>
               </div>
+              
            
              
 
@@ -226,47 +239,82 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-  document.getElementById("addToCart").addEventListener("click", async function(event){
- event.preventDefault
 
-    const productId = document.getElementById("ProductId").value
-    const varientId = document.getElementById("variantId").value
+        const minusBtn = document.querySelector(".quantity .btn:first-child");
+        const plusBtn = document.querySelector(".quantity .btn:last-child");
+        const quantitySpan = document.querySelector(".quantity span");
+
+        
+        const maxQuantity = parseInt(quantitySpan.getAttribute("data-max"));
+
+        plusBtn.addEventListener("click", function () {
+            let currentValue = parseInt(quantitySpan.textContent);
+            if (currentValue < maxQuantity) {  // Restrict to max quantity
+                quantitySpan.textContent = currentValue + 1;
+            }
+        });
+
+        minusBtn.addEventListener("click", function () {
+            let currentValue = parseInt(quantitySpan.textContent);
+            if (currentValue > 1) { 
+                quantitySpan.textContent = currentValue - 1;
+            }
+        });
+      
+  document.getElementById("addToCart").addEventListener("click", async function(event){
+    event.preventDefault(); 
+
+    const productId = document.getElementById("ProductId").value;
+    const varientId = document.getElementById("variantId").value;
+    const quantities = document.getElementById("quantities").textContent.trim();
+
+
+    try {
         const response = await fetch("/user/add-Cart", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ productId, varientId })  // Ensure both fields are sent
+            body: JSON.stringify({ productId, varientId, quantities }) 
         });
 
-        if (!response.ok) {
-            throw new Error("Failed to add item to cart");
-        }
-
         const data = await response.json();
-
+       console.log(data)
         if (data.success) {
             Swal.fire({
                 title: "Success",
                 text: data.success,
                 icon: "success",
             });
+        } else if (data.existingCartItem) {
+            Swal.fire({ 
+                title: "Item Already in Cart",
+                text: data.existingCartItem,
+                icon: "warning",
+            });
+        } else if (data.variantDetails) {
+            Swal.fire({
+                title: "Variant Not Found",
+                text: data.variantDetails,
+                icon: "error",
+            });
+        } else {
+            Swal.fire({
+                title: "Error",
+                text: "Something went wrong!",
+                icon: "error",
+            });
         }
-        if(data.existingCartItem){
-          swal.fire({
-            title:"ERROR",
-            text:data.existingCartItem,
-            icon:"warning",
-          })
-        }
-        if(data.variantDetails){
-          swal.fire({
-            title:"Not Founded",
-            text:data.variantDetails,
-            icon:"error",
-          })
-        }
+    } catch (error) {
+        console.error("Error:", error);
+        Swal.fire({
+            title: "Error",
+            text: "Failed to add item to cart!",
+            icon: "error",
+        });
+    }
 });
+
 
 document.querySelectorAll('.variant-btn').forEach(button => {
       button.addEventListener('click', function() {
@@ -311,45 +359,86 @@ function updateMainImage(src) {
 
 
 const mainImage = document.getElementById("mainImage");
-const zoomLens = document.querySelector(".zoom-lens");
-const zoomResult = document.querySelector(".zoom-result");
+    const zoomLens = document.querySelector(".zoom-lens");
+    const zoomResult = document.querySelector(".zoom-result");
 
-function initZoom() {
-    mainImage.addEventListener("mousemove", function (e) {
-        zoomLens.style.display = "block";
-        zoomResult.style.display = "block";
-
+    function moveLens(e) {
+        e.preventDefault();
         let rect = mainImage.getBoundingClientRect();
-        let x = e.clientX - rect.left;
-        let y = e.clientY - rect.top;
+        let lensSize = zoomLens.offsetWidth / 2;
 
-        let lensSize = 100;
-        let zoomLevel = 2;
+        let x = e.clientX - rect.left - lensSize;
+        let y = e.clientY - rect.top - lensSize;
 
-        // Prevent lens from going out of bounds
-        x = Math.max(0, Math.min(x - lensSize / 2, rect.width - lensSize));
-        y = Math.max(0, Math.min(y - lensSize / 2, rect.height - lensSize));
+        x = Math.max(0, Math.min(x, rect.width - zoomLens.offsetWidth));
+        y = Math.max(0, Math.min(y, rect.height - zoomLens.offsetHeight));
 
         zoomLens.style.left = x + "px";
         zoomLens.style.top = y + "px";
 
-        // Get current image source
-        let highResImage = mainImage.getAttribute("data-highres") || mainImage.src;
-
-        // Update zoom result
-        zoomResult.style.backgroundImage = `url(${highResImage})`;
-        zoomResult.style.backgroundSize = rect.width * zoomLevel + "px " + rect.height * zoomLevel + "px";
+        let zoomLevel = 2;
         zoomResult.style.backgroundPosition = `-${x * zoomLevel}px -${y * zoomLevel}px`;
+    }
+
+    function initZoom() {
+    const container = document.querySelector('.main-image-container');
+    const mainImage = document.getElementById('mainImage');
+    const zoomResult = document.querySelector('.zoom-result');
+    
+    function handleZoom(e) {
+        const bounds = mainImage.getBoundingClientRect();
+        
+       
+        const x = (e.clientX - bounds.left) / bounds.width;
+        const y = (e.clientY - bounds.top) / bounds.height;
+        
+       
+        const clampedX = Math.max(0, Math.min(1, x));
+        const clampedY = Math.max(0, Math.min(1, y));
+
+        
+        zoomResult.style.backgroundImage = `url(${mainImage.src})`;
+        zoomResult.style.backgroundSize = '100%';
+        
+       
+        const posX = clampedX * 100;
+        const posY = clampedY * 100;
+        zoomResult.style.backgroundPosition = `${-posX}% ${-posY}%`;
+    }
+
+    
+    container.addEventListener('mouseenter', () => {
+        zoomResult.style.display = 'block';
+        
+       
+        zoomResult.style.backgroundImage = `url(${mainImage.src})`;
+        zoomResult.style.backgroundSize = '100%';
     });
 
-    mainImage.addEventListener("mouseleave", function () {
-        zoomLens.style.display = "none";
-        zoomResult.style.display = "none";
+   
+    container.addEventListener('mousemove', handleZoom);
+
+    
+    container.addEventListener('mouseleave', () => {
+        zoomResult.style.display = 'none';
     });
 }
 
 
+function updateMainImage(src) {
+    const mainImage = document.getElementById('mainImage');
+    mainImage.src = src;
+    
+  
+    const zoomResult = document.querySelector('.zoom-result');
+    zoomResult.style.display = 'none';
+    
+   
+    initZoom();
+}
 
+
+window.addEventListener('load', initZoom);
 
 
 

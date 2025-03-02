@@ -20,16 +20,6 @@ const productSchema = new Schema({
         ref: 'Category', 
         required: true,
     },
-    regularPrice: {
-        type: Number,
-        required: true,
-    },
-    salePrice: {
-        type: Number,
-    },
-    productOffer: {
-        type: String,
-    },
     images: [{
         type: String,
         required: true,

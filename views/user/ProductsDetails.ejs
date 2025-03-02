@@ -1,112 +1,378 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <%- include('partials/header') %>
 <%- include('partials/head') %>
-    
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <button class="btn btn-dark d-flex align-items-center">
-            <i class="bi bi-funnel"></i> Filter Products
+
+<div class="container mt-4 flex-grow-1">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <button class="btn btn-dark d-flex align-items-center" id="filterToggleBtn">
+            <i class="fas fa-filter me-2"></i> Filter Products
         </button>
         <div class="input-group search-bar" style="width: 300px;">
             <input type="text" class="form-control" placeholder="Search for products...">
-            <button class="btn btn-outline-secondary"><i class="bi bi-search"></i> Search</button>
+            <button class="btn btn-outline-secondary"><i class="fas fa-search"></i></button>
         </div>
-        <div class="d-flex align-items-center">
-            <span class="me-2">Sort By :</span>
-            <select class="form-select w-auto">
-                <option>Default</option>
-                <option>Popularity</option>
-                <option>Price: Low to High</option>
-                <option>Price: High to Low</option>
+        <div class="d-flex align-items-center gap-2">
+            <span class="me-2">Sort By:</span>
+            <select class="form-select w-auto" id="values" onchange="sorting()">
+                <option value="all">Default</option>
+                <option value="atoZ">Aa-Zz</option>
+                <option value="ztoA">Zz-Aa</option>
+                <option value="ltoH">Price: Low to High</option>
+                <option value="htoL">Price: High to Low</option>
             </select>
         </div>
     </div>
-    
-    <div class="row">
-        <% Products.forEach(product => { %>
-            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                <div class="card p-2 position-relative shadow-lg" style="border-radius: 12px; transition: transform 0.3s ease-in-out;">
-                    <div class="wishlist-container position-absolute top-0 end-0 p-2">
-                        <span class="wishlist" onclick="toggleWishlist(this)">&#10084;</span>
+
+    <!-- Filter Sidebar -->
+    <div class="filter-sidebar" id="filterSidebar">
+        <div class="filter-header d-flex justify-content-between align-items-center mb-3">
+            <h5 class="m-0 fw-bold">Filters</h5>
+            <button class="btn-close" id="closeFilterBtn"></button>
+        </div>
+        <form action="/user/productsDetails" method="GET">
+            <div class="filter-box">
+                <!-- Categories Filter -->
+                <h5 class="fw-bold mb-3">Categories</h5>
+                <div class="mb-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="categories" value="Romance" id="romance">
+                        <label class="form-check-label" for="Gaming">Gaming </label>
                     </div>
-                    <form action="/user/productView">
-                        <button class="btn border-0 w-100 p-0">
-                            <img src="<%= product.images[0] %>" class="card-img-top" style="height: 150px; width: 100%; object-fit: cover; border-radius: 10px;" alt="Product Image">
-                            <div class="card-body text-center">
-                                <input type="hidden" value="<%= product._id %>" name="productId">
-                                <input type="hidden" value="" name="varientId">
-                                <h6 class="card-title mb-1"><%= product.name %></h6>
-                                <% if (product.stock === 0) { %>
-                                    <p class="text-danger fw-bold">Out of Stock</p>
-                                <% } %>
-                                <p class="text-muted mb-1"><del>₹<%= product.regularPrice %></del></p>
-                                <p class="text-dark fw-bold">₹<%= product.salePrice %> <span class="badge bg-success">5% OFF</span></p>
-                                <div class="rating text-warning">⭐ (4.5)</div>
-                            </div>
-                        </button>
-                    </form>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="categories" value="Novel" id="novel">
+                        <label class="form-check-label" for="novel">Creators </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="categories" value="Thriller" id="thriller">
+                        <label class="form-check-label" for="thriller">Office Work </label>
+                    </div>
                 </div>
+    
+                <hr class="my-3">
+    
+                <!-- Price Range Filter -->
+                <h5 class="fw-bold mb-3">Price Range</h5>
+                <div class="row g-2 mb-4">
+                    <div class="col">
+                        <input type="number" class="form-control" placeholder="Min" name="minPrice">
+                    </div>
+                    <div class="col">
+                        <input type="number" class="form-control" placeholder="Max" name="maxPrice">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
             </div>
-        <% }) %>
+        </form>
     </div>
+
+    <!-- Overlay -->
+    <div class="filter-overlay" id="filterOverlay"></div>
+
+    <div class="row">
+        <!-- Products Grid -->
+        <div class="col-md-12">
+            <div class="row">
+                <% Products.forEach(product => { %>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 position-relative shadow-sm">
+                        <div class="wishlist-container position-absolute top-0 end-0 p-2">
+                            <i class="fa-heart wishlist <%= product.inWishlist ? 'fas active' : 'far' %>"
+                               data-product-id="<%= product._id %>" 
+                               onclick="toggleWishlist(this)"></i>
+                        </div>
+                        <form action="/user/productView">
+                            <button class="btn border-0 w-100 p-0 h-100 d-flex flex-column">
+                                <img src="<%= product.productDetails[0].images[0] %>" 
+                                     class="card-img-top flex-grow-1 object-fit-cover"
+                                     style="height: 200px; border-radius: 8px 8px 0 0;"
+                                     alt="Product Image">
+                                <div class="card-body text-center">
+                                    <input type="hidden" value="<%= product.productDetails[0]._id %>" name="productId">
+                                    <input type="hidden" value="<%= product._id %>" name="varientId">
+                                    <h6 class="card-title mb-1"><%= product.productDetails[0].name %></h6>
+                                    <% if (product.stock === 0) { %>
+                                        <p class="text-danger fw-bold mb-1">Out of Stock</p>
+                                    <% } %>
+                                    <p class="text-dark fw-bold h5 mb-2">₹<%= product.price %></p>
+                                    <div class="rating text-warning small">⭐ 4.5</div>
+                                </div>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <% }) %>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Page navigation" class="mt-5">
+        <ul class="pagination justify-content-center">
+            <% if (currentPage > 1) { %>
+                <li class="page-item">
+                    <a class="page-link" href="?value=<%= value %>&page=<%= currentPage - 1 %>">Previous</a>
+                </li>
+            <% } %>
+
+            <% for (let i = 1; i <= totalPages; i++) { %>
+                <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                    <a class="page-link" href="?value=<%= value %>&page=<%= i %>"><%= i %></a>
+                </li>
+            <% } %>
+
+            <% if (currentPage < totalPages) { %>
+                <li class="page-item">
+                    <a class="page-link" href="?value=<%= value %>&page=<%= currentPage + 1 %>">Next</a>
+                </li>
+            <% } %>
+        </ul>
+    </nav>
 </div>
 
+<%- include('partials/footer') %>
+
 <style>
+    body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    /* Filter Sidebar Styles */
+    .filter-sidebar {
+        position: fixed;
+        top: 0;
+        left: -300px;
+        width: 300px;
+        height: 100vh;
+        background: #fff;
+        z-index: 1050;
+        padding: 1.5rem;
+        overflow-y: auto;
+        transition: left 0.3s ease;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    }
+
+    .filter-sidebar.open {
+        left: 0;
+    }
+
+    .filter-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.5);
+        z-index: 1040;
+        display: none;
+    }
+
+    .filter-box {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+    }
+
     .wishlist {
-        font-size: 20px;
-        color: grey;
+        font-size: 1.25rem;
+        color: #6c757d;
         cursor: pointer;
+        transition: color 0.2s ease;
     }
+
     .wishlist.active {
-        color: red;
+        color: #dc3545;
     }
+
+    .card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: none;
+        border-radius: 10px;
+    }
+
     .card:hover {
-        transform: scale(1.05);
-        box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
     }
+
+    footer {
+        margin-top: auto;
+        background: #f8f9fa;
+        padding: 1.5rem 0;
+    }
+
+    .form-check-input:checked {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+
+    .object-fit-cover {
+        object-fit: cover;
+    }/* Enhanced Pagination Styles */
+.pagination {
+  margin-top: 2rem;
+  gap: 5px;
+}
+
+.page-item .page-link {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+  border: 1px solid #dee2e6;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+/* Active page styling */
+.page-item.active .page-link {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: white;
+  box-shadow: 0 2px 5px rgba(13, 110, 253, 0.3);
+}
+
+/* Previous/Next buttons */
+.page-item:first-child .page-link,
+.page-item:last-child .page-link {
+  border-radius: 20px;
+  width: auto;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+/* Hover effects */
+.page-link:hover {
+  background-color: #f8f9fa;
+  color: #0d6efd;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+
+.page-item.active .page-link:hover {
+  background-color: #0b5ed7;
+  color: white;
+}
+
+/* Disabled state */
+.page-item.disabled .page-link {
+  color: #bbb;
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 576px) {
+  .page-item .page-link {
+    width: 35px;
+    height: 35px;
+    font-size: 0.9rem;
+  }
+  
+  .page-item:first-child .page-link,
+  .page-item:last-child .page-link {
+    font-size: 0.85rem;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
 </style>
-
 <script>
-    function toggleWishlist(element) {
-        element.classList.toggle('active');
-    }
-    // Add this script after your existing toggleWishlist function
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.querySelector('.search-bar input');
-    const searchButton = document.querySelector('.search-bar button');
-    const productCards = document.querySelectorAll('.card');
-
-    function performSearch() {
-        const searchTerm = searchInput.value.toLowerCase().trim();
+    // Filter Sidebar Toggle
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterToggleBtn = document.getElementById('filterToggleBtn');
+        const closeFilterBtn = document.getElementById('closeFilterBtn');
+        const filterSidebar = document.getElementById('filterSidebar');
+        const filterOverlay = document.getElementById('filterOverlay');
         
-        productCards.forEach(card => {
-            const productName = card.querySelector('.card-title').textContent.toLowerCase();
-            const productContainer = card.closest('.col-lg-3');
+        filterToggleBtn.addEventListener('click', function() {
+            filterSidebar.classList.add('open');
+            filterOverlay.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        });
+        
+        function closeFilter() {
+            filterSidebar.classList.remove('open');
+            filterOverlay.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+        
+        closeFilterBtn.addEventListener('click', closeFilter);
+        filterOverlay.addEventListener('click', closeFilter);
+    });
+
+    async function toggleWishlist(element) {
+        const productId = element.getAttribute("data-product-id");
+        
+        const action = element.classList.contains("active") ? "remove" : "add";
+
+        try {
+            const response = await fetch("/user/Wishlist", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ productId, action }) 
+            });
+
+            const data = await response.json();
             
-            if (productName.includes(searchTerm)) {
-                productContainer.style.display = '';
+            if (data.success) {
+                if (action === "add") {
+                    element.classList.add("active"); 
+                } else {
+                    element.classList.remove("active"); 
+                }
             } else {
-                productContainer.style.display = 'none';
+                console.log("Error updating wishlist:", data.error);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    }
+
+    function sorting() {
+        const values=document.getElementById('values').value
+        window.location.href=`/user/productsDetails?value=${values}`
+    }
+  
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.querySelector('.search-bar input');
+        const searchButton = document.querySelector('.search-bar button');
+        const productCards = document.querySelectorAll('.card');
+
+        function performSearch() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            
+            productCards.forEach(card => {
+                const productName = card.querySelector('.card-title').textContent.toLowerCase();
+                const productContainer = card.closest('.col-lg-4, .col-md-6');
+                
+                if (productName.includes(searchTerm)) {
+                    productContainer.style.display = '';
+                } else {
+                    productContainer.style.display = 'none';
+                }
+            });
+
+            searchInput.value = '';
+        }
+
+        searchButton.addEventListener('click', performSearch);
+
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                performSearch();
             }
         });
-
-        // Clear the search input after search
-        searchInput.value = '';
-    }
-
-    // Search when clicking the search button
-    searchButton.addEventListener('click', performSearch);
-
-    // Search when pressing Enter key
-    searchInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            performSearch();
-        }
     });
-});
 </script>
-<%- include('partials/footer.ejs') %>

@@ -17,11 +17,13 @@ const loadpage=async(req,res)=>{
 
 const addProduct=async(req,res)=>{
     try {
-        const {product,description,brand,category,regularPrice,salePrice}=req.body;
+        const { product, description, brand, category } = req.body;
+
         const [file1,file2,file3]=req.files;
-        if(!product || !description || !brand || !category || !regularPrice || !salePrice ){
-            return res.json({error:"Please Fill All The Field"})
+        if (!product || !description || !brand || !category) {
+            return res.json({ error: "Please Fill All The Fields" });
         }
+        
         if(req.files.length!=3){
             return res.json({imageError:"Please Upload 3 Images"})
         }
@@ -36,14 +38,13 @@ const addProduct=async(req,res)=>{
            images.push(`/uploads/${req.files[i].filename}`)
         }
         const newProduct = new Product({
-            name:product,
+            name: product,
             description,
             brand,
             category,
-            regularPrice,
-            salePrice,
             images
-        })
+        });
+        
         await newProduct.save()
         
       

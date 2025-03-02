@@ -7,9 +7,13 @@ const addressController = require("../controller/user/addressController")
 const cartController = require("../controller/user/cartContoller")
 const checkout = require("../controller/user/checkoutController")
 const userAuth = require("../middlware/userAuth")
+const orderController = require("../controller/user/orderManagmentController")
+const placeOrder = require("../controller/user/placeOrder")
+const wishlist = require("../controller/user/wishlistController")
+const wallet = require("../controller/user/walletController")
 
-routes.get("/pageNotfound", usercontroller.pageNotfound);
-routes.get("/home", userAuth.userAuth, usercontroller.loadHomepage);
+routes.get("/pageNotfound",usercontroller.pageNotfound);
+routes.get("/home",userAuth.userAuth,usercontroller.loadHomepage);
 routes.get("/login", usercontroller.loadlogin);
 routes.get("/signup", usercontroller.loadsignup);
 routes.post("/signup", usercontroller.signup);
@@ -18,7 +22,7 @@ routes.post("/verifyOTP", usercontroller.verifyOTP);
 routes.post("/resend-otp", usercontroller.resendOTP);
 routes.get('/welcome',usercontroller.welcome)
 
-routes.get('/logout',usercontroller.logout);
+routes.get('/logout',userAuth.userAuth,usercontroller.logout);
 
 
 routes.get("/productsDetails",userAuth.userAuth,usercontroller.loadproductDetails)
@@ -77,7 +81,7 @@ routes.post("/address/delete",userAuth.userAuth,addressController.deleteAddress)
 //cart route
 routes.get("/cart",userAuth.userAuth,cartController.loadCart)
 routes.post("/add-Cart",userAuth.userAuth,cartController.AddCart)
-routes.post("/Cart/remove",userAuth.userAuth,cartController.deleteCart)
+routes.post("/cart-delete",userAuth.userAuth,cartController.deleteCart)
 
 
 //chnage email in userProfile  and password 
@@ -89,9 +93,27 @@ routes.post("/updateProfile",userAuth.userAuth,userProfileController.changeProfi
 routes.get("/checkout",userAuth.userAuth,checkout.loadcheckout)
 
 
+// order details 
+routes.get("/order",userAuth.userAuth,orderController.loadOrder)
+routes.get("/orderDetailss",userAuth.userAuth,orderController.loadorderFullDetails)
+routes.post("/cancelOrder",orderController.cancelOrder)
+
+//place order
+routes.get("/PlaceOrderr",userAuth.userAuth,placeOrder.loadPlaceOrder)
+routes.post("/placeOrder",userAuth.userAuth,placeOrder.placeOrder)
+routes.post("/verifyPayment", userAuth.userAuth,placeOrder.verifyPayment);
 
 
 
+
+//wishlist 
+routes.get("/wishlist",wishlist.loadWishlist)
+routes.post("/Wishlist",wishlist.Wishlist)
+
+
+//wallet 
+routes.get("/wallet",wallet.loadWallet)
+routes.post("/Wallett",wallet.addMoney)
 
 
 
