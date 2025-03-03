@@ -6,180 +6,6 @@
 
 <%- include('partials/header') %>
 <%- include('partials/head') %>
-
-<div class="container mt-4 flex-grow-1">
-    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-        <button class="btn btn-dark d-flex align-items-center" id="filterToggleBtn">
-            <i class="fas fa-filter me-2"></i> Filter Products
-        </button>
-        <div class="input-group search-bar" style="width: 300px;">
-            <input type="text" class="form-control" placeholder="Search for products...">
-            <button class="btn btn-outline-secondary"><i class="fas fa-search"></i></button>
-        </div>
-        <div class="d-flex align-items-center gap-2">
-            <span class="me-2">Sort By:</span>
-            <select class="form-select w-auto" id="values" onchange="sorting()">
-                <option value="all">Default</option>
-                <option value="atoZ">Aa-Zz</option>
-                <option value="ztoA">Zz-Aa</option>
-                <option value="ltoH">Price: Low to High</option>
-                <option value="htoL">Price: High to Low</option>
-            </select>
-        </div>
-    </div>
-
-    <!-- Filter Sidebar -->
-  <div class="filter-sidebar" id="filterSidebar">
-    <div class="filter-header d-flex justify-content-between align-items-center mb-3">
-        <h5 class="m-0 fw-bold">Filters</h5>
-        <button class="btn-close" id="closeFilterBtn"></button>
-    </div>
-    <form action="/user/productsDetails" method="GET">
-        <div class="filter-box">
-            <!-- Categories Filter -->
-            <h5 class="fw-bold mb-3">Categories</h5>
-            <div class="mb-4">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="categories" value="Business" id="business">
-                    <label class="form-check-label" for="business">Business</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="categories" value="Student Laptops" id="student-laptops">
-                    <label class="form-check-label" for="student-laptops">Student Laptops</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="categories" value="Budget Laptops" id="budget-laptops">
-                    <label class="form-check-label" for="budget-laptops">Budget Laptops</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="categories" value="Ultrabooks" id="ultrabooks">
-                    <label class="form-check-label" for="ultrabooks">Ultrabooks</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="categories" value="Editing" id="editing">
-                    <label class="form-check-label" for="editing">Editing</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="categories" value="Gaming" id="gaming">
-                    <label class="form-check-label" for="gaming">Gaming</label>
-                </div>
-            </div>
-
-            <hr class="my-3">
-
-            <!-- Brands Filter -->
-            <h5 class="fw-bold mb-3">Brands</h5>
-            <div class="mb-4">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="brands" value="Apple" id="apple">
-                    <label class="form-check-label" for="apple">Apple</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="brands" value="Dell" id="dell">
-                    <label class="form-check-label" for="dell">Dell</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="brands" value="HP" id="hp">
-                    <label class="form-check-label" for="hp">HP</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="brands" value="Lenovo" id="lenovo">
-                    <label class="form-check-label" for="lenovo">Lenovo</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="brands" value="Asus" id="asus">
-                    <label class="form-check-label" for="asus">Asus</label>
-                </div>
-            </div>
-
-            <hr class="my-3">
-
-            <!-- Price Range Filter
-            <h5 class="fw-bold mb-3">Price Range</h5>
-            <div class="row g-2 mb-4">
-                <div class="col">
-                    <input type="number" class="form-control" placeholder="Min" name="minPrice">
-                </div>
-                <div class="col">
-                    <input type="number" class="form-control" placeholder="Max" name="maxPrice">
-                </div>
-            </div> -->
-
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
-                <button type="reset" class="btn btn-secondary w-100">Clear</button>
-            </div>
-        </div>
-    </form>
-</div>
-
-
-    <!-- Overlay -->
-    <div class="filter-overlay" id="filterOverlay"></div>
-
-    <div class="row">
-        <!-- Products Grid -->
-        <div class="col-md-12">
-            <div class="row">
-                <% Products.forEach(product => { %>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card h-100 position-relative shadow-sm">
-                        <div class="wishlist-container position-absolute top-0 end-0 p-2">
-                            <i class="fa-heart wishlist <%= product.inWishlist ? 'fas active' : 'far' %>"
-                               data-product-id="<%= product._id %>" 
-                               onclick="toggleWishlist(this)"></i>
-                        </div>
-                        <form action="/user/productView">
-                            <button class="btn border-0 w-100 p-0 h-100 d-flex flex-column">
-                                <img src="<%= product.productDetails[0].images[0] %>" 
-                                     class="card-img-top flex-grow-1 object-fit-cover"
-                                     style="height: 200px; border-radius: 8px 8px 0 0;"
-                                     alt="Product Image">
-                                <div class="card-body text-center">
-                                    <input type="hidden" value="<%= product.productDetails[0]._id %>" name="productId">
-                                    <input type="hidden" value="<%= product._id %>" name="varientId">
-                                    <h6 class="card-title mb-1"><%= product.productDetails[0].name %></h6>
-                                    <% if (product.stock === 0) { %>
-                                        <p class="text-danger fw-bold mb-1">Out of Stock</p>
-                                    <% } %>
-                                    <p class="text-dark fw-bold h5 mb-2">₹<%= product.price %></p>
-                                    <div class="rating text-warning small">⭐ 4.5</div>
-                                </div>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-                <% }) %>
-            </div>
-        </div>
-    </div>
-
-    <!-- Pagination -->
-    <nav aria-label="Page navigation" class="mt-5">
-        <ul class="pagination justify-content-center">
-            <% if (currentPage > 1) { %>
-                <li class="page-item">
-                    <a class="page-link" href="?value=<%= value %>&page=<%= currentPage - 1 %>">Previous</a>
-                </li>
-            <% } %>
-
-            <% for (let i = 1; i <= totalPages; i++) { %>
-                <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-                    <a class="page-link" href="?value=<%= value %>&page=<%= i %>"><%= i %></a>
-                </li>
-            <% } %>
-
-            <% if (currentPage < totalPages) { %>
-                <li class="page-item">
-                    <a class="page-link" href="?value=<%= value %>&page=<%= currentPage + 1 %>">Next</a>
-                </li>
-            <% } %>
-        </ul>
-    </nav>
-</div>
-
-<%- include('partials/footer') %>
-
 <style>
     body {
         display: flex;
@@ -332,6 +158,144 @@
   }
 }
 </style>
+
+<div class="container mt-4 flex-grow-1">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <button class="btn btn-dark d-flex align-items-center" id="filterToggleBtn">
+            <i class="fas fa-filter me-2"></i> Filter Products
+        </button>
+        <div class="input-group search-bar" style="width: 300px;">
+            <input type="text" class="form-control" placeholder="Search for products...">
+            <button class="btn btn-outline-secondary"><i class="fas fa-search"></i></button>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="me-2">Sort By:</span>
+            <select class="form-select w-auto" id="data" onchange="sorting()">
+                <option value="all">Default</option>
+                <option value="atoZ">Aa-Zz</option>
+                <option value="ztoA">Zz-Aa</option>
+                <option value="ltoH">Price: Low to High</option>
+                <option value="htoL">Price: High to Low</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Filter Sidebar -->
+  <div class="filter-sidebar" id="filterSidebar">
+    <div class="filter-header d-flex justify-content-between align-items-center mb-3">
+        <h5 class="m-0 fw-bold">Filters</h5>
+        <button class="btn-close" id="closeFilterBtn"></button>
+    </div>
+    
+        <div class="filter-box">
+            <!-- Categories Filter -->
+            <h5 class="fw-bold mb-3">Categories</h5>
+            <div class="mb-4">
+                <% catagories.forEach(element => { %>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="categories" value="<%=element.name%>" id="business-<%=element.name%>">
+                    <label class="form-check-label" for="business"><%= element.name %></label>
+                </div>
+                <% }) %>
+               
+               
+               
+            </div>
+
+            <hr class="my-3">
+
+            <!-- Brands Filter -->
+            <h5 class="fw-bold mb-3">Brands</h5>
+            <div class="mb-4">
+                <% brands.forEach(element => { %>
+                 <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="brands" value="Apple" id="apple">
+                    <label class="form-check-label" for="apple"><%= element.brandName %></label>
+                </div>
+                <% }) %>
+                
+               
+            </div>
+
+            
+
+           
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                <button type="reset" class="btn btn-secondary w-100">Clear</button>
+            </div>
+        </div>
+    
+</div>
+
+
+    <!-- Overlay -->
+    <div class="filter-overlay" id="filterOverlay"></div>
+
+    <div class="row">
+        <!-- Products Grid -->
+        <div class="col-md-12">
+            <div class="row">
+                <% Products.forEach(product => { %>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 position-relative shadow-sm">
+                        <div class="wishlist-container position-absolute top-0 end-0 p-2">
+                            <i class="fa-heart wishlist <%= product.inWishlist ? 'fas active' : 'far' %>"
+                               data-product-id="<%= product._id %>" 
+                               onclick="toggleWishlist(this)"></i>
+                        </div>
+                        <form action="/user/productView">
+                            <button class="btn border-0 w-100 p-0 h-100 d-flex flex-column">
+                                <img src="<%= product.productDetails[0].images[0] %>" 
+                                     class="card-img-top flex-grow-1 object-fit-cover"
+                                     style="height: 200px; border-radius: 8px 8px 0 0;"
+                                     alt="Product Image">
+                                <div class="card-body text-center">
+                                    <input type="hidden" value="<%= product.productDetails[0]._id %>" name="productId">
+                                    <input type="hidden" value="<%= product._id %>" name="varientId">
+                                    <h6 class="card-title mb-1"><%= product.productDetails[0].name %></h6>
+                                    <% if (product.stock === 0) { %>
+                                        <p class="text-danger fw-bold mb-1">Out of Stock</p>
+                                    <% } %>
+                                    <p class="text-dark fw-bold h5 mb-2">₹<%= product.price %></p>
+                                    <div class="rating text-warning small">⭐ 4.5</div>
+                                </div>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <% }) %>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Page navigation" class="mt-5">
+        <ul class="pagination justify-content-center">
+            <% if (currentPage > 1) { %>
+                <li class="page-item">
+                    <a class="page-link" href="?value=<%= value %>&page=<%= currentPage - 1 %>">Previous</a>
+                </li>
+            <% } %>
+
+            <% for (let i = 1; i <= totalPages; i++) { %>
+                <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                    <a class="page-link" href="?value=<%= value %>&page=<%= i %>"><%= i %></a>
+                </li>
+            <% } %>
+
+            <% if (currentPage < totalPages) { %>
+                <li class="page-item">
+                    <a class="page-link" href="?value=<%= value %>&page=<%= currentPage + 1 %>">Next</a>
+                </li>
+            <% } %>
+        </ul>
+    </nav>
+</div>
+
+<%- include('partials/footer') %>
+
+
 <script>
    
     document.addEventListener('DOMContentLoaded', function() {
@@ -373,6 +337,9 @@
             if (data.success) {
                 if (action === "add") {
                     element.classList.add("active"); 
+
+
+
                 } else {
                     element.classList.remove("active"); 
                 }
@@ -385,7 +352,7 @@
     }
 
     function sorting() {
-        const values=document.getElementById('values').value
+        const values=document.getElementById('data').value
         window.location.href=`/user/productsDetails?value=${values}`
     }
   
@@ -420,27 +387,5 @@
             }
         });
     });
-
-
-
-
-
-document.getElementById('filterForm').addEventListener('submit', function (e) {
-    e.preventDefault(); // Prevent default form submission
-
-    const formData = new FormData(this);
-    const params = new URLSearchParams();
-
-    // Append selected filters to the URL
-    formData.forEach((value, key) => {
-        if (value) {
-            params.append(key, value);
-        }
-    });
-
-    // Redirect to the filtered products page
-    window.location.href = `/user/productsDetails?${params.toString()}`;
-});
-
-
+    
 </script>

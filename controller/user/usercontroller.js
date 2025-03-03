@@ -4,6 +4,8 @@ const env = require("dotenv").config();
 const bcrypt = require("bcryptjs");
 const product = require("../../model/productSchema");
 const variant = require("../../model/varient");
+const catagory = require("../../model/categorySchema");
+const brand = require("../../model/brandschema");
 
 const generateOtp = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -341,6 +343,9 @@ const loadproductDetails = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const value = req.query.value || "default";
+    const catagories = await catagory.find({});
+    const brands = await brand.find({});
+    console.log("brands data", brands);
 
     let Products = [];
     let totalProducts;
@@ -430,6 +435,8 @@ const loadproductDetails = async (req, res) => {
       currentPage: page,
       totalPages,
       value,
+      catagories,
+      brands,
     });
   } catch (error) {
     console.log("error", error);
