@@ -1,109 +1,197 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Wishlist UI</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
-        
-        body {
-            background-color: #f9f9f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        
-        .wishlist-container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            width: 350px;
-            text-align: center;
-            position: relative;
-            animation: fadeIn 1s ease-in-out;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
 
-        .wishlist-container img {
-            width: 100%;
-            height: auto;
-            transition: transform 0.3s ease-in-out;
-        }
+      body {
+        background-color: #f9f9f9;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
 
-        .wishlist-container img:hover {
-            transform: scale(1.05);
-        }
+      .wishlist-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        max-width: 1200px;
+      }
 
-        .delete-icon {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: #c99c67;
-            color: white;
-            padding: 10px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: transform 0.3s ease-in-out, background-color 0.3s;
-        }
+      .wishlist-container {
+        background-color: white;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        width: 280px; /* Fixed width */
+        height: 400px; /* Fixed height */
+        text-align: center;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
 
-        .delete-icon:hover {
-            transform: rotate(15deg) scale(1.1);
-            background-color: #a07642;
-        }
+      .wishlist-container img {
+        width: 100%;
+        height: 200px; /* Uniform height */
+        object-fit: cover; /* Ensures images fit properly */
+        border-radius: 8px;
+        transition: transform 0.3s ease-in-out;
+      }
 
-        .product-name {
-            font-size: 18px;
-            margin: 10px 0;
-        }
+      .wishlist-container img:hover {
+        transform: scale(1.05);
+      }
 
-        .price {
-            font-size: 16px;
-            color: gray;
-        }
+      .delete-icon {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: #c99c67;
+        color: white;
+        padding: 8px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: transform 0.3s ease-in-out, background-color 0.3s;
+      }
 
-        .add-to-cart {
-            display: inline-block;
-            margin-top: 10px;
-            padding: 10px 20px;
-            background-color: black;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: transform 0.3s ease-in-out;
-        }
+      .delete-icon:hover {
+        transform: rotate(15deg) scale(1.1);
+        background-color: #a07642;
+      }
 
-        .add-to-cart:hover {
-            transform: scale(1.1);
-        }
+      .product-name {
+        font-size: 18px;
+        margin: 10px 0;
+        font-weight: bold;
+      }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+      .price {
+        font-size: 16px;
+        color: gray;
+      }
+
+      .add-to-cart {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 10px 15px;
+        background-color: black;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 14px;
+        transition: transform 0.3s ease-in-out;
+      }
+
+      .add-to-cart:hover {
+        transform: scale(1.1);
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
+    <% if (wish.length === 0 || wish.every(item => item.products.length === 0)) { %>
+  <script>
+    window.location.href = "/user/empty";
+  </script>
+<% } else { %>
+  <div class="wishlist-wrapper" onclick="window.location.href='/user/ProductsDetails'">
+    <% wish.forEach(element => { %>
+      <% element.products.forEach(product => { %>
+        <div class="wishlist-container">
+         <a href="#" onclick="event.preventDefault(); event.stopPropagation(); deleteWishlist('<%=element._id%>', '<%=product._id%>')">
+               <div class="delete-icon">🗑️</div></a>
 
-    <div class="wishlist-container">
-       <a href="#"><div class="delete-icon">🗑️</div></a> 
-        <img src="https://m.media-amazon.com/images/I/61hRy2f27pL._AC_SX679_.jpg" alt="DJI Air 3">
-        <p class="product-name">DJI Air 3</p>
-        <p class="price">$141748</p>
-        <a href="#" class="add-to-cart">Add to Cart</a>
-    </div>
+          <img src="<%= product.productImage %>" alt="<%= product.productName %>" />
+          <p class="product-name"><%= product.productName %></p>
+          <p class="price"><%= product.Price %></p>
+        </div>
+      <% }) %>
+    <% }) %>
+  </div>
+<% } %>
 
-</body>
+  </body>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script>
+   async function deleteWishlist(wishlistId, productId) {
+    const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you want to remove this product from your wishlist?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, remove it!'
+    });
+
+    if (!result.isConfirmed) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/user/Wishlist/delete', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ wishlistId, productId })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Removed!',
+                text: 'Product removed from wishlist',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2000
+            });
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: data.message || 'Failed to remove product from wishlist',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'An error occurred!',
+            text: 'Please try again.',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    }
+}
+
+
+  </script>
 </html>

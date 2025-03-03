@@ -512,7 +512,7 @@
                                 <button class="apply-btn" id="applyCoupon">Apply</button>
                             </div>
                             
-                            <!-- This will show when a coupon is applied (hidden by default) -->
+                           
                             <div class="applied-coupon" id="appliedCoupon" style="display: none;">
                                 <span class="coupon-code">WELCOME20</span>
                                 <i class="fas fa-times-circle remove-coupon" id="removeCoupon"></i>
@@ -557,16 +557,16 @@
         </div>
     </div>
 
-    <!-- Sweet Alert Library for notifications -->
+   
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        // Original price for calculations
+        
         let originalPrice = <%= typeof totalPrice !== 'undefined' ? totalPrice : 0 %>;
         let finalPrice = originalPrice;
         let appliedCoupon = null;
         
-        // Coupon functionality
+       
         document.getElementById("applyCoupon").addEventListener("click", function() {
             const couponCode = document.getElementById("couponCode").value.trim();
             
@@ -579,23 +579,23 @@
                 return;
             }
             
-            // Simulated coupon validation (replace with actual API call)
+           
             if (couponCode === "WELCOME20") {
-                // Apply 20% discount
+              
                 const discount = Math.round(originalPrice * 0.2);
                 finalPrice = originalPrice - discount;
                 
-                // Update UI
+               
                 document.getElementById("discountAmount").textContent = discount;
                 document.getElementById("discountRow").style.display = "flex";
                 document.getElementById("finalPrice").textContent = finalPrice;
                 
-                // Show applied coupon
+              
                 document.getElementById("appliedCoupon").style.display = "flex";
                 document.querySelector(".coupon-code").textContent = couponCode;
                 document.getElementById("couponCode").value = "";
                 
-                // Store applied coupon
+               
                 appliedCoupon = {
                     code: couponCode,
                     discount: discount
@@ -615,19 +615,19 @@
             }
         });
         
-        // Remove coupon functionality
+      
         document.getElementById("removeCoupon").addEventListener("click", function() {
-            // Reset price
+          
             finalPrice = originalPrice;
             document.getElementById("finalPrice").textContent = finalPrice;
             
-            // Hide discount row
+           
             document.getElementById("discountRow").style.display = "none";
             
-            // Hide applied coupon
+          
             document.getElementById("appliedCoupon").style.display = "none";
             
-            // Clear stored coupon
+           
             appliedCoupon = null;
             
             Swal.fire({
@@ -637,11 +637,11 @@
             });
         });
 
-        // Checkout button event listener
+      
         document.getElementById("checkout").addEventListener("click", async (event) => {
             event.preventDefault();
 
-            // Validate address selection
+          
             let selectedAddress = document.querySelector('input[name="selectedAddress"]:checked');
             if (!selectedAddress) {
                 Swal.fire({
@@ -652,7 +652,7 @@
                 return;
             }
 
-            // Validate payment method selection
+           
             let selectedPayment = document.querySelector('input[name="payment"]:checked');
             if (!selectedPayment) {
                 Swal.fire({
@@ -663,24 +663,24 @@
                 return;
             }
 
-            // Collect cart items from server data
+           
             let cartItems = <%- JSON.stringify((carts || []).map(element => ({
                 product: element?.productDetails?.[0]?._id || "",
                 quantity: element?.quantity || 0,
                 price: element?.variantDetails?.[0]?.price || 0
             }))) %>;
 
-            // Data to send to the server
+           
             let orderData = {
                 orderItems: cartItems,
-                totalPrice: finalPrice, // Use final price after coupon
+                totalPrice: finalPrice, 
                 address: selectedAddress.value,
                 paymentMethod: selectedPayment.value,
-                coupon: appliedCoupon // Include coupon information if applied
+                coupon: appliedCoupon 
             };
 
             try {
-                // Send order data to the server
+               
                 let response = await fetch("/user/placeOrder", {
                     method: "POST",
                     headers: {
@@ -691,18 +691,18 @@
                 let result = await response.json();
 
                 if (response.ok) {
-                    // Handle different payment methods
+                   
                     if (selectedPayment.value === 'razorpay') {
-                        // Initialize Razorpay payment
+                       
                         const options = {
                             key: result.key,
                             amount: result.amount,
                             currency: result.currency,
                             order_id: result.orderId,
-                            name: "Your Company Name",
+                            name: "Laptop_Hub",
                             description: "Purchase Description",
                             handler: async function (response) {
-                                // Handle successful payment
+                              
                                 const paymentResponse = await fetch("/user/verifyPayment", {
                                     method: "POST",
                                     headers: {
@@ -741,14 +741,14 @@
                                 contact: "9999999999"
                             },
                             theme: {
-                                color: "#2563eb" // Match the site theme
+                                color: "#2563eb" 
                             }
                         };
 
                         const rzp = new Razorpay(options);
                         rzp.open();
                     } else {
-                        // For COD and wallet payments
+                       
                         Swal.fire({
                             icon: 'success',
                             title: 'Order Placed!',
@@ -759,7 +759,7 @@
                         });
                     }
                 } else {
-                    // Handle order failure
+                  
                     Swal.fire({
                         icon: 'error',
                         title: 'Order Failed!',
@@ -777,7 +777,7 @@
             }
         });
 
-        // Add some visual feedback for address and payment selection
+        
         document.querySelectorAll('.static-address input[type="radio"]').forEach(radio => {
             radio.addEventListener('change', function() {
                 document.querySelectorAll('.static-address').forEach(addr => {

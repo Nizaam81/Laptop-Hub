@@ -53,7 +53,7 @@ const addCoupon = async (req, res) => {
 
     const newCoupon = new Coupon({
       name: couponName,
-      createdOn: now, // Created now
+      createdOn: now,
       expireOn: end,
       offerPrice: offerPriceNum,
       minimumPrice: minimumPriceNum,

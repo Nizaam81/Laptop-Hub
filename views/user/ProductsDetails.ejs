@@ -1,3 +1,4 @@
+
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <link rel="stylesheet" href="/styles.css">
@@ -28,46 +29,90 @@
     </div>
 
     <!-- Filter Sidebar -->
-    <div class="filter-sidebar" id="filterSidebar">
-        <div class="filter-header d-flex justify-content-between align-items-center mb-3">
-            <h5 class="m-0 fw-bold">Filters</h5>
-            <button class="btn-close" id="closeFilterBtn"></button>
-        </div>
-        <form action="/user/productsDetails" method="GET">
-            <div class="filter-box">
-                <!-- Categories Filter -->
-                <h5 class="fw-bold mb-3">Categories</h5>
-                <div class="mb-4">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="categories" value="Romance" id="romance">
-                        <label class="form-check-label" for="Gaming">Gaming </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="categories" value="Novel" id="novel">
-                        <label class="form-check-label" for="novel">Creators </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="categories" value="Thriller" id="thriller">
-                        <label class="form-check-label" for="thriller">Office Work </label>
-                    </div>
-                </div>
-    
-                <hr class="my-3">
-    
-                <!-- Price Range Filter -->
-                <h5 class="fw-bold mb-3">Price Range</h5>
-                <div class="row g-2 mb-4">
-                    <div class="col">
-                        <input type="number" class="form-control" placeholder="Min" name="minPrice">
-                    </div>
-                    <div class="col">
-                        <input type="number" class="form-control" placeholder="Max" name="maxPrice">
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
-            </div>
-        </form>
+  <div class="filter-sidebar" id="filterSidebar">
+    <div class="filter-header d-flex justify-content-between align-items-center mb-3">
+        <h5 class="m-0 fw-bold">Filters</h5>
+        <button class="btn-close" id="closeFilterBtn"></button>
     </div>
+    <form action="/user/productsDetails" method="GET">
+        <div class="filter-box">
+            <!-- Categories Filter -->
+            <h5 class="fw-bold mb-3">Categories</h5>
+            <div class="mb-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="categories" value="Business" id="business">
+                    <label class="form-check-label" for="business">Business</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="categories" value="Student Laptops" id="student-laptops">
+                    <label class="form-check-label" for="student-laptops">Student Laptops</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="categories" value="Budget Laptops" id="budget-laptops">
+                    <label class="form-check-label" for="budget-laptops">Budget Laptops</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="categories" value="Ultrabooks" id="ultrabooks">
+                    <label class="form-check-label" for="ultrabooks">Ultrabooks</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="categories" value="Editing" id="editing">
+                    <label class="form-check-label" for="editing">Editing</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="categories" value="Gaming" id="gaming">
+                    <label class="form-check-label" for="gaming">Gaming</label>
+                </div>
+            </div>
+
+            <hr class="my-3">
+
+            <!-- Brands Filter -->
+            <h5 class="fw-bold mb-3">Brands</h5>
+            <div class="mb-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="brands" value="Apple" id="apple">
+                    <label class="form-check-label" for="apple">Apple</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="brands" value="Dell" id="dell">
+                    <label class="form-check-label" for="dell">Dell</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="brands" value="HP" id="hp">
+                    <label class="form-check-label" for="hp">HP</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="brands" value="Lenovo" id="lenovo">
+                    <label class="form-check-label" for="lenovo">Lenovo</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="brands" value="Asus" id="asus">
+                    <label class="form-check-label" for="asus">Asus</label>
+                </div>
+            </div>
+
+            <hr class="my-3">
+
+            <!-- Price Range Filter
+            <h5 class="fw-bold mb-3">Price Range</h5>
+            <div class="row g-2 mb-4">
+                <div class="col">
+                    <input type="number" class="form-control" placeholder="Min" name="minPrice">
+                </div>
+                <div class="col">
+                    <input type="number" class="form-control" placeholder="Max" name="maxPrice">
+                </div>
+            </div> -->
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                <button type="reset" class="btn btn-secondary w-100">Clear</button>
+            </div>
+        </div>
+    </form>
+</div>
+
 
     <!-- Overlay -->
     <div class="filter-overlay" id="filterOverlay"></div>
@@ -143,7 +188,7 @@
         overflow-x: hidden;
     }
 
-    /* Filter Sidebar Styles */
+  
     .filter-sidebar {
         position: fixed;
         top: 0;
@@ -214,7 +259,7 @@
 
     .object-fit-cover {
         object-fit: cover;
-    }/* Enhanced Pagination Styles */
+    }
 .pagination {
   margin-top: 2rem;
   gap: 5px;
@@ -233,7 +278,7 @@
   transition: all 0.2s ease;
 }
 
-/* Active page styling */
+
 .page-item.active .page-link {
   background-color: #0d6efd;
   border-color: #0d6efd;
@@ -241,7 +286,7 @@
   box-shadow: 0 2px 5px rgba(13, 110, 253, 0.3);
 }
 
-/* Previous/Next buttons */
+
 .page-item:first-child .page-link,
 .page-item:last-child .page-link {
   border-radius: 20px;
@@ -250,7 +295,7 @@
   padding-right: 15px;
 }
 
-/* Hover effects */
+
 .page-link:hover {
   background-color: #f8f9fa;
   color: #0d6efd;
@@ -264,7 +309,7 @@
   color: white;
 }
 
-/* Disabled state */
+
 .page-item.disabled .page-link {
   color: #bbb;
   background-color: #f8f9fa;
@@ -288,7 +333,7 @@
 }
 </style>
 <script>
-    // Filter Sidebar Toggle
+   
     document.addEventListener('DOMContentLoaded', function() {
         const filterToggleBtn = document.getElementById('filterToggleBtn');
         const closeFilterBtn = document.getElementById('closeFilterBtn');
@@ -334,7 +379,7 @@
             } else {
                 console.log("Error updating wishlist:", data.error);
             }
-        } catch (error) {
+        } catch (error) { 
             console.error("Error:", error);
         }
     }
@@ -375,4 +420,27 @@
             }
         });
     });
+
+
+
+
+
+document.getElementById('filterForm').addEventListener('submit', function (e) {
+    e.preventDefault(); // Prevent default form submission
+
+    const formData = new FormData(this);
+    const params = new URLSearchParams();
+
+    // Append selected filters to the URL
+    formData.forEach((value, key) => {
+        if (value) {
+            params.append(key, value);
+        }
+    });
+
+    // Redirect to the filtered products page
+    window.location.href = `/user/productsDetails?${params.toString()}`;
+});
+
+
 </script>

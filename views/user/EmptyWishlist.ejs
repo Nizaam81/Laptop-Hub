@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Empty Cart UI</title>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f8f9fa;
+        font-family: Arial, sans-serif;
+        margin: 0;
+      }
+      .container {
+        text-align: center;
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .cart-icon {
+        width: 150px;
+        animation: bounce 1.5s infinite;
+      }
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+      h2 {
+        color: #333;
+        margin: 15px 0;
+      }
+      p {
+        color: #666;
+        font-size: 14px;
+      }
+      .btn {
+        display: inline-block;
+        margin-top: 15px;
+        padding: 12px 20px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 16px;
+        transition:
+          background 0.3s,
+          transform 0.3s;
+        position: relative;
+        overflow: hidden;
+      }
+      .btn:hover {
+        background-color: #0056b3;
+        transform: scale(1.1);
+      }
+      .btn:active {
+        transform: scale(0.95);
+      }
+      .btn::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.2);
+        transform: scaleX(0);
+        transform-origin: right;
+        transition: transform 0.3s ease-in-out;
+      }
+      .btn:hover::after {
+        transform: scaleX(1);
+        transform-origin: left;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <img
+        class="cart-icon"
+        src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png"
+        alt="Empty Cart"
+      />
+      <h2>Your cart is empty</h2>
+      <p>
+        Looks like you have not added anything to your cart. Go ahead & explore
+        top categories.
+      </p>
+      <a href="/user/ProductsDetails" class="btn">Shop our products</a>
+    </div>
+  </body>
+</html>
