@@ -10,12 +10,12 @@ const loadCart = async (req, res) => {
 
     const carts = await cart.aggregate([
       {
-        $match: { userId: new ObjectId(userId) }, // Filter carts by userId
+        $match: { userId: new ObjectId(userId) },
       },
       {
         $lookup: {
           from: "products",
-          localField: "productId", // Assuming productId is the correct field in the cart schema
+          localField: "productId",
           foreignField: "_id",
           as: "productDetails",
         },
@@ -23,7 +23,7 @@ const loadCart = async (req, res) => {
       {
         $lookup: {
           from: "variants",
-          localField: "VariantId", // Assuming variantId is the correct field in the cart schema
+          localField: "VariantId",
           foreignField: "_id",
           as: "variantDetails",
         },

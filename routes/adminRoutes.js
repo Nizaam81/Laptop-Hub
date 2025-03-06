@@ -12,6 +12,7 @@ const addProductController = require("../controller/admin/addProductController")
 const orderController = require("../controller/admin/orderManagmentController");
 const varientController = require("../controller/admin/variantController");
 const upload = require("../utils/multer/uploads");
+const sales = require("../controller/admin/salesReport");
 
 // admin login home logout
 routes.get("/login", admincontroller.loadlogin);
@@ -61,6 +62,7 @@ routes.put(
 
 //Order Managment Route
 routes.get("/OrderManagment", orderController.loadOrder);
+routes.post("/OrderManagment", orderController.updateOrderStatus);
 
 // varient
 routes.get("/varient/:id", varientController.loadvarient);
@@ -72,5 +74,11 @@ routes.post("/edit-variant", varientController.updatevariant);
 routes.get("/coupon", coupon.loadcoupon);
 routes.post("/add-coupon", coupon.addCoupon);
 routes.put("/coupon/toggle-block", coupon.toggleBlockCoupon);
+
+//sales Report
+
+routes.get("/SalesReport", sales.loadSaleReportPage);
+routes.get("/SalesReport/pdf", sales.generatePDF);
+routes.get("/SalesReport/excel", sales.generateExcel);
 
 module.exports = routes;

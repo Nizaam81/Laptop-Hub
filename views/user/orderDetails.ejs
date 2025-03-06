@@ -1,155 +1,126 @@
 <%- include("partials/profileHeader.ejs") %>
-    <title>My Orders</title>
-    <!-- SweetAlert2 CSS -->
+<title>My Orders</title>
+<!-- SweetAlert2 CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            margin: 20px;
-            padding: 0;
-        }
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+        margin: 20px;
+        padding: 0;
+    }
 
-        .order-container {
-            max-width: 700px;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin: auto;
-        }
+    .order-container {
+        max-width: 1000px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin: auto;
+        overflow-x: auto;
+    }
 
-        .order-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 14px;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-            margin-bottom: 10px;
-        }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
 
-        .order-id {
-            color: #007bff;
-            font-weight: bold;
-            text-decoration: none;
-        }
+    th, td {
+        padding: 10px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+    }
 
-        .status {
-            background-color: #ffc107;
-            color: #000;
-            padding: 5px 10px;
-            border-radius: 5px;
+    th {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .product-image img {
+        width: 60px;
+        border-radius: 5px;
+    }
+
+    .btn {
+        padding: 6px 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .view-btn {
+        background-color: #17a2b8;
+        color: #fff;
+    }
+
+    .cancel-btn {
+        background-color: #dc3545;
+        color: #fff;
+    }
+
+    @media (max-width: 768px) {
+        table {
             font-size: 12px;
-            font-weight: bold;
-        }
-
-        .order-body {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .product-image img {
-            width: 80px;
-            border-radius: 5px;
-        }
-
-        .product-details {
-            flex: 1;
-        }
-
-        .product-name {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .product-info {
-            font-size: 14px;
-            color: #555;
-        }
-
-        .buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
         }
 
         .btn {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
+            padding: 4px 8px;
+            font-size: 12px;
         }
-
-        .view-btn {
-            background-color: #17a2b8;
-            color: #fff;
-        }
-
-        .cancel-btn {
-            background-color: #dc3545;
-            color: #fff;
-        }
-
-        .total-amount {
-            text-align: right;
-            font-size: 16px;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-    </style>
+    }
+</style>
 </head>
 <body>
-
     <div class="order-container">
-        <div class="order-header">
-            <!-- <a href="#" class="order-id">Order #67b96b5380ae9fa82b3ea2f6</a> -->
-            <!-- <span class="status">PENDING</span> -->
-        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% orders.forEach(element => { %>
+                    <tr>
+                        <td class="product-image">
+                            <img src="<%= element.productDetails[0].images[0] %>" alt="Product Image">
+                        </td>
+                        <td><%= element.productDetails[0].name %></td>
+                        <td><%= element.orderItem.quantity %></td>
+                        <td>₹ <%= element.orderItem.price %></td>
+                        <td>
+                            <input type="hidden" value="<%= element._id %>" class="orderId">
+                            <input type="hidden" value="<%= element.orderItem._id %>" class="materialId">
+                          <a href="/user/orderDetailss/<%= element._id %>?product=<%= element.orderItem._id %>">
+    <button class="btn view-btn">View</button>
+</a>
 
 
-        <% orders.forEach(element => { %>
-            <div class="order-body">
-                <div class="product-image">
-                    <img src="<%= element.productDetails[0].images[0] %>" alt="Book">
-                </div>
-                <div class="product-details">
-                    <div class="product-name"><%= element.productDetails[0].name %></div>
-                    <div class="product-info">Quantity: <%= element.orderItem.quantity %></div>
-                    <div class="product-info">Price: ₹ <%= element.orderItem.price %></div>
-                    <input type="hidden" value=<%= element._id %> class="orderId">
-                    <input type="hidden" value="<%= element.orderItem._id %>" class="materialId">
-                    <div class="buttons">
-                       <a href="/user/orderDetailss"> <button  class="btn view-btn">View Details</button></a>
-                        <button class="btn cancel-btn" id="cancelOrder">Cancel Order</button>
-                        
-                    </div>
-                </div>
-            </div>
-        <% }) %>
-       
 
-        <!-- <div class="total-amount">
-            Total Amount: ₹640.00
-        </div> -->
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+                            <button class="btn cancel-btn">Cancel</button>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     <script>
         document.querySelectorAll(".cancel-btn").forEach(button => {
             button.addEventListener("click", async (event) => {
                 event.preventDefault();
-        
-                // Find the closest order-body div to get correct values for that specific order
-                const orderBody = event.target.closest(".order-body");
-        
-                const orderId = orderBody.querySelector(".orderId").value;
-                const materialId = orderBody.querySelector(".materialId").value;
-        
-                // SweetAlert confirmation before canceling
+                
+                const row = event.target.closest("tr");
+                const orderId = row.querySelector(".orderId").value;
+                const materialId = row.querySelector(".materialId").value;
+                
                 const confirmCancel = await Swal.fire({
                     title: "Are you sure?",
                     text: "You won't be able to revert this!",
@@ -158,24 +129,19 @@
                     confirmButtonText: "Yes, cancel it!",
                     cancelButtonText: "No, keep it"
                 });
-        
+
                 if (confirmCancel.isConfirmed) {
                     try {
                         const response = await fetch("/user/cancelOrder", {
                             method: "POST",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
+                            headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({ orderId, materialId })
                         });
-        
+
                         const result = await response.json();
-        
                         if (result.success) {
                             Swal.fire("Cancelled!", "Your order has been cancelled.", "success")
-                                .then(() => {
-                                    window.location.reload(); // Reload after success
-                                });
+                                .then(() => { window.location.reload(); });
                         } else {
                             Swal.fire("Error!", "Something went wrong. Try again.", "error");
                         }
@@ -186,8 +152,6 @@
                 }
             });
         });
-        </script>
-        
-
+    </script>
 </body>
 </html>

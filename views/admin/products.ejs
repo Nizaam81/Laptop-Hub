@@ -108,8 +108,10 @@
              <% for( let i = 0; i < products.length; i++ ) { %>
                 <tr>
                     <td><%= products[i].name %></td>
-                    <td><%= products[i].brandDetails[0].brandName %></td>
-                    <td><%= products[i]. categoryDetails[0].name %></td>
+                   <td><%= products[i].categoryDetails?.[0]?.name || "No Category" %></td>
+
+                  <td><%= products[i].categoryDetails?.[0]?.name || "No Category" %></td>
+
                    
                    
                  <td> <a href="/admin/varient/<%= products[i]._id %>"><button class="btn btn-add ">View</button></a>

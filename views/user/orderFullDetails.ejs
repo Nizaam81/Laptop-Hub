@@ -141,7 +141,7 @@
 
     <div class="container">
         <!-- Back Button -->
-        <a href="order" class="back-button">← Back to Orders</a>
+        <a href="/user/order" class="back-button">← Back to Orders</a>
 
         <div class="order-header">
             <h3>Order Details</h3>
@@ -151,29 +151,28 @@
 
         <div class="order-content">
             <!-- Product Section -->
-             <% orders.forEach(element => { %>
-                <div class="product-section">
-                    <h4>Products</h4>
-                    <div class="product">
-                        <img src="<%= element.productDetails[0].images[0] %>" alt="Book">
-                        <div>
-                            <p><strong><%= element.productDetails[0].name %></strong></p>
-                            <p>Price :₹ <%= element.orderItem.price %></p>
-                            <p><strong>Total: ₹ <%= totalPrice %></strong></p>
-                        </div>
-                    </div>
-                </div>
-             <% }) %>
+            
+               <div class="product-section">
+    <h4>Products</h4>
+  <% orders.forEach(order => { %>
+    <div class="product">
+    <img src="<%= orders[0].productDetails[0].images[0] %>" alt="Product">
+    <div>
+        <p><strong><%= orders[0].productDetails[0].name %></strong></p>
+        <p>Price: ₹ <%= orders[0].orderItem.price %></p>
+        <p><strong>Total: ₹ <%= totalPrice %></strong></p>
+    </div>
+</div>
+
+<% }) %>
+
+
+</div>
+
+             
           
 
-            <!-- Order Summary -->
-            <!-- <div class="order-summary">
-                <h4>Order Summary</h4>
-                <div class="summary-item"><span>Subtotal</span> <span>₹600.00</span></div>
-                <div class="summary-item"><span>Discount</span> <span>-₹0.00</span></div>
-                <div class="summary-item"><span>Shipping</span> <span>₹40.00</span></div>
-                <div class="summary-item summary-total"><span>Amount</span> <span>₹640</span></div>
-            </div> -->
+           
         </div>
 
         <% Addres.address.forEach(element => { %>
@@ -184,19 +183,21 @@
                 <p><%= element.state %></p>
                 <p><%= element.city %></p>
                 <p><%= element.phone %></p>
-                <p>Alt. Phone: altPhone</p>
+               
             </div>
         <% }) %>
        
 
         <div class="section">
             <h4>Order Status</h4>
-            <span class="status">PENDING</span>
+            <span class="status"><%=orders[0].orderItem.status%></span>
         </div>
 
-        <div class="buttons">
-            <!-- <button class="btn cancel-btn">Cancel Order</button> -->
-            <button class="btn download-btn">📥 Download Invoice</button>
+       <div class="buttons">
+    <button class="btn return-btn" style="background-color: #28a745; color: white;">↩ Return</button>
+    <button class="btn download-btn">📥 Download Invoice</button>
+</div>
+
         </div>
     </div>
 

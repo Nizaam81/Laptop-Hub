@@ -6,6 +6,7 @@ const product = require("../../model/productSchema");
 const variant = require("../../model/varient");
 const catagory = require("../../model/categorySchema");
 const brand = require("../../model/brandschema");
+const wishlist = require("../../model/wishlistSchema");
 
 const generateOtp = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -343,87 +344,103 @@ const loadproductDetails = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const value = req.query.value || "default";
+    const selectedCategories = req.query.categories
+      ? Array.isArray(req.query.categories)
+        ? req.query.categories
+        : [req.query.categories]
+      : [];
+    const selectedBrands = req.query.brands
+      ? Array.isArray(req.query.brands)
+        ? req.query.brands
+        : [req.query.brands]
+      : [];
+
     const catagories = await catagory.find({});
     const brands = await brand.find({});
-    console.log("brands data", brands);
 
-    let Products = [];
-    let totalProducts;
+    // Build the filter query
+    const filterQuery = {};
 
-    if (value === "default") {
-      totalProducts = await variant.countDocuments();
-      Products = await variant.aggregate([
-        {
-          $lookup: {
-            from: "products",
-            localField: "product",
-            foreignField: "_id",
-            as: "productDetails",
-          },
+    // Add category filter if selected
+    if (selectedCategories.length > 0) {
+      // First get product IDs that match the selected categories
+      const productsWithCategory = await product.find(
+        { category: { $in: selectedCategories } },
+        { _id: 1 }
+      );
+
+      const productIds = productsWithCategory.map((p) => p._id);
+      filterQuery.product = { $in: productIds };
+    }
+
+    // Add brand filter if selected
+    if (selectedBrands.length > 0) {
+      // First get product IDs that match the selected brands
+      const productsWithBrand = await product.find(
+        { brand: { $in: selectedBrands } },
+        { _id: 1 }
+      );
+
+      const productIds = productsWithBrand.map((p) => p._id);
+
+      if (filterQuery.product) {
+        // If we already have product filter, ensure it's an intersection
+        filterQuery.product = {
+          $in: productIds.filter((id) =>
+            filterQuery.product.$in.some((existingId) => existingId.equals(id))
+          ),
+        };
+      } else {
+        filterQuery.product = { $in: productIds };
+      }
+    }
+
+    // Get total count for pagination
+    const totalProducts = await variant.countDocuments(filterQuery);
+
+    // Base aggregation pipeline with filters
+    let aggregationPipeline = [
+      { $match: filterQuery },
+      {
+        $lookup: {
+          from: "products",
+          localField: "product",
+          foreignField: "_id",
+          as: "productDetails",
         },
-        { $skip: skip },
-        { $limit: limit },
-      ]);
-    } else if (value === "ltoH") {
-      totalProducts = await variant.countDocuments();
-      Products = await variant.aggregate([
-        {
-          $lookup: {
-            from: "products",
-            localField: "product",
-            foreignField: "_id",
-            as: "productDetails",
-          },
-        },
-        { $sort: { price: 1 } },
-        { $skip: skip },
-        { $limit: limit },
-      ]);
+      },
+    ];
+
+    // Add sorting based on value parameter
+    if (value === "ltoH") {
+      aggregationPipeline.push({ $sort: { price: 1 } });
     } else if (value === "htoL") {
-      totalProducts = await variant.countDocuments();
-      Products = await variant.aggregate([
-        {
-          $lookup: {
-            from: "products",
-            localField: "product",
-            foreignField: "_id",
-            as: "productDetails",
-          },
-        },
-        { $sort: { price: -1 } },
-        { $skip: skip },
-        { $limit: limit },
-      ]);
+      aggregationPipeline.push({ $sort: { price: -1 } });
     } else if (value === "atoZ") {
-      totalProducts = await variant.countDocuments();
-      Products = await variant.aggregate([
-        {
-          $lookup: {
-            from: "products",
-            localField: "product",
-            foreignField: "_id",
-            as: "productDetails",
-          },
-        },
-        { $sort: { "productDetails.name": 1 } },
-        { $skip: skip },
-        { $limit: limit },
-      ]);
+      aggregationPipeline.push({ $sort: { "productDetails.0.name": 1 } });
     } else if (value === "ztoA") {
-      totalProducts = await variant.countDocuments();
-      Products = await variant.aggregate([
-        {
-          $lookup: {
-            from: "products",
-            localField: "product",
-            foreignField: "_id",
-            as: "productDetails",
-          },
-        },
-        { $sort: { "productDetails.name": -1 } },
-        { $skip: skip },
-        { $limit: limit },
-      ]);
+      aggregationPipeline.push({ $sort: { "productDetails.0.name": -1 } });
+    }
+
+    // Add pagination
+    aggregationPipeline.push({ $skip: skip });
+    aggregationPipeline.push({ $limit: limit });
+
+    // Execute the query
+    const Products = await variant.aggregate(aggregationPipeline);
+
+    // Add wishlist status for each product
+    if (req.session.user) {
+      const userId = req.session.user._id;
+      const userWishlist = (await wishlist.findOne({ user: userId })) || {
+        products: [],
+      };
+
+      Products.forEach((product) => {
+        product.inWishlist = userWishlist.products.some(
+          (wishlistItem) => wishlistItem.toString() === product._id.toString()
+        );
+      });
     }
 
     const totalPages = Math.ceil(totalProducts / limit);
@@ -437,6 +454,8 @@ const loadproductDetails = async (req, res) => {
       value,
       catagories,
       brands,
+      selectedCategories,
+      selectedBrands,
     });
   } catch (error) {
     console.log("error", error);

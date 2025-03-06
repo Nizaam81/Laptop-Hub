@@ -1,0 +1,313 @@
+<%- include("partials/header.ejs") %>
+    <title> Sales Report</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      /* Global Responsive Styles */
+      :root {
+        --primary-color: #007bff;
+        --success-color: #28a745;
+        --warning-color: #ffc107;
+        --danger-color: #dc3545;
+        --text-color: #333;
+        --background-color: #f4f4f4;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Arial", sans-serif;
+        background-color: var(--background-color);
+        line-height: 1.6;
+        color: var(--text-color);
+      }
+
+    
+      .container {
+        width: 100%;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 15px;
+        margin-right: 70px;
+      }
+
+      
+      .header {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        gap: 15px;
+      }
+
+      .header h1 {
+        flex-grow: 1;
+        font-size: 1.8rem;
+      }
+
+    
+      .filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        justify-content: flex-end;
+        width: 100%;
+      }
+
+      .filters > * {
+        flex: 1 1 200px;
+        min-width: 120px;
+        height: 40px;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+
+      .filters button {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+
+      .card {
+        background: var(--primary-color);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .card h3 {
+        margin-bottom: 10px;
+        font-size: 1rem;
+        opacity: 0.8;
+      }
+
+      .card p {
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+
+      
+      .report-table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+      }
+
+      .report table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 800px; 
+      }
+
+      .report th,
+      .report td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .report th {
+        background: var(--primary-color);
+        color: white;
+        position: sticky;
+        top: 0;
+      }
+
+     
+      .export-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 15px;
+      }
+
+      .export-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 10px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        flex: 1 1 150px;
+      }
+
+      .export-btn-pdf {
+        background: var(--danger-color);
+        color: white;
+      }
+
+      .export-btn-excel {
+        background: var(--success-color);
+        color: white;
+      }
+
+      
+      .completed {
+        color: var(--success-color);
+      }
+      .pending {
+        color: var(--warning-color);
+      }
+      .cancelled {
+        color: var(--danger-color);
+      }
+
+     
+      @media screen and (max-width: 600px) {
+        .header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .filters {
+          flex-direction: column;
+        }
+
+        .filters > * {
+          width: 100%;
+        }
+
+        .stats {
+          grid-template-columns: 1fr;
+        }
+
+        .export-buttons {
+          flex-direction: column;
+        }
+
+        .export-btn {
+          width: 100%;
+        }
+
+        .header h1 {
+          font-size: 1.5rem;
+          margin-bottom: 10px;
+        }
+      }
+
+      
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+        .container,
+        .container * {
+          visibility: visible;
+        }
+        .container {
+          position: absolute;
+          left: 0;
+          top: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <div class="header">
+        <h1>Sales Report Dashboard</h1>
+        <div class="filters">
+          <select id="dateRange">
+            <option value="1day">1 Day</option>
+            <option value="1week">1 Week</option>
+            <option value="1month">1 Month</option>
+            <option value="custom">Custom Range</option>
+          </select>
+          <input type="date" id="startDate" placeholder="Start Date" />
+          <input type="date" id="endDate" placeholder="End Date" />
+          <button onclick="filterReport()">
+            <i class="fas fa-filter"></i> Filter
+          </button>
+        </div> 
+      </div>
+
+      <!-- Key Metrics -->
+      <section class="stats">
+        <div class="card">
+          <h3>Total Sales</h3>
+          <p>$50,000</p>
+        </div>
+        <div class="card">
+          <h3>Total Orders</h3>
+          <p>1,200</p>
+        </div>
+        <div class="card">
+          <h3>Total Revenue</h3>
+          <p>$45,000</p>
+        </div>
+        <div class="card">
+          <h3>Total Discounts</h3>
+          <p>$5,000</p>
+        </div>
+      </section> 
+
+      <!-- Sales Report Table -->
+      <div class="report-table-wrapper">
+           <section class="report">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Amount</th>
+              <th>Payment Method</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+  <% orderData.forEach(element => { %>
+    <tr>
+      <td><%= element.createdOn.toLocaleDateString() %></td>
+      <td>#<%= element._id %></td>
+      <td><%= element.userId.FirstName %> <%= element.userId.LastName %></td>
+      <td>$ <%= element.totalPrice %></td>
+      <td><%= element.paymentMethod %></td>
+      <td class="<%= element.paymentStatus %>"><%= element.paymentStatus %></td>
+    </tr>
+  <% }) %>
+</tbody>                
+        </table>
+      </section>
+      </div>
+
+      <!-- Export Buttons -->
+     <!-- Export Buttons -->
+<div class="export-buttons">
+  <a href="/admin/SalesReport/pdf" class="export-btn export-btn-pdf">
+    <i class="fas fa-file-pdf"></i> Export PDF
+  </a>
+  <a href="/admin/SalesReport/excel" class="export-btn export-btn-excel">
+    <i class="fas fa-file-excel"></i> Export Excel
+  </a>
+</div>
+    </div>
+  </body>
+</html>

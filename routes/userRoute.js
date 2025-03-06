@@ -11,6 +11,7 @@ const orderController = require("../controller/user/orderManagmentController");
 const placeOrder = require("../controller/user/placeOrder");
 const wishlist = require("../controller/user/wishlistController");
 const wallet = require("../controller/user/walletController");
+const coupon = require("../controller/user/couponController");
 
 routes.get("/pageNotfound", usercontroller.pageNotfound);
 routes.get("/home", userAuth.userAuth, usercontroller.loadHomepage);
@@ -113,7 +114,7 @@ routes.get("/checkout", userAuth.userAuth, checkout.loadcheckout);
 // order details
 routes.get("/order", userAuth.userAuth, orderController.loadOrder);
 routes.get(
-  "/orderDetailss",
+  "/orderDetailss/:id",
   userAuth.userAuth,
   orderController.loadorderFullDetails
 );
@@ -133,5 +134,10 @@ routes.get("/empty", wishlist.empty);
 //wallet
 routes.get("/wallet", wallet.loadWallet);
 routes.post("/Wallett", wallet.addMoney);
+
+//coupon
+
+routes.post("/availableCoupons", coupon.getAvailableCoupons);
+routes.post("/couponApplied", coupon.applyCoupon);
 
 module.exports = routes;

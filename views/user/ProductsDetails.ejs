@@ -181,50 +181,53 @@
     </div>
 
     <!-- Filter Sidebar -->
-  <div class="filter-sidebar" id="filterSidebar">
-    <div class="filter-header d-flex justify-content-between align-items-center mb-3">
-        <h5 class="m-0 fw-bold">Filters</h5>
-        <button class="btn-close" id="closeFilterBtn"></button>
-    </div>
+  <!-- Filter Sidebar -->
+<div class="filter-sidebar" id="filterSidebar">
+  <div class="filter-header d-flex justify-content-between align-items-center mb-3">
+    <h5 class="m-0 fw-bold">Filters</h5>
+    <button class="btn-close" id="closeFilterBtn"></button>
+  </div>
+  
+  <form action="/user/productsDetails" method="GET" id="filterForm">
+    <!-- Keep current sorting and page -->
+    <input type="hidden" name="value" value="<%= value %>">
     
-        <div class="filter-box">
-            <!-- Categories Filter -->
-            <h5 class="fw-bold mb-3">Categories</h5>
-            <div class="mb-4">
-                <% catagories.forEach(element => { %>
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="categories" value="<%=element.name%>" id="business-<%=element.name%>">
-                    <label class="form-check-label" for="business"><%= element.name %></label>
-                </div>
-                <% }) %>
-               
-               
-               
-            </div>
+    <div class="filter-box">
+      <!-- Categories Filter -->
+      <h5 class="fw-bold mb-3">Categories</h5>
+      <div class="mb-4">
+        <% catagories.forEach(element => { %>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="categories" 
+                   value="<%= element._id %>" id="category-<%= element._id %>"
+                   <%= selectedCategories && selectedCategories.includes(element._id.toString()) ? 'checked' : '' %>>
+            <label class="form-check-label" for="category-<%= element._id %>"><%= element.name %></label>
+          </div>
+        <% }) %>
+      </div>
 
-            <hr class="my-3">
+      <hr class="my-3">
 
-            <!-- Brands Filter -->
-            <h5 class="fw-bold mb-3">Brands</h5>
-            <div class="mb-4">
-                <% brands.forEach(element => { %>
-                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="brands" value="Apple" id="apple">
-                    <label class="form-check-label" for="apple"><%= element.brandName %></label>
-                </div>
-                <% }) %>
-                
-               
-            </div>
-
-            
-
-           
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
-                <button type="reset" class="btn btn-secondary w-100">Clear</button>
-            </div>
-        </div>
+      <!-- Brands Filter -->
+      <h5 class="fw-bold mb-3">Brands</h5>
+      <div class="mb-4">
+        <% brands.forEach(element => { %>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="brands" 
+                   value="<%= element._id %>" id="brand-<%= element._id %>"
+                   <%= selectedBrands && selectedBrands.includes(element._id.toString()) ? 'checked' : '' %>>
+            <label class="form-check-label" for="brand-<%= element._id %>"><%= element.brandName %></label>
+          </div>
+        <% }) %>
+      </div>
+      
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+        <button type="button" class="btn btn-secondary w-100" id="clearFiltersBtn">Clear</button>
+      </div>
+    </div>
+  </form>
+</div>
     
 </div>
 
@@ -388,4 +391,138 @@
         });
     });
     
+
+    document.addEventListener('DOMContentLoaded', function() {
+    const filterToggleBtn = document.getElementById('filterToggleBtn');
+    const closeFilterBtn = document.getElementById('closeFilterBtn');
+    const filterSidebar = document.getElementById('filterSidebar');
+    const filterOverlay = document.getElementById('filterOverlay');
+    const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+    
+    filterToggleBtn.addEventListener('click', function() {
+        filterSidebar.classList.add('open');
+        filterOverlay.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    });
+    
+    function closeFilter() {
+        filterSidebar.classList.remove('open');
+        filterOverlay.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+    
+    closeFilterBtn.addEventListener('click', closeFilter);
+    filterOverlay.addEventListener('click', closeFilter);
+    
+    // Clear filters button
+    clearFiltersBtn.addEventListener('click', function() {
+        const checkboxes = document.querySelectorAll('#filterForm input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        
+        // Submit the form without any filters
+        document.getElementById('filterForm').submit();
+    });
+    
+    // Update pagination links to preserve filters
+    function updatePaginationLinks() {
+        const paginationLinks = document.querySelectorAll('.pagination .page-link');
+        const currentUrl = new URL(window.location.href);
+        const urlParams = new URLSearchParams(currentUrl.search);
+        
+        // Get all selected categories and brands
+        const selectedCategories = document.querySelectorAll('input[name="categories"]:checked');
+        const selectedBrands = document.querySelectorAll('input[name="brands"]:checked');
+        
+        paginationLinks.forEach(link => {
+            const href = new URL(link.href);
+            const linkParams = new URLSearchParams(href.search);
+            
+            // Preserve the value parameter (sorting)
+            if (urlParams.has('value')) {
+                linkParams.set('value', urlParams.get('value'));
+            }
+            
+            // Add selected categories
+            selectedCategories.forEach(category => {
+                linkParams.append('categories', category.value);
+            });
+            
+            // Add selected brands
+            selectedBrands.forEach(brand => {
+                linkParams.append('brands', brand.value);
+            });
+            
+            // Update the link href
+            href.search = linkParams.toString();
+            link.href = href.toString();
+        });
+    }
+    
+    // Call this function when the page loads
+    updatePaginationLinks();
+});
+
+// Keep the existing functions
+async function toggleWishlist(element) {
+    const productId = element.getAttribute("data-product-id");
+    
+    const action = element.classList.contains("active") ? "remove" : "add";
+
+    try {
+        const response = await fetch("/user/Wishlist", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ productId, action }) 
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            if (action === "add") {
+                element.classList.add("active", "fas");
+                element.classList.remove("far");
+            } else {
+                element.classList.remove("active", "fas");
+                element.classList.add("far");
+            }
+        } else {
+            console.log("Error updating wishlist:", data.error);
+        }
+    } catch (error) { 
+        console.error("Error:", error);
+    }
+}
+
+function sorting() {
+    // Get current URL and parameters
+    const currentUrl = new URL(window.location.href);
+    const urlParams = new URLSearchParams(currentUrl.search);
+    
+    // Update the value parameter
+    const values = document.getElementById('data').value;
+    urlParams.set('value', values);
+    
+    // Preserve filter parameters
+    const selectedCategories = document.querySelectorAll('input[name="categories"]:checked');
+    const selectedBrands = document.querySelectorAll('input[name="brands"]:checked');
+    
+    // Clear old filter parameters
+    urlParams.delete('categories');
+    urlParams.delete('brands');
+    
+    // Add selected categories
+    selectedCategories.forEach(category => {
+        urlParams.append('categories', category.value);
+    });
+    
+    // Add selected brands
+    selectedBrands.forEach(brand => {
+        urlParams.append('brands', brand.value);
+    });
+    
+    // Redirect with all parameters
+    window.location.href = `/user/productsDetails?${urlParams.toString()}`;
+}
 </script>

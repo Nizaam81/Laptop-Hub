@@ -72,10 +72,11 @@
 <body>
     <div class="container">
         <h2>Order Management</h2>
-        <div class="search-box">
+        <!-- <div class="search-box">
             <input type="text" placeholder="Search by Invoice Number...">
+            <input type="hidden" id="orderid" value="<%= Order._id %>">
            
-        </div>
+        </div> -->
         <table>
             <thead>
                 <tr>
@@ -96,19 +97,76 @@
                     <td><%= element.userDetails[0].FirstName %><%= element.userDetails[0].LastName %></td>
                     <td><%= element.productDetails[0].name %></td>
                     <td><%= element.orderItem.price %></td>
-                    <td>
-                        <select class="status delivered" onchange="updateStatus(this)">
-                            <option class="d-none"  selected><%= element.orderItem.status  %></option>
-                             <% status.forEach(value => { %>
-                                <option class="<%= value %>"><%= value %></option>
-                             <% }) %>
-                        </select>
-                    </td>
+                   <td>
+    <select class="status" 
+        onchange="updateStatus(this, '<%= element._id %>')" 
+        data-previous-status="<%= element.orderItem.status %>" 
+        <%= element.orderItem.status === 'Cancelled' ? 'disabled' : '' %>>
+        
+        <% status.forEach(value => { %>
+            <option value="<%= value %>" <%= element.orderItem.status === value ? "selected" : "" %>>
+                <%= value %>
+            </option>
+        <% }) %>
+    </select>
+</td>
+
+
                     <!-- <td><button>View</button></td> -->
                 </tr>
           <% }) %>
                
         </table>
     </div>
+
+  <script>
+    function updateStatus(selectElement, orderId) {
+        const selectedStatus = selectElement.value.trim();
+        const previousStatus = selectElement.dataset.previousStatus;
+
+       
+        if (previousStatus === "Cancelled") {
+            alert("This order has been cancelled and cannot be modified.");
+            selectElement.value = previousStatus; 
+            return;
+        }
+
+       
+        Array.from(selectElement.options).forEach(option => {
+            if (option.value !== selectedStatus && option.value !== previousStatus) {
+                option.disabled = true;
+            }
+        });
+
+        
+        if (selectedStatus === "Delivered") {
+            Array.from(selectElement.options).forEach(option => {
+                if (option.value !== "Delivered") {
+                    option.disabled = true;
+                }
+            });
+        }
+
+       
+        fetch("/admin/OrderManagment", {
+            method: "post",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ orderId, status: selectedStatus }),
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log("Status updated successfully");
+                selectElement.dataset.previousStatus = selectedStatus; 
+            } else {
+                console.error("Failed to update status");
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    }
+</script>
+
+
 </body>
 </html>
