@@ -119,6 +119,7 @@ routes.get(
   orderController.loadorderFullDetails
 );
 routes.post("/cancelOrder", orderController.cancelOrder);
+routes.post("/cancelItem", orderController.cancelItem);
 
 //place order
 routes.get("/PlaceOrderr", userAuth.userAuth, placeOrder.loadPlaceOrder);

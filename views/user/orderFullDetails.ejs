@@ -1,7 +1,10 @@
-
+<!DOCTYPE html>
+<html>
+<head>
     <title>Order Details</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body {
+       body {
             font-family: Arial, sans-serif;
             background-color: #f2f7f5;
             margin: 20px;
@@ -28,7 +31,11 @@
 
         .back-button:hover {
             text-decoration: underline;
-        }
+        }.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    cursor: not-allowed;
+}
 
         .order-header {
             background: linear-gradient(90deg, #0033cc, #0052cc);
@@ -53,6 +60,7 @@
             justify-content: space-between;
             align-items: flex-start;
             margin-top: 15px;
+            flex-wrap: wrap;
         }
 
         .product-section {
@@ -60,12 +68,14 @@
             background: #f8f9fa;
             padding: 15px;
             border-radius: 8px;
+            min-width: 300px;
         }
 
         .product {
             display: flex;
             align-items: center;
             gap: 15px;
+            flex-wrap: wrap;
         }
 
         .product img {
@@ -78,7 +88,7 @@
             background: #eef1f6;
             padding: 15px;
             border-radius: 8px;
-            align-self: flex-start; /* Ensures it stays at the top */
+            align-self: flex-start;
         }
 
         .summary-item {
@@ -114,6 +124,8 @@
             display: flex;
             justify-content: space-between;
             margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .btn {
@@ -123,6 +135,14 @@
             cursor: pointer;
             font-size: 14px;
             font-weight: bold;
+            flex-grow: 1;
+            text-align: center;
+            margin: 5px;
+        }
+
+        .return-btn {
+            background-color: #28a745;
+            color: white;
         }
 
         .cancel-btn {
@@ -135,9 +155,93 @@
             color: white;
         }
 
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: black;
+        }
+
+        .return-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .return-form textarea {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+       
+        @media screen and (max-width: 768px) {
+            .order-content {
+                flex-direction: column;
+            }
+            
+            .product-section, .order-summary {
+                width: 100%;
+                margin-bottom: 15px;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+            
+            .modal-content {
+                width: 90%;
+                margin: 30% auto;
+            }
+        }
     </style>
 </head>
 <body>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <div class="container">
         <!-- Back Button -->
@@ -145,34 +249,25 @@
 
         <div class="order-header">
             <h3>Order Details</h3>
-            <!-- <span>Order ID: 67b96b5380ae9fa82b3ea2f6</span> -->
-            <!-- <span>22/2/2025</span> -->
+            <span>Order ID: <%= orders[0]._id %></span>
+            <span><%= new Date(orders[0].createdOn).toLocaleDateString("en-US", { day: '2-digit', month: 'long', year: 'numeric' }) %></span>
         </div>
 
         <div class="order-content">
             <!-- Product Section -->
-            
-               <div class="product-section">
-    <h4>Products</h4>
-  <% orders.forEach(order => { %>
-    <div class="product">
-    <img src="<%= orders[0].productDetails[0].images[0] %>" alt="Product">
-    <div>
-        <p><strong><%= orders[0].productDetails[0].name %></strong></p>
-        <p>Price: ₹ <%= orders[0].orderItem.price %></p>
-        <p><strong>Total: ₹ <%= totalPrice %></strong></p>
-    </div>
-</div>
-
-<% }) %>
-
-
-</div>
-
-             
-          
-
-           
+            <div class="product-section">
+                <h4>Products</h4>
+                <% orders.forEach(order => { %>
+                    <div class="product">
+                        <img src="<%= orders[0].productDetails[0].images[0] %>" alt="Product">
+                        <div>
+                            <p><strong><%= orders[0].productDetails[0].name %></strong></p>
+                            <p>Price: ₹ <%= orders[0].orderItem.price %></p>
+                            <p><strong>Total: ₹ <%= totalPrice %></strong></p>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
         </div>
 
         <% Addres.address.forEach(element => { %>
@@ -183,23 +278,135 @@
                 <p><%= element.state %></p>
                 <p><%= element.city %></p>
                 <p><%= element.phone %></p>
-               
             </div>
         <% }) %>
        
-
         <div class="section">
             <h4>Order Status</h4>
-            <span class="status"><%=orders[0].orderItem.status%></span>
+            <span class="status"><%= orders[0].orderItem.status %></span>
         </div>
 
-       <div class="buttons">
-    <button class="btn return-btn" style="background-color: #28a745; color: white;">↩ Return</button>
-    <button class="btn download-btn">📥 Download Invoice</button>
-</div>
-
+        <div class="buttons">
+           <button class="btn cancel-btn" data-order-id="<%= orders[0]._id %>" data-item-id="<%= orders[0].orderItem._id %>">❌ Cancel Item</button>
+            <button class="btn return-btn" id="returnBtn">↩ Return</button>
+            <button class="btn download-btn">📥 Download Invoice</button>
         </div>
     </div>
 
+    <!-- Return Reason Modal -->
+    <div id="returnModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>Return Request</h4>
+                <span class="close">&times;</span>
+            </div>
+            <form class="return-form">
+                <div>
+                    <label for="returnReason"><strong>Please provide a reason for your return:</strong></label>
+                    <textarea id="returnReason" name="returnReason" placeholder="Tell us why you want to return this item..." required></textarea>
+                </div>
+                <div class="form-buttons">
+                    <button type="button" class="btn" style="background-color: #6c757d; color: white;" onclick="handleCancel('<%= orders[0]._id %>')">Cancel</button>
+                    <button type="submit" class="btn" style="background-color: #28a745; color: white;">Submit Return</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById("returnModal");
+        const returnBtn = document.getElementById("returnBtn");
+        const closeBtn = document.getElementsByClassName("close")[0];
+        const cancelBtn = document.querySelector(".form-buttons .btn:first-child");
+
+        returnBtn.onclick = function() {
+            modal.style.display = "block";
+        }
+
+        closeBtn.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        cancelBtn.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        document.querySelector(".return-form").onsubmit = function(e) {
+            e.preventDefault();
+            const reason = document.getElementById("returnReason").value;
+            console.log("Return reason:", reason);
+            modal.style.display = "none";
+            alert("Return request submitted successfully!");
+        }
+
+      
+      // Function to handle the cancel button click
+async function handleCancelItem(orderId, specificItemId) {
+    try {
+        const response = await fetch('/user/cancelItem', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ orderId, specificItemId }),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showToast("Item cancelled successfully!", "success");
+
+            const cancelButton = document.querySelector(`.cancel-btn[data-order-id="${orderId}"]`);
+            if (cancelButton) {
+                cancelButton.textContent = "Cancelled";
+                cancelButton.disabled = true;
+                cancelButton.classList.remove("cancel-btn");
+                cancelButton.classList.add("btn-secondary");
+            }
+        } else {
+            showToast(result.message || "Failed to cancel the item.", "error");
+        }
+    } catch (error) {
+        console.error("Error cancelling item:", error);
+        showToast("An error occurred while cancelling the item.", "error");
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const cancelButton = document.querySelector(".cancel-btn");
+    if (cancelButton) {
+        cancelButton.addEventListener("click", function () {
+            const orderId = this.getAttribute("data-order-id");
+            const specificItemId = this.getAttribute("data-item-id");
+
+            if (orderId && specificItemId) {
+                handleCancelItem(orderId, specificItemId);
+            } else {
+                showToast("Order ID or Item ID not found.", "warning");
+            }
+        });
+    }
+});
+
+// Function to show toast notifications using SweetAlert2
+function showToast(message, icon = "info") {
+    Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: icon, // 'success', 'error', 'warning', 'info'
+        title: message,
+        showConfirmButton: false,
+        timer: 3000, // Auto close after 3 seconds
+        timerProgressBar: true,
+    });
+}
+
+    </script>
 </body>
 </html>

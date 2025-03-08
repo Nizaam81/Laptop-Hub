@@ -1,8 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>Laptop Hub</title>
     <link
       rel="stylesheet"
@@ -108,26 +104,87 @@
         margin-left: 270px;
         padding: 20px;
       }
+
+      /* Responsive Styles */
+      @media (max-width: 768px) {
+        .navbar-left h1 {
+          font-size: 1.2rem;
+        }
+
+        .navbar-right .admin-name {
+          font-size: 0.9rem;
+        }
+
+        .menu-aside {
+          width: 200px;
+          padding: 10px;
+        }
+
+        .menu-item a {
+          padding: 8px;
+          font-size: 0.9rem;
+        }
+
+        .main-wrap {
+          margin-left: 220px;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .navbar {
+          flex-direction: column;
+          align-items: flex-start;
+          padding: 10px;
+        }
+
+        .navbar-left {
+          margin-bottom: 10px;
+        }
+
+        .navbar-right {
+          width: 100%;
+          justify-content: flex-end;
+        }
+
+        .menu-aside {
+          width: 100%;
+          height: auto;
+          position: relative;
+          box-shadow: none;
+          padding: 10px;
+        }
+
+        .menu-item {
+          margin: 5px 0;
+        }
+
+        .menu-item a {
+          padding: 8px;
+          font-size: 0.9rem;
+        }
+
+        .main-wrap {
+          margin-left: 0;
+          padding: 10px;
+        }
+      }
     </style>
   </head>
 
   <body>
     <div class="navbar">
       <div class="navbar-left">
-        <img
-          src="/images/laptopHub-removebg-preview.png"
-          alt="Laptop Hub Logo"
-        />
+        <!-- <img src="images/admin imape.jpg" alt="Laptop Hub Logo" /> -->
         <h1>Laptop Hub</h1>
       </div>
       <div class="navbar-right">
-        <img src="/images/nizam.jpg" alt="Admin Avatar" />
+        <!-- <img src="admin imape" alt="Admin Avatar" /> -->
         <span class="admin-name">Nizaam <br />Admin</span>
       </div>
     </div>
     <ul class="menu-aside">
       <li class="menu-item">
-        <a href="/admin"><i class="fas fa-home"></i> Dashboard</a>
+        <a href="/admin/dashboard"><i class="fas fa-home"></i> Dashboard</a>
       </li>
       <li class="menu-item">
         <a href="/admin/users"><i class="fas fa-users"></i> Customers</a>
@@ -156,10 +213,6 @@
         <a href="/admin/orderManagment"
           ><i class="fas fa-shopping-cart"></i> Orders</a
         >
-      </li>
-
-      <li class="menu-item">
-        <a href="/admin/settings"><i class="fas fa-cog"></i> Settings</a>
       </li>
       <li class="menu-item">
         <a href="/admin/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>

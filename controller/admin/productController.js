@@ -7,7 +7,27 @@ const { log } = require("console");
 
 const loadproduct = async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
+    const searchQuery = req.query.search || "";
+
+    let matchCondition = {};
+    if (searchQuery && searchQuery.trim() !== "") {
+      matchCondition.name = { $regex: searchQuery.trim(), $options: "i" };
+    }
+
+    const totalProducts = await Product.countDocuments(matchCondition);
+    const totalPages = Math.ceil(totalProducts / limit) || 1;
+
     const products = await Product.aggregate([
+      { $match: matchCondition },
+
+      { $skip: skip },
+      { $limit: limit },
+
       {
         $lookup: {
           from: "brands",
@@ -26,11 +46,19 @@ const loadproduct = async (req, res) => {
       },
     ]);
 
-    return res.render("admin/products", { products });
+    return res.render("admin/products", {
+      products,
+      currentPage: page,
+      totalPages,
+      searchQuery,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).render("admin/products", {
       products: [],
+      currentPage: 1,
+      totalPages: 0,
+      searchQuery: "",
       error: "Failed to load products",
     });
   }

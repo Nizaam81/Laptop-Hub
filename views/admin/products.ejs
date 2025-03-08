@@ -1,6 +1,9 @@
 <%- include("partials/header.ejs") %>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+   <!-- Noty CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/noty/lib/noty.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/noty/lib/themes/mint.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -82,16 +85,149 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}/* Pagination Styling */
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    list-style-type: none;
+    padding: 0;
 }
+.pagination li {
+    margin: 0 5px;
+}
+.pagination a {
+    display: block;
+    padding: 8px 12px;
+    text-decoration: none;
+    background-color: #f4f4f4;
+    color: #333;
+    border-radius: 5px;
+}
+.pagination a.active {
+    background-color: #17a2b8;
+    color: white;
+}
+.pagination a:hover:not(.active) {
+    background-color: #ddd;
+}/* Style the button */
+.btn {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.btn:hover {
+    background-color: #45a049;
+}
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    padding-top: 60px;
+}
+
+/* Modal Content/Box */
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto; /* 5% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
+    max-width: 500px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+/* The Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Form Styling */
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="number"],
+textarea {
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+textarea {
+    resize: vertical;
+    height: 100px;
+}
+
+.btn-submit {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.btn-submit:hover {
+    background-color: #45a049;
+}.noty_type__success {
+    background-color: #28a745 !important; /* Green */
+    border-left: 5px solid #218838 !important;
+}
+
+.noty_type__error {
+    background-color: #dc3545 !important; /* Red */
+    border-left: 5px solid #c82333 !important;
+}
+
 
     </style>
 </head>
 <body>
     <div class="main-content">
         <h2>Products</h2>
-        <div class="search-bar">
-            <input type="text" placeholder="Search products or brands">
-        </div>
+       <form action="/admin/products" method="GET">
+    <div class="search-bar">
+        <input type="text" name="search" placeholder="Search products by name" value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
+        <button type="submit" style="padding: 10px 15px; background: #17a2b8; color: white; border: none; border-radius: 0 5px 5px 0; cursor: pointer;">
+            <i class="fas fa-search"></i>
+        </button>
+    </div>
+</form>
         <table>
             <thead>
                 <tr>
@@ -99,7 +235,8 @@
                     <th>Brand</th>
                     <th>Category</th>
                     <th>Varient</th>
-                    
+                    <th>Offer(%)</th>
+                    <th>Offer</th>
                     <th>Action</th>
                     <th>Edit</th>
                 </tr>
@@ -108,7 +245,7 @@
              <% for( let i = 0; i < products.length; i++ ) { %>
                 <tr>
                     <td><%= products[i].name %></td>
-                   <td><%= products[i].categoryDetails?.[0]?.name || "No Category" %></td>
+                   <td><%= products[i].brandDetails?.[0]?.brandName || "No Category" %></td>
 
                   <td><%= products[i].categoryDetails?.[0]?.name || "No Category" %></td>
 
@@ -116,6 +253,11 @@
                    
                  <td> <a href="/admin/varient/<%= products[i]._id %>"><button class="btn btn-add ">View</button></a>
                  </td>
+                  <td><%= products[i].offerPercentage || 0  %>%</td> 
+                 <td>
+                 <button class="btn btn-add" onclick="openModal('<%= products[i]._id %>')">Add Offer</button>
+                </td>
+
                    
                     
                     <td class="actions">
@@ -138,6 +280,50 @@
              <% } %>
             </tbody>
         </table>
+        
+         <!-- Pagination -->
+<% if (typeof totalPages !== 'undefined' && totalPages > 0) { %>
+    <ul class="pagination">
+        <% if (currentPage > 1) { %>
+            <li><a href="/admin/products?page=<%= currentPage - 1 %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search='+encodeURIComponent(searchQuery) : '' %>">Previous</a></li>
+        <% } %>
+        
+        <% for (let i = 1; i <= totalPages; i++) { %>
+            <% if (i === currentPage) { %>
+                <li><a class="active" href="/admin/products?page=<%= i %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search='+encodeURIComponent(searchQuery) : '' %>"><%= i %></a></li>
+            <% } else { %>
+                <li><a href="/admin/products?page=<%= i %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search='+encodeURIComponent(searchQuery) : '' %>"><%= i %></a></li>
+            <% } %>
+        <% } %>
+        
+        <% if (currentPage < totalPages) { %>
+            <li><a href="/admin/products?page=<%= currentPage + 1 %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search='+encodeURIComponent(searchQuery) : '' %>">Next</a></li>
+        <% } %>
+    </ul>
+<% } %>
+    </div>
+<!-- Modal -->
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Add Offer</h2>
+        <form id="offerForm">
+            <label for="offerName">Offer Name:</label>
+            <input type="text" id="offerName" name="offerName" placeholder="Enter offer name">
+            <input type="hidden" id="productId" name="productId">
+            <label for="offerDescription">Offer Description:</label>
+            <textarea id="offerDescription" name="offerDescription" placeholder="Enter offer description"></textarea>
+            <label for="offerDiscount">Discount (%):</label>
+            <input type="number" id="offerDiscount" name="offerDiscount" placeholder="Enter discount percentage">
+            <button type="submit" class="btn-submit">Submit</button>
+        </form>
+    </div>
+</div>  
+
+<script src="https://cdn.jsdelivr.net/npm/noty/lib/noty.min.js"></script>
+</body>
+</html>
+
 
        
     </div>
@@ -177,6 +363,84 @@
         alert('Failed to toggle product status. Please try again.');
     }
 }
+
+
+var modal = document.getElementById("myModal");
+
+
+function openModal(productId) {
+    document.getElementById("productId").value = productId; 
+    modal.style.display = "block";
+}
+
+
+function closeModal() {
+    modal.style.display = "none";
+}
+
+
+window.onclick = function(event) {
+    if (event.target == modal) {
+        closeModal();
+    }
+}
+
+document.getElementById("offerForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const offerName = document.getElementById("offerName").value.trim();
+    const description = document.getElementById("offerDescription").value.trim();
+    const discount = document.getElementById("offerDiscount").value.trim();
+    const productId = document.getElementById("productId").value.trim();
+
+   
+
+    try {
+        const response = await fetch("/admin/addoffer", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ offerName, description, discount, productId })
+        });
+
+        const data = await response.json();
+        console.log(data);
+
+        if (data.success) {
+            new Noty({
+                text: "<strong style='font-size: 18px; color: white;'>✅ Offer added successfully!</strong>",
+                type: "success",
+                layout: "topRight",
+                timeout: 4000, 
+                theme: "metroui",
+                progressBar: true
+            }).show();
+            closeModal();
+        } else {
+            new Noty({
+                text: "<strong style='font-size: 18px; color: white;'>❌ " + (data.message || "Failed to add offer") + "</strong>",
+                type: "error",
+                layout: "topRight",
+                timeout: 4000,
+                theme: "metroui",
+                progressBar: true
+            }).show();
+        }
+    } catch (error) {
+        console.error("Error adding offer:", error);
+        new Noty({
+            text: "<strong style='font-size: 18px; color: white;'>❌ Failed to add offer. Please try again.</strong>",
+            type: "error",
+            layout: "topRight",
+            timeout: 4000,
+            theme: "metroui",
+            progressBar: true
+        }).show();
+    }
+});
+
+
 
     </script>
 </body>

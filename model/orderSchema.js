@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
-const User = require("./usersSchema"); // Import the User model
+const User = require("./usersSchema");
 
 const orderSchema = new Schema({
   userId: {
     type: Schema.Types.ObjectId,
-    ref: "user", // Ensure this matches the registered model name
+    ref: "user",
     required: true,
   },
   orderItem: [

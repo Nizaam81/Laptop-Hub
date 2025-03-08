@@ -1,110 +1,224 @@
-<%- include("partials/header.ejs") %>
+ <%- include("partials/header.ejs") %>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #ffffff;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 800px;
-            margin: 50 auto;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background-color: #f9f9f9;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            margin-left: 390px;
-        }
-        h1 {
-            color: #0653cc;
-            text-align: center;
-        }
-        .form-container {
-            display: none;
-            margin-bottom: 20px;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: center;
-        }
-        th {
-            background-color: #0653cc;
-            color: white;
-        }
-        button {
-            padding: 8px 16px;
-            font-size: 14px;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin: 0 5px;
-        }
-        .add-btn {
-            background-color: #0653cc;
-            margin-bottom: 20px;
-        }
-        .list-btn {
-            background-color: #28a745;
-        }
-        .unlist-btn {
-            background-color: #dc3545;
-        }
-        .edit-btn {
-            background-color: #ffc107;
-            color: black;
-        }
-        .submit-btn {
-            background-color: #0653cc;
-        }
-        .pagination a {
-    text-decoration: none;
-    margin: 0 5px;
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #ffffff;
+        margin: 0;
+        padding: 20px;
+    }
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin-left: 320px;
+        margin-top: 70px;
+    }
+    h1 {
+        color: #0653cc;
+        text-align: center;
+    }
+    .form-container {
+        display: none;
+        margin-bottom: 20px;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    .form-group {
+        margin-bottom: 15px;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+    }
+    .form-group input, .form-group textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+        vertical-align: middle;
+    }
+    th {
+        background-color: #0653cc;
+        color: white;
+    }
+    button {
+        padding: 8px 16px;
+        font-size: 14px;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 0 5px;
+    }
+    .add-btn {
+        background-color: #0653cc;
+        margin-bottom: 20px;
+    }
+    .list-btn {
+        background-color: #28a745;
+    }
+    .unlist-btn {
+        background-color: #dc3545;
+    }
+    .edit-btn {
+        background-color: #ffc107;
+        color: black;
+    }
+    .submit-btn {
+        background-color: #0653cc;
+    }
+    .pagination a {
+        text-decoration: none;
+        margin: 0 5px;
+    }
+    .pagination .active button {
+        background-color: #043584;
+        cursor: not-allowed;
+    }
+    .pagination button {
+        background-color: #0653cc;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .delete-btn {
+        background-color: #dc3545;
+        color: white;
+    }
+    .actions-container {
+        display: flex;
+        justify-content: center;
+        gap: 5px;
+    }
+    .add-offer-btn {
+        background-color: #28a745;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+   /* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px); /* Add a blur effect to the background */
 }
-        .pagination .active button {
-    background-color: #043584;
-    cursor: not-allowed;
-}.pagination button {
+
+.modal-content {
+    background-color: #ffffff;
+    margin: 10% auto;
+    padding: 30px;
+    border: none;
+    border-radius: 12px;
+    width: 50%;
+    max-width: 500px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    animation: slideIn 0.3s ease-out; /* Add a slide-in animation */
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s ease; /* Add a smooth color transition */
+}
+
+.close:hover {
+    color: #000;
+}
+
+.modal h2 {
+    margin-bottom: 20px;
+    color: #0653cc;
+    text-align: center;
+    font-size: 24px;
+}
+
+.modal .form-group {
+    margin-bottom: 20px;
+}
+
+.modal .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333;
+}
+
+.modal .form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border-color 0.3s ease; /* Add a smooth border transition */
+}
+
+.modal .form-group input:focus {
+    border-color: #0653cc;
+    outline: none;
+}
+
+.modal .submit-btn {
     background-color: #0653cc;
     color: white;
-    padding: 8px 16px;
+    padding: 12px 24px;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
 }
-.delete-btn {
-    background-color: #dc3545;
-    color: white;
+
+.modal .submit-btn:hover {
+    background-color: #043584;
 }
-    </style>
+</style>
 </head>
 <body>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <div class="container">
         <h1>Category Management</h1>
         <button class="add-btn" onclick="showAddForm()">Add Category</button>
@@ -127,33 +241,39 @@
         </div>
 
         <!-- Categories Table -->
-        <table>
-            <thead>
-                <tr>
-                    <th>Category Name</th>
-                    <th>Description</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="categoryTableBody">
-                <% categories.forEach(function(category) { %>
-                <tr data-id="<%= category._id %>">
-                    <td><%= category.name %></td>
-                    <td><%= category.description %></td>
-                    <td class="status"><%= category.isListed ? 'Active' : 'Inactive' %></td>
-                    <td>
-                        <button class="<%= category.isListed ? 'list-btn' : 'unlist-btn' %>" 
-                                onclick="toggleList('<%= category._id %>')">
-                            <%= category.isListed ? 'Unlist' : 'List' %>
-                        </button>
-                        <button class="edit-btn" onclick="showEditForm('<%= category._id %>')">Edit</button>
-                        <button class="delete-btn" onclick="deleteCategory('<%= category._id %>')">Delete</button>
-                    </td>
-                </tr>
-                <% }); %>
-            </tbody>
-        </table>
+     <table>
+    <thead>
+        <tr>
+            <th>Category Name</th>
+            <th>Description</th>
+            <th>Offer(%)</th>
+            <th>Offer</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody id="categoryTableBody">
+        <% categories.forEach(function(category) { %>
+        <tr data-id="<%= category._id %>">
+            <td><%= category.name %></td>
+            <td><%= category.description %></td>
+            <td><%= category.offerPercentage || 0 %>%</td>
+            <td><button class="add-offer-btn" onclick="openOfferModal('<%= category._id %>')">Add Offer</button></td>
+            <td class="status"><%= category.isListed ? 'Active' : 'Inactive' %></td>
+          <td>
+    <div class="actions-container">
+        <button class="<%= category.isListed ? 'list-btn' : 'unlist-btn' %>" 
+                onclick="toggleList('<%= category._id %>')">
+            <%= category.isListed ? 'Unlist' : 'List' %>
+        </button>
+        <button class="edit-btn" onclick="showEditForm('<%= category._id %>')">Edit</button>
+        <button class="delete-btn" onclick="deleteCategory('<%= category._id %>')">Delete</button>
+    </div>
+</td>
+        </tr>
+        <% }); %>
+    </tbody>
+</table>
 
        <!-- Pagination -->
 <div class="pagination">
@@ -166,6 +286,23 @@
       </a>
   <% } %>
 </div>
+
+<!-- Add Offer Modal -->
+<div id="offerModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Add Offer</h2>
+        <form id="offerForm" onsubmit="handleOfferSubmit(event)">
+            <input type="hidden" id="offerCategoryId">
+            <div class="form-group">
+                <label for="offerPercentage">Offer Percentage:</label>
+                <input type="number" id="offerPercentage" required>
+            </div>
+            <button type="submit" class="submit-btn">Add Offer</button>
+        </form>
+    </div>
+</div>
+
     <script>
         function showAddForm() {
             const form = document.getElementById('categoryForm');
@@ -181,7 +318,7 @@
             document.getElementById('formTitle').textContent = 'Edit Category';
             document.getElementById('categoryId').value = categoryId;
             
-            // Get category data from the table
+           
             const row = document.querySelector(`tr[data-id="${categoryId}"]`);
             document.getElementById('name').value = row.cells[0].textContent;
             document.getElementById('description').value = row.cells[1].textContent;
@@ -292,6 +429,89 @@
         }
     }
 }
+
+
+
+function openOfferModal(categoryId) {
+    const modal = document.getElementById('offerModal');
+    document.getElementById('offerCategoryId').value = categoryId;
+    modal.style.display = 'block';
+}
+
+
+function closeModal() {
+    const modal = document.getElementById('offerModal');
+    modal.style.display = 'none';
+}
+
+
+
+
+function updateTableRow(categoryId, offerPercentage) {
+    const row = document.querySelector(`tr[data-id="${categoryId}"]`);
+    if (row) {
+        row.cells[2].textContent = offerPercentage;
+    }
+}
+
+  
+
+
+ document.getElementById("offerForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const offer = document.getElementById("offerPercentage").value.trim();
+    const categoryId = document.getElementById("offerCategoryId").value.trim(); 
+
+    try {
+        const response = await fetch("/admin/addOfferCategory", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json', 
+            },
+            body: JSON.stringify({ categoryId, offer }) 
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            Toastify({
+                text: "Offer added successfully!",
+                duration: 2000, // Duration in milliseconds
+                close: true, // Show a close button
+                gravity: "top", // Position: top, bottom, left, right
+                position: "right", // Alignment: left, center, right
+                backgroundColor: "green", // Background color
+                stopOnFocus: true, // Stop timer on hover
+            }).showToast();
+            closeModal();
+            window.location.reload(); 
+        } else {
+            Toastify({
+                text: data.error || "Failed to add offer",
+                duration: 2000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "red",
+                stopOnFocus: true,
+            }).showToast();
+        }
+    } catch (error) {
+        Toastify({
+            text: "An error occurred while adding the offer",
+            duration: 2000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "red",
+            stopOnFocus: true,
+        }).showToast();
+        console.error('Error:', error);
+    }
+});
+
+
     </script>
 </body>
 </html>
