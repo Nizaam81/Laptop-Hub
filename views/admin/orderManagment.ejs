@@ -1,172 +1,190 @@
 <%- include("partials/header.ejs") %>
-
-
-    <title>Order Management</title>
+    <title>Orders Table</title>
     <style>
-        body {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
             font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #ffffff;
-            color: #FFF;
         }
-        .container {
-            max-width: 900px;
-            margin: auto;
-            background: white;
+
+        body {
+            background-color: #f5f5f5;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            color: black;
-            margin-left: 285px;
-            margin-top: 50px;
         }
-        .search-box {
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
+
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin: 0 auto;
+            max-width: 1200px;
+            margin-top: 70px;
+            
         }
-        .search-box input, .search-box select {
-            padding: 8px;
+
+        .header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .table-container {
             width: 100%;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            overflow-x: auto;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
         }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
+
+        thead {
+            background-color: #f9f9f9;
         }
+
         th {
-            background-color: #006CE1;
-            color: white;
+            text-align: left;
+            padding: 12px 20px;
+            color: #666;
+            font-weight: normal;
+            border-bottom: 1px solid #eee;
         }
-        .status {
-            padding: 5px 10px;
-            border-radius: 5px;
+
+        td {
+            padding: 12px 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .customer-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .customer-name {
             font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .customer-email, .customer-phone {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .payment-badge {
             display: inline-block;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            background-color: #f0f0f0;
         }
-        .delivered { background: green; color: white; }
-        .processing { background: yellow; color: black; }
-        .onTheWay { background: gray; color: white; }
-        .return { background: red; color: white; }
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
+
+        .payment-wallet {
+            background-color: #e3f2fd;
+            color: #1976d2;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+
+        .payment-online {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .amount {
+            font-weight: bold;
+        }.customer-info div {
+    margin-bottom: 8px;
+}
+
+
+        /* Responsive styles */
+        @media screen and (max-width: 768px) {
+            .header {
+                padding: 15px;
+            }
+
+            th, td {
+                padding: 10px 15px;
+            }
+            
+            table {
+                width: 700px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .header {
+                padding: 12px;
+            }
+
+            th, td {
+                padding: 8px 12px;
+            }
+            
+            table {
+                width: 600px;
+            }
         }
     </style>
-    <script>
-       
-    </script>
 </head>
 <body>
-    <div class="container">
-        <h2>Order Management</h2>
-        <!-- <div class="search-box">
-            <input type="text" placeholder="Search by Invoice Number...">
-            <input type="hidden" id="orderid" value="<%= Order._id %>">
-           
-        </div> -->
+  <div class="container">
+    <div class="header">
+        <h1>Orders</h1>
+    </div>
+    <div class="table-container">
         <table>
             <thead>
                 <tr>
-                  
-                    <th>Invoice Number</th>
-                    <th>Client Name</th>
-                    <th>Product Name</th>
-                    <th>Rate</th>
-                    <th>Status</th>
-                    <!-- <th>View</th> -->
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Payment</th>
+                    <th>Amount</th>
                 </tr>
             </thead>
-          <% Order.forEach(element => { %>
-            <tbody>
-                <tr class="fade-in">
-                   
-                    <td><%= element._id %></td>
-                    <td><%= element.userDetails[0].FirstName %><%= element.userDetails[0].LastName %></td>
-                    <td><%= element.productDetails[0].name %></td>
-                    <td><%= element.orderItem.price %></td>
-                   <td>
-    <select class="status" 
-        onchange="updateStatus(this, '<%= element._id %>')" 
-        data-previous-status="<%= element.orderItem.status %>" 
-        <%= element.orderItem.status === 'Cancelled' ? 'disabled' : '' %>>
-        
-        <% status.forEach(value => { %>
-            <option value="<%= value %>" <%= element.orderItem.status === value ? "selected" : "" %>>
-                <%= value %>
-            </option>
-        <% }) %>
-    </select>
-</td>
+           <tbody>
+    <% Order.forEach(element => { %>
+    <tr class="clickable-row" data-href="/admin/OrderDetails/<%= element._id %>">
+        <td>LAPTOP-HUB- <%= element._id %></td>
+        <td>
+            <div class="customer-info">
+                <div class="customer-name"><%= element.userDetails[0].FirstName %></div>
+                <div class="customer-email"><%= element.userDetails[0].email %></div>
+                <div class="customer-phone"><%= element.userDetails[0].phone %></div>
+            </div>
+        </td>
+        <td><%= new Date(element.createdOn).toLocaleDateString("en-US", { month: 'short', day: '2-digit', year: 'numeric' }) %></td>
+        <td><span class="payment-badge payment-wallet"><%= element.paymentMethod.toUpperCase() %></span></td>
+        <td class="amount">₹<%= element.totalPrice.toLocaleString() %></td>
+    </tr>
+    <% }) %>
+</tbody>
 
-
-                    <!-- <td><button>View</button></td> -->
-                </tr>
-          <% }) %>
-               
         </table>
     </div>
-
-  <script>
-    function updateStatus(selectElement, orderId) {
-        const selectedStatus = selectElement.value.trim();
-        const previousStatus = selectElement.dataset.previousStatus;
-
-       
-        if (previousStatus === "Cancelled") {
-            alert("This order has been cancelled and cannot be modified.");
-            selectElement.value = previousStatus; 
-            return;
-        }
-
-       
-        Array.from(selectElement.options).forEach(option => {
-            if (option.value !== selectedStatus && option.value !== previousStatus) {
-                option.disabled = true;
-            }
-        });
-
-        
-        if (selectedStatus === "Delivered") {
-            Array.from(selectElement.options).forEach(option => {
-                if (option.value !== "Delivered") {
-                    option.disabled = true;
-                }
+</div>
+<script>
+   
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll(".clickable-row").forEach(row => {
+            row.addEventListener("click", function() {
+                window.location.href = this.dataset.href;
             });
-        }
+        });
+    });
 
-       
-        fetch("/admin/OrderManagment", {
-            method: "post",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ orderId, status: selectedStatus }),
-        })
-        .then(response => {
-            if (response.ok) {
-                console.log("Status updated successfully");
-                selectElement.dataset.previousStatus = selectedStatus; 
-            } else {
-                console.error("Failed to update status");
-            }
-        })
-        .catch(error => console.error("Error:", error));
-    }
+
 </script>
-
-
 </body>
 </html>

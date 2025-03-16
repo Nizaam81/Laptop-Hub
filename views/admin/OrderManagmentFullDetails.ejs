@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order Details</title>
+     <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background-color: #f0f2f5;
+        padding: 20px;
+        color: #333;
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+      }
+
+      h1 {
+        font-size: 28px;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f0f0f0;
+        color: #2d3748;
+        font-weight: 600;
+      }
+
+      .info-section {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 30px;
+        gap: 20px;
+      }
+
+      .info-col {
+        flex: 1;
+        min-width: 300px;
+        padding: 20px;
+        background-color: #f9fafc;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+      }
+
+      .section-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 18px;
+        color: #4a5568;
+        position: relative;
+        padding-bottom: 8px;
+      }
+
+      .section-title:after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        height: 3px;
+        width: 40px;
+        background: linear-gradient(to right, #5a67d8, #4c51bf);
+        border-radius: 2px;
+      }
+
+      .info-row {
+        margin-bottom: 12px;
+        display: flex;
+        align-items: baseline;
+      }
+
+      .info-label {
+        font-weight: 600;
+        display: inline-block;
+        color: #718096;
+        width: 130px;
+      }
+
+      .payment-status {
+        display: inline-block;
+        color: #38a169;
+        font-weight: 600;
+        background-color: #f0fff4;
+        padding: 3px 10px;
+        border-radius: 15px;
+        font-size: 14px;
+      }
+
+      .customer-section,
+      .address-section {
+        background-color: #f9fafc;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+      }
+
+      .address-line {
+        margin-bottom: 8px;
+        color: #4a5568;
+      }
+
+      .items-section {
+        margin-bottom: 40px;
+      }
+
+      .item {
+        display: flex;
+        border-bottom: 1px solid #edf2f7;
+        padding: 20px 0;
+        gap: 20px;
+        align-items: center;
+      }
+
+      .item:last-child {
+        border-bottom: none;
+      }
+
+      .item-image {
+        width: 100px;
+        height: 100px;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      }
+
+      .item-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+      }
+
+      .item-image:hover img {
+        transform: scale(1.05);
+      }
+
+      .item-details {
+        flex: 1;
+      }
+
+      .item-title {
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #2d3748;
+        font-size: 16px;
+      }
+
+      .item-meta {
+        color: #718096;
+        font-size: 14px;
+        margin-bottom: 8px;
+        display: flex;
+        gap: 15px;
+      }
+
+      .meta-item {
+        background-color: #f7fafc;
+        padding: 3px 10px;
+        border-radius: 15px;
+        font-size: 13px;
+      }
+
+      .item-price {
+        margin-top: 12px;
+        color: #4a5568;
+        font-weight: 500;
+      }
+
+      .price-highlight {
+        color: #4c51bf;
+        font-weight: 600;
+      }
+
+      .item-status {
+        text-align: right;
+        align-self: center;
+        min-width: 150px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 15px;
+      }
+
+      .status-pill {
+        display: inline-block;
+        padding: 6px 16px;
+        background-color: #fef9c3;
+        color: #854d0e;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        transition: all 0.2s ease;
+      }
+
+      .status-pill:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Attractive enhanced dropdown styling */
+      .select-wrapper {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 10px;
+        width: 140px;
+      }
+
+      .custom-select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        width: 100%;
+        padding: 10px 15px;
+        font-size: 14px;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        background-color: #fff;
+        cursor: pointer;
+        color: #4a5568;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        font-weight: 500;
+      }
+
+      .custom-select:hover {
+        border-color: #cbd5e0;
+        background-color: #f8fafc;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      }
+
+      .custom-select:focus {
+        outline: none;
+        border-color: #5a67d8;
+        box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.2);
+        transform: translateY(-2px);
+      }
+
+      .select-arrow {
+        position: absolute;
+        top: 50%;
+        right: 12px;
+        transform: translateY(-50%);
+        pointer-events: none;
+        transition: all 0.3s ease;
+      }
+
+      .select-arrow:before {
+        content: "";
+        display: block;
+        width: 10px;
+        height: 10px;
+        border-right: 2px solid #a0aec0;
+        border-bottom: 2px solid #a0aec0;
+        transform: rotate(45deg);
+        transition: all 0.3s ease;
+      }
+
+      .select-wrapper:hover .select-arrow:before {
+        border-color: #5a67d8;
+      }
+
+      .summary-section {
+        background-color: #f9fafc;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+      }
+
+      .summary-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: #4a5568;
+        position: relative;
+        padding-bottom: 8px;
+      }
+
+      .summary-title:after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        height: 3px;
+        width: 40px;
+        background: linear-gradient(to right, #5a67d8, #4c51bf);
+        border-radius: 2px;
+      }
+
+      .summary-table {
+        width: 100%;
+      }
+
+      .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+        padding: 5px 0;
+      }
+
+      .summary-label {
+        flex: 1;
+        color: #718096;
+        font-weight: 500;
+      }
+
+      .summary-value {
+        text-align: right;
+        font-weight: 600;
+        color: #2d3748;
+        min-width: 120px;
+      }
+
+      .total-row {
+        border-top: 2px solid #e2e8f0;
+        padding-top: 15px;
+        margin-top: 15px;
+      }
+
+      .total-row .summary-label,
+      .total-row .summary-value {
+        color: #4c51bf;
+        font-weight: 700;
+        font-size: 18px;
+      }
+
+      /* Status colors */
+      .status-option-pending {
+        color: #d97706;
+      }
+      .status-option-processing {
+        color: #2563eb;
+      }
+      .status-option-shipped {
+        color: #059669;
+      }
+      .status-option-delivered {
+        color: #047857;
+      }
+      .status-option-cancelled {
+        color: #dc2626;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 20px;
+        }
+
+        .info-section {
+          flex-direction: column;
+        }
+
+        .info-col {
+          min-width: 100%;
+        }
+
+        .item {
+          flex-wrap: wrap;
+        }
+
+        .item-image {
+          width: 80px;
+          height: 80px;
+        }
+
+        .item-status {
+          width: 100%;
+          text-align: left;
+          margin-top: 15px;
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .select-wrapper {
+          width: 48%;
+        }
+      }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Order Details</h1>
+
+        <div class="info-section">
+            <div class="info-col">
+                <div class="section-title">Order Info</div>
+                <div class="info-row">
+                    <span class="info-label">Order ID:</span> LAPTOP-HUB<%= Orderr[0]._id %>
+                    <input type="hidden" value="<%= Orderr[0]._id %>" id="orderId">
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Ordered Date:</span> <%= new Date(Orderr[0].createdOn).toLocaleDateString() %>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Total Price:</span> ₹<%= Orderr[0].totalPrice %>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Payment Method:</span> <%= Orderr[0].paymentMethod %>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Payment Status:</span> 
+                    <span class="payment-status"><%= Orderr[0].paymentStatus %></span>
+                </div>
+            </div>
+
+<div class="info-col">
+    <div class="section-title">Customer Details</div>
+    <div class="info-row">
+        <span class="info-label">Name:</span> 
+        <% if (Orderr[0].userDetails && Orderr[0].userDetails.FirstName && Orderr[0].userDetails.LastName) { %>
+            <%= Orderr[0].userDetails.FirstName %> <%= Orderr[0].userDetails.LastName %>
+        <% } else { %>
+            <span class="not-available">Not Available</span>
+        <% } %>
+    </div>
+    <div class="info-row">
+        <span class="info-label">Email:</span> 
+        <% if (Orderr[0].userDetails && Orderr[0].userDetails.email) { %>
+            <%= Orderr[0].userDetails.email %>
+        <% } else { %>
+            <span class="not-available">Not Available</span>
+        <% } %>
+    </div>
+    <div class="info-row">
+        <span class="info-label">Phone:</span> 
+        <% if (Orderr[0].userDetails && Orderr[0].userDetails.phone) { %>
+            <%= Orderr[0].userDetails.phone %>
+        <% } else { %>
+            <span class="not-available">Not Provided</span>
+        <% } %>
+    </div>
+</div>
+
+        </div>
+
+       <div class="address-section">
+    <div class="section-title">Shipping Address</div>
+       <% if (Orderr[0].addressDetails) { %>
+         <div class="address-line"><%= Orderr[0].addressDetails.address[0].name %></div>
+        <div class="address-line"><%= Orderr[0].addressDetails.address[0].city %></div>
+        <div class="address-line"><%= Orderr[0].addressDetails.address[0].state %> - <%= Orderr[0].addressDetails.address[0].pincode %></div>
+        <div class="address-line">
+            <span class="info-label">Landmark:</span> <%= Orderr[0].addressDetails.address[0].landMark %>
+        </div>
+         <% } else { %>
+                  <div class="address-line"><span class="not-available">Address Not Available</span></div>
+
+       <% } %>
+      
+        
+    
+  
+</div>
+
+
+       <div class="items-section">
+    <div class="section-title">Order Items</div>
+    <% Orderr.forEach((item) => { %>
+       
+        <div class="item">
+            <div class="item-image">
+                <% if (item.productDetails.images && item.productDetails.images.length > 0) { %>
+                    <img src="<%= item.productDetails.images[0] %>" alt="<%= item.productDetails.name %>" />
+                <% } else { %>
+                    <img src="/images/placeholder.png" alt="No Image Available" />
+                <% } %>
+            </div>
+            <div class="item-details">
+                <div class="item-title"><%= item.productDetails.name %></div>
+                <input type="hidden" value="<%= item.orderItem._id %>" id="specificId">
+                <div class="item-meta">
+  
+                    <span class="meta-item">Quantity: <%= item.orderItem.quantity %></span>
+                </div>
+                <div class="item-price">
+                    Price: <span class="price-highlight">₹<%= item.orderItem.price %></span> each | 
+                    Total: <span class="price-highlight">₹<%= item.orderItem.price * item.orderItem.quantity %></span>
+                </div>
+            </div>
+              <div class="item-status">
+    <div class="select-wrapper">
+        <select class="custom-select dropdownbtn" data-specificid="<%= item._id %>" data-orderid="<%= Orderr[0]._id %>">
+            <option value="<%= item.orderItem.status %>" selected><%= item.orderItem.status %></option>
+            <% if (item.orderItem.status != "cancel" && item.orderItem.status != "delivered") { %>
+                <% if (item.orderItem.status == "processing") { %>
+                    <% ['shipped', 'delivered'].forEach(status => { %>
+                        <option value="<%= status %>"><%= status %></option>
+                    <% }) %>
+                <% } else if (item.orderItem.status == "shipped") { %>
+                    <option value="delivered">delivered</option>
+                <% } %>
+            <% } %>
+        </select>
+    </div>
+    <% if (item.orderItem.status === "Return Request" && item.orderItem.returnRequest.status === "Pending") { %>
+        <button class="approve-return-btn" data-specificid="<%= item._id %>" data-orderid="<%= Orderr[0]._id %>">Approve Return</button>
+    <% } %>
+</div>
+
+        </div>
+    <% }) %>
+
+   
+</div>
+
+
+        <div class="summary-section">
+            <div class="summary-title">Summary</div>
+            <div class="summary-table">
+                <div class="summary-row">
+                    <span class="summary-label">Subtotal:</span>
+                    <span class="summary-value">₹<%= Orderr[0].totalPrice %></span>
+                </div>
+                <% if (Orderr[0].couponApplied) { %>
+                    <div class="summary-row">
+                        <span class="summary-label">Discount:</span>
+                        <span class="summary-value">₹<%= Orderr[0].discountAmount %></span>
+                    </div>
+                <% } %>
+                <div class="summary-row total-row">
+                    <span class="summary-label">Grand Total:</span>
+                    <span class="summary-value">₹<%= Orderr[0].totalPrice - (Orderr[0].discountAmount || 0) %></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+   document.querySelectorAll(".dropdownbtn").forEach(dropdown => {
+    dropdown.addEventListener("change", async (event) => {
+        const status = event.target.value; // Get selected status
+        console.log("Status:", status);
+
+        const specificId = document.getElementById('specificId').value ;
+        const orderId = event.target.dataset.orderid;
+
+        console.log("Specific ID:", specificId);
+        console.log("Order ID:", orderId);
+
+        if (!specificId || !orderId) {
+            console.error("Missing specificId or orderId.");
+            alert("Error: Required order details not found.");
+            return;
+        }
+
+        try {
+            const response = await fetch("/admin/OrderStatus", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ status, specificId, orderId }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert("Order status updated successfully!");
+            } else {
+                alert("Error: " + result.message);
+            }
+        } catch (error) {
+            console.error("Error updating order status:", error);
+            alert("Something went wrong!");
+        }
+    });
+});
+
+
+
+
+
+
+//approve return 
+    document.querySelectorAll(".approve-return-btn").forEach(button => {
+        button.addEventListener("click", async (event) => {
+            const specificId = document.getElementById('specificId').value;
+            const orderId = event.target.dataset.orderid;
+
+            if (!specificId || !orderId) {
+                console.error("Missing specificId or orderId.");
+                alert("Error: Required order details not found.");
+                return;
+            }
+
+            try {
+                const response = await fetch("/admin/approveReturn", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ specificId, orderId }),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert("Return request approved and amount refunded to wallet!");
+                    location.reload(); // Reload the page to reflect the changes
+                } else {
+                    alert("Error: " + result.message);
+                }
+            } catch (error) {
+                console.error("Error approving return request:", error);
+                alert("Something went wrong!");
+            }
+        });
+    });
+
+
+</script>
+
+</html>

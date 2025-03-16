@@ -1,27 +1,63 @@
+const mongoose = require("mongoose"); // Import mongoose
 const user = require("../../model/usersSchema");
 const address = require("../../model/addressSchema");
 const order = require("../../model/orderSchema");
+const Wallet = require("../../model/walletSchema");
 
 const loadOrder = async (req, res) => {
   try {
     const Order = await order.aggregate([
       {
         $lookup: {
-          from: "users",
-          localField: "userId",
-          foreignField: "_id",
-          as: "userDetails",
+          from: "users", // Collection to join with
+          localField: "userId", // Field from the orders collection
+          foreignField: "_id", // Field from the users collection
+          as: "userDetails", // Output array field
         },
       },
       {
-        $unwind: "$orderItem",
+        $unwind: {
+          path: "$orderItem", // Unwind the orderItem array
+          preserveNullAndEmptyArrays: true, // Keep documents with empty or null orderItem arrays
+        },
       },
       {
         $lookup: {
-          from: "products",
-          localField: "orderItem.product",
-          foreignField: "_id",
-          as: "productDetails",
+          from: "products", // Collection to join with
+          localField: "orderItem.product", // Field from the orders collection
+          foreignField: "_id", // Field from the products collection
+          as: "productDetails", // Output array field
+        },
+      },
+      {
+        $unwind: {
+          path: "$productDetails", // Unwind the productDetails array
+          preserveNullAndEmptyArrays: true, // Keep documents if productDetails is empty or null
+        },
+      },
+      {
+        $group: {
+          _id: "$_id", // Group by order ID
+          userId: { $first: "$userId" }, // Retain the userId field
+          userDetails: { $first: "$userDetails" }, // Retain the userDetails field
+          orderItems: {
+            $push: {
+              productDetails: "$productDetails", // Collect productDetails for each orderItem
+              quantity: "$orderItem.quantity", // Retain the quantity field
+              price: "$orderItem.price", // Retain the price field
+              status: "$orderItem.status", // Retain the status field
+            },
+          },
+          totalPrice: { $first: "$totalPrice" }, // Retain the totalPrice field
+          address: { $first: "$address" }, // Retain the address field
+          invoiceDate: { $first: "$invoiceDate" }, // Retain the invoiceDate field
+          createdOn: { $first: "$createdOn" }, // Retain the createdOn field
+          couponApplied: { $first: "$couponApplied" }, // Retain the couponApplied field
+          paymentMethod: { $first: "$paymentMethod" }, // Retain the paymentMethod field
+          razorpayOrderId: { $first: "$razorpayOrderId" }, // Retain the razorpayOrderId field
+          razorpayPaymentId: { $first: "$razorpayPaymentId" }, // Retain the razorpayPaymentId field
+          razorpaySignature: { $first: "$razorpaySignature" }, // Retain the razorpaySignature field
+          paymentStatus: { $first: "$paymentStatus" }, // Retain the paymentStatus field
         },
       },
     ]);
@@ -43,20 +79,101 @@ const loadOrder = async (req, res) => {
   }
 };
 
+const loadFulldetailsOrder = async (req, res) => {
+  try {
+    const Orderr = await order.aggregate([
+      {
+        $match: { _id: new mongoose.Types.ObjectId(req.params.id) }, // Fetch only the required order
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "userDetails",
+        },
+      },
+      {
+        $unwind: {
+          path: "$userDetails",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "products",
+          localField: "orderItem.product",
+          foreignField: "_id",
+          as: "productDetails",
+        },
+      },
+      {
+        $unwind: {
+          path: "$productDetails",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "addresses",
+          localField: "userId",
+          foreignField: "userId",
+          as: "addressDetails",
+        },
+      },
+      {
+        $unwind: {
+          path: "$addressDetails",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $unwind: "$orderItem",
+      },
+    ]);
+
+    const status = [
+      "pending",
+      "processing",
+      "shipped",
+      "Delivered",
+      "Cancelled",
+      "Return Request",
+      "Returnedd",
+    ];
+    console.log(Orderr);
+    console.log(Orderr[0].addressDetails.address);
+    res.render("admin/OrderManagmentFullDetails", {
+      status,
+      Orderr: Orderr,
+    });
+  } catch (error) {
+    console.log("error in loadFulldetailsOrder");
+    console.error(error);
+  }
+};
+
 const updateOrderStatus = async (req, res) => {
   try {
     console.log("Received Update Request:", req.body);
 
-    const { orderId, status } = req.body;
+    const { status, specificId, orderId } = req.body;
     if (!orderId || !status) {
       return res.status(400).json({ success: false, message: "Missing data" });
     }
 
     const updatedOrder = await order.findOneAndUpdate(
-      { _id: orderId, "orderItem.product": { $exists: true } },
-      { $set: { "orderItem.$.status": status } },
-      { new: true }
+      {
+        _id: new mongoose.Types.ObjectId(orderId),
+        "orderItem._id": new mongoose.Types.ObjectId(specificId), // Match the specific product
+      },
+      {
+        $set: { "orderItem.$.status": status }, // Update only the matched product status
+      },
+      { new: true } // Return the updated document
     );
+
+    console.log(updatedOrder);
 
     if (!updatedOrder) {
       return res
@@ -71,7 +188,80 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
+const approveRequest = async (req, res) => {
+  try {
+    const { orderId, specificId } = req.body;
+
+    if (!orderId || !specificId) {
+      return res.status(400).json({ message: "Missing orderId or specificId" });
+    }
+
+    // Find the order
+    const Order = await order.findById(orderId);
+    if (!Order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // Find the specific item in the order
+    const item = Order.orderItem.find(
+      (item) => item._id.toString() === specificId
+    );
+    if (!item) {
+      return res.status(404).json({ message: "Item not found in the order" });
+    }
+
+    // Check if the item has a return request with status "Pending"
+    if (
+      item.status !== "Return Request" ||
+      item.returnRequest.status !== "Pending"
+    ) {
+      return res
+        .status(400)
+        .json({ message: "No pending return request for this item" });
+    }
+
+    // Calculate the refund amount
+    const refundAmount = item.price * item.quantity;
+
+    // Find the user's wallet
+    const wallet = await Wallet.findOne({ userId: Order.userId });
+    if (!wallet) {
+      const newWallet = new Wallet({
+        userId,
+      });
+    }
+
+    // Update the wallet balance and add a refund transaction
+    wallet.totalBalance += refundAmount;
+    wallet.transactions.push({
+      type: "Refund",
+      amount: refundAmount,
+      status: "Completed",
+      description: `Refund for order ${orderId}, item ${specificId}`,
+    });
+
+    // Save the updated wallet
+    await wallet.save();
+
+    // Update the return request status to "Approved"
+    item.returnRequest.status = "Approved";
+    item.returnRequest.returnDate = new Date();
+    item.returnRequest.refundStatus = "Completed";
+
+    // Save the updated order
+    await Order.save();
+
+    res.status(200).json({
+      message: "Return request approved and amount refunded to wallet",
+    });
+  } catch (error) {
+    console.error("Error in approveRequest:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 module.exports = {
   loadOrder,
   updateOrderStatus,
+  loadFulldetailsOrder,
+  approveRequest,
 };

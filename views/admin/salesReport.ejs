@@ -233,19 +233,19 @@
       <!-- Header -->
       <div class="header">
         <h1>Sales Report Dashboard</h1>
-        <div class="filters">
-          <select id="dateRange">
-            <option value="1day">1 Day</option>
-            <option value="1week">1 Week</option>
-            <option value="1month">1 Month</option>
-            <option value="custom">Custom Range</option>
-          </select>
-          <input type="date" id="startDate" placeholder="Start Date" />
-          <input type="date" id="endDate" placeholder="End Date" />
-          <button onclick="filterReport()">
-            <i class="fas fa-filter"></i> Filter
-          </button>
-        </div> 
+       <div class="filters">
+  <select id="dateRange">
+    <option value="1day">1 Day</option>
+    <option value="1week">1 Week</option>
+    <option value="1month">1 Month</option>
+    <option value="custom">Custom Range</option>
+  </select>
+  <input type="date" id="startDate" placeholder="Start Date" />
+  <input type="date" id="endDate" placeholder="End Date" />
+  <button onclick="filterReport()">
+    <i class="fas fa-filter"></i> Filter
+  </button>
+</div>
       </div>
 
       <!-- Key Metrics -->
@@ -282,18 +282,24 @@
               <th>Status</th>
             </tr>
           </thead>
-          <tbody>
-  <% orderData.forEach(element => { %>
+        <tbody>
+  <% if (orderData && orderData.length > 0) { %>
+    <% orderData.forEach(element => { %>
+      <tr>
+        <td><%= element.createdOn.toLocaleDateString() %></td>
+        <td>#<%= element._id %></td>
+        <td><%= element.userId.FirstName %> <%= element.userId.LastName %></td>
+        <td>$ <%= element.totalPrice %></td>
+        <td><%= element.paymentMethod %></td>
+        <td class="<%= element.paymentStatus %>"><%= element.paymentStatus %></td>
+      </tr>
+    <% }) %>
+  <% } else { %>
     <tr>
-      <td><%= element.createdOn.toLocaleDateString() %></td>
-      <td>#<%= element._id %></td>
-      <td><%= element.userId.FirstName %> <%= element.userId.LastName %></td>
-      <td>$ <%= element.totalPrice %></td>
-      <td><%= element.paymentMethod %></td>
-      <td class="<%= element.paymentStatus %>"><%= element.paymentStatus %></td>
+      <td colspan="6">No orders found for the selected date range.</td>
     </tr>
-  <% }) %>
-</tbody>                
+  <% } %>
+</tbody>           
         </table>
       </section>
       </div>
@@ -301,13 +307,61 @@
       <!-- Export Buttons -->
      <!-- Export Buttons -->
 <div class="export-buttons">
-  <a href="/admin/SalesReport/pdf" class="export-btn export-btn-pdf">
+   <a
+    href="/admin/SalesReport/pdf?dateRange=<%= dateRange %>&startDate=<%= startDate %>&endDate=<%= endDate %>"
+    class="export-btn export-btn-pdf"
+  >
     <i class="fas fa-file-pdf"></i> Export PDF
   </a>
-  <a href="/admin/SalesReport/excel" class="export-btn export-btn-excel">
+  <a
+    href="/admin/SalesReport/excel?dateRange=<%= dateRange %>&startDate=<%= startDate %>&endDate=<%= endDate %>"
+    class="export-btn export-btn-excel"
+  >
     <i class="fas fa-file-excel"></i> Export Excel
   </a>
 </div>
     </div>
   </body>
+  <script>
+   
+  function filterReport() {
+    const dateRange = document.getElementById('dateRange').value;
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+
+    
+    fetch('/admin/SalesReport/filter', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ dateRange, startDate, endDate }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        
+        updateTable(data);
+      })
+      .catch(error => console.error('Error:', error));
+  }
+
+  function updateTable(data) {
+    const tbody = document.querySelector('.report tbody');
+    tbody.innerHTML = ''; 
+
+    data.forEach(order => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${new Date(order.createdOn).toLocaleDateString()}</td>
+        <td>#${order._id}</td>
+        <td>${order.userId.FirstName} ${order.userId.LastName}</td>
+        <td>$ ${order.totalPrice}</td>
+        <td>${order.paymentMethod}</td>
+        <td class="${order.paymentStatus}">${order.paymentStatus}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  </script>
 </html>

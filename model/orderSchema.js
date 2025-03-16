@@ -17,7 +17,6 @@ const orderSchema = new Schema({
         type: String,
         required: true,
         enum: [
-          "pending",
           "processing",
           "shipped",
           "Delivered",
@@ -27,6 +26,23 @@ const orderSchema = new Schema({
         ],
         default: "processing",
       },
+
+      returnRequest: {
+        reason: { type: String, default: null },
+        requestDate: { type: Date, default: null },
+        status: {
+          type: String,
+          enum: ["Pending", "Approved", "Rejected"],
+          default: "Pending",
+        },
+        adminResponse: { type: String, default: null },
+        returnDate: { type: Date, default: null },
+        refundStatus: {
+          type: String,
+          enum: ["Pending", "Completed", "Failed"],
+          default: "Pending",
+        },
+      },
     },
   ],
   totalPrice: { type: Number, required: true },
@@ -34,13 +50,17 @@ const orderSchema = new Schema({
   invoiceDate: { type: Date },
   createdOn: { type: Date, default: Date.now, required: true },
   couponApplied: { type: Boolean, default: false },
-  paymentMethod: { type: String, enum: ["cod", "razorpay"], required: true },
+  paymentMethod: {
+    type: String,
+    enum: ["cod", "razorpay", "wallet"],
+    required: true,
+  },
   razorpayOrderId: { type: String, default: null },
   razorpayPaymentId: { type: String, default: null },
   razorpaySignature: { type: String, default: null },
   paymentStatus: {
     type: String,
-    enum: ["pending", "completed", "failed"],
+    enum: ["pending", "Paid", "failed"],
     default: "pending",
   },
 });

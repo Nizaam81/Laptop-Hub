@@ -189,9 +189,20 @@
             <div class="pricing mb-4">
               <input type="hidden" id="variantId" value="<%= Variants._id %>">
 
-                <h2 class="current-price" id="salePrice" >₹ <%= Variants.price %></h2>
+                <h2 class="current-price" id="salePrice" >₹ <% if (products.offerPercentage ==0 && category.offerPercentage==0) { %>
+                 <%= Variants.price %>
+                 <% } else if (products.offerPercentage > category.offerPercentage) { %>
+                  <del><%= Variants.price %></del>   <%= Variants.price - Variants.price*products.offerPercentage/100 %>
+                  <% } else { %>
+                   <del><%= Variants.price %></del>   <%= Variants.price - Variants.price*category.offerPercentage/100 %>
+                <% } %></h2>
                  <h3>Available Stock<%= Variants.quantity %></h3>
-                  <h1 style="height: 40px; width: 40px;" ><%= products.offerPercentage%>%</h1>
+                  <h1 style="height: 40px; width: 150px;" class="text-danger" > <% if (products.offerPercentage > category.offerPercentage) { %>
+                   <%= products.offerPercentage %> 
+                   <% } else { %>
+                    <%= category.offerPercentage %> 
+                  <% } %> % OFF</h1>
+                 
              
               <div class="product-variants mb-3">
                 <label class="fw-bold">System Memory:</label>
@@ -220,9 +231,7 @@
               <button class="btn btn-warning btn-lg me-2 add-to-cart" id="addToCart">
                 <i class="fas fa-shopping-cart"></i> ADD TO CART
               </button>
-              <button class="btn btn-success btn-lg buy-now">
-                <i class="fas fa-bolt"></i> BUY NOW
-              </button>
+             
             </div>
     
             <!-- Product Description -->

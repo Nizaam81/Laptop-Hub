@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Ensure these are in your layout -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
   <%- include("partials/profileHeader.ejs") %>
   <title>Order Details</title>
   <style>
@@ -25,7 +28,19 @@
         max-width: 800px;
         margin: 0 auto;
       }
-
+ .retry-btn {
+      background: linear-gradient(135deg, #ff416c, #ff4b2b);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .retry-btn:hover { transform: scale(1.05); }
+    .status-badge.failed { background: #ffe0e0; color: #ff4444; }
+    .status-badge.pending { background: #fff3d1; color: #ff9900; }
+    .status-badge.paid { background: #e0ffe9; color: #00c851; }
       .card {
         background-color: #fff;
         border-radius: 12px;
@@ -387,6 +402,41 @@
   background: #5a6268;
   transform: none;
   box-shadow: none;
+}  .retry-btn {
+    background: linear-gradient(135deg, #ff416c, #ff4b2b);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 50px;
+    display: block;
+    margin: 20px auto;
+    box-shadow: 0px 4px 10px rgba(255, 65, 108, 0.5);
+    margin-right: 14px;
+  }
+
+  .retry-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0px 6px 15px rgba(255, 65, 108, 0.7);
+  }
+
+  .retry-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0px 2px 5px rgba(255, 65, 108, 0.3);
+  }.status-badge.failed {
+  background: #ffe0e0;
+  color: #ff4444;
+}
+.status-badge.pending {
+  background: #fff3d1;
+  color: #ff9900;
+}
+.status-badge.paid {
+  background: #e0ffe9;
+  color: #00c851;
 }
 
       @media (max-width: 400px) {
@@ -445,6 +495,12 @@
           <h1 class="order-heading">Order #LAPTOP-HUB- <%= order._id %></h1>
           <p class="order-date">Placed on <%= order.createdOn.toDateString() %></p>
           <a href="#" class="order-link">View full order details →</a>
+
+          <% if (order.paymentStatus === 'failed' ) { %>
+    <button class="retry-btn" data-order-id="<%= order._id %>">Retry Payment</button>
+  <% } %>
+
+  
         </div>
 
         <div class="order-summary">
@@ -480,6 +536,7 @@
                   <a href="/user/orderDetailss/<%= order._id %>?product=<%= item._id %>">
                     <button class="btn btn-primary">
                       View Details <span style="margin-left: 5px">›</span>
+                      
                     </button>
                   </a>
                 </div>
@@ -554,20 +611,127 @@
   });
 });
 
-// Function to show toast notifications using SweetAlert2
+
 function showToast(message, icon = 'info') {
   Swal.fire({
     toast: true,
     position: 'top-end',
-    icon: icon, // 'success', 'error', 'warning', 'info'
+    icon: icon, 
     title: message,
     showConfirmButton: false,
-    timer: 3000, // Auto close after 3 seconds
+    timer: 3000, 
     timerProgressBar: true,
   });
 }
 
+ 
+  // Retry Payment Handler - Fixed implementation
+document.addEventListener('DOMContentLoaded', function() {
+  const retryButtons = document.querySelectorAll('.retry-btn');
+  
+  retryButtons.forEach(button => {
+    button.addEventListener('click', async function() {
+      const orderId = this.getAttribute('data-order-id');
+      
+      try {
+        const response = await fetch('/user/retryPayment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId })
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to initiate payment');
+        }
+        
+        const { key, amount, currency, order_id } = await response.json();
+        
+        const options = {
+          key: key,
+          amount: amount,
+          currency: currency,
+          order_id: order_id,
+          name: "Laptop Hub",
+          description: "Payment for order",
+          handler: async function(response) {
+            try {
+              const verifyResponse = await fetch('/user/verifyPayment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  razorpayOrderId: order_id,
+                  razorpayPaymentId: response.razorpay_payment_id,
+                  razorpaySignature: response.razorpay_signature
+                })
+              });
+              
+              if (verifyResponse.ok) {
+                showToast('Payment successful!', 'success');
+                window.location.reload();
+              } else {
+                showToast('Payment verification failed', 'error');
+              }
+            } catch (error) {
+              showToast('Payment verification error', 'error');
+            }
+          },
+          prefill: {
+            name: "Customer",
+            email: "customer@example.com"
+          },
+          theme: {
+            color: "#6c7ae0"
+          }
+        };
+        
+        const rzp = new Razorpay(options);
+        
+        rzp.on('payment.failed', async function(response) {
+          try {
+            await fetch('/user/paymentFailed', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ 
+                razorpayOrderId: response.error.metadata.order_id,
+                errorMessage: response.error.description
+              })
+            });
+            showToast('Payment failed: ' + response.error.description, 'error');
+          } catch (error) {
+            showToast('Failed to record payment failure', 'error');
+          }
+        });
+        
+        rzp.open();
+      } catch (error) {
+        showToast('Failed to initiate payment. Please try again.', 'error');
+        console.error('Error:', error);
+      }
+    });
+  });
+});
 
+    // Cancel Order Handler
+    document.querySelectorAll('.cancel-order-btn').forEach(button => {
+      button.addEventListener('click', async function() {
+        const orderId = this.dataset.order-id;
+        try {
+          const response = await fetch('/user/cancelOrder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId })
+          });
+          
+          if (response.ok) {
+            this.disabled = true;
+            this.textContent = 'Cancelled';
+            Swal.fire('Success!', 'Order cancelled successfully.', 'success');
+          }
+        } catch (error) {
+          Swal.fire('Error!', 'Failed to cancel order.', 'error');
+        }
+      });
+    });
   </script>
 </body>
 </html>

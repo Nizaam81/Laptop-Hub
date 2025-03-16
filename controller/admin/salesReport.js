@@ -4,23 +4,70 @@ const ExcelJS = require("exceljs");
 
 const loadSaleReportPage = async (req, res) => {
   try {
-    // Populate the userId field to get user details
-    const orderData = await order
-      .find({})
-      .populate("userId", "FirstName LastName");
-    console.log("orderdatafull :", orderData);
+    const { dateRange, startDate, endDate } = req.query;
 
-    res.render("admin/salesReport", { orderData });
+    const isValidDate = (dateString) => {
+      const date = new Date(dateString);
+      return !isNaN(date.valueOf());
+    };
+
+    const defaultStartDate = new Date();
+    defaultStartDate.setDate(defaultStartDate.getDate() - 7);
+    const defaultEndDate = new Date();
+
+    const parsedStartDate = isValidDate(startDate)
+      ? new Date(startDate)
+      : defaultStartDate;
+    const parsedEndDate = isValidDate(endDate)
+      ? new Date(endDate)
+      : defaultEndDate;
+
+    const orderData = await order
+      .find({
+        createdOn: {
+          $gte: parsedStartDate,
+          $lte: parsedEndDate,
+        },
+      })
+      .sort({ createdOn: -1 })
+      .populate("userId", "FirstName LastName");
+    console.log("total orde", orderData);
+    res.render("admin/salesReport", {
+      dateRange: dateRange || "last7days",
+      startDate: parsedStartDate.toISOString().split("T")[0],
+      endDate: parsedEndDate.toISOString().split("T")[0],
+      orderData: orderData,
+    });
   } catch (error) {
-    console.log("error in sale report load controller");
-    console.error(error);
+    console.error("Error loading sales report page:", error);
+    res.status(500).send("Internal Server Error");
   }
 };
 
 const generatePDF = async (req, res) => {
   try {
+    const { dateRange, startDate, endDate } = req.query;
+
+    let query = {};
+
+    if (dateRange === "1day") {
+      const oneDayAgo = new Date();
+      oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+      query.createdOn = { $gte: oneDayAgo };
+    } else if (dateRange === "1week") {
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      query.createdOn = { $gte: oneWeekAgo };
+    } else if (dateRange === "1month") {
+      const oneMonthAgo = new Date();
+      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+      query.createdOn = { $gte: oneMonthAgo };
+    } else if (dateRange === "custom" && startDate && endDate) {
+      query.createdOn = { $gte: new Date(startDate), $lte: new Date(endDate) };
+    }
+
     const orders = await order
-      .find({})
+      .find(query)
       .populate("userId", "FirstName LastName");
 
     if (!orders || orders.length === 0) {
@@ -36,7 +83,6 @@ const generatePDF = async (req, res) => {
 
     doc.pipe(res);
 
-    // Title
     doc
       .fontSize(20)
       .font("Helvetica-Bold")
@@ -44,7 +90,6 @@ const generatePDF = async (req, res) => {
       .text("Sales Report", { align: "center" });
     doc.moveDown(1);
 
-    // Subtitle with date range
     const reportDate = new Date().toLocaleDateString();
     doc
       .fontSize(12)
@@ -53,7 +98,6 @@ const generatePDF = async (req, res) => {
       .text(`Generated on: ${reportDate}`, { align: "center" });
     doc.moveDown(2);
 
-    // Table headers
     const headers = [
       "Date",
       "Order ID",
@@ -95,7 +139,6 @@ const generatePDF = async (req, res) => {
     startY += rowHeight;
     doc.font("Helvetica").fontSize(10).fillColor("#000000");
 
-    // Table rows
     orders.forEach((order, index) => {
       const row = [
         order.createdOn.toLocaleDateString(),
@@ -143,9 +186,29 @@ const generatePDF = async (req, res) => {
 
 const generateExcel = async (req, res) => {
   try {
+    const { dateRange, startDate, endDate } = req.query;
+
+    let query = {};
+
+    if (dateRange === "1day") {
+      const oneDayAgo = new Date();
+      oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+      query.createdOn = { $gte: oneDayAgo };
+    } else if (dateRange === "1week") {
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      query.createdOn = { $gte: oneWeekAgo };
+    } else if (dateRange === "1month") {
+      const oneMonthAgo = new Date();
+      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+      query.createdOn = { $gte: oneMonthAgo };
+    } else if (dateRange === "custom" && startDate && endDate) {
+      query.createdOn = { $gte: new Date(startDate), $lte: new Date(endDate) };
+    }
+
     const orders = await order
-      .find({})
-      .populate("userId", "FirstName LastName"); // Fetch orders from the database
+      .find(query)
+      .populate("userId", "FirstName LastName");
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Sales Report");
@@ -164,7 +227,7 @@ const generateExcel = async (req, res) => {
         date: order.createdOn.toLocaleDateString(),
         orderId: `#${order._id}`,
         customerName: `${order.userId.FirstName} ${order.userId.LastName}`,
-        amount: `$${order.totalPrice}`,
+        amount: `$${order.totalPrice.toFixed(2)}`,
         paymentMethod: order.paymentMethod,
         status: order.paymentStatus,
       });
@@ -188,8 +251,42 @@ const generateExcel = async (req, res) => {
   }
 };
 
+const filterSalesReport = async (req, res) => {
+  try {
+    const { dateRange, startDate, endDate } = req.body;
+
+    let query = {};
+
+    if (dateRange === "1day") {
+      const oneDayAgo = new Date();
+      oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+      query.createdOn = { $gte: oneDayAgo };
+    } else if (dateRange === "1week") {
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      query.createdOn = { $gte: oneWeekAgo };
+    } else if (dateRange === "1month") {
+      const oneMonthAgo = new Date();
+      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+      query.createdOn = { $gte: oneMonthAgo };
+    } else if (dateRange === "custom" && startDate && endDate) {
+      query.createdOn = { $gte: new Date(startDate), $lte: new Date(endDate) };
+    }
+
+    const filteredOrders = await order
+      .find(query)
+      .populate("userId", "FirstName LastName");
+
+    res.json(filteredOrders);
+  } catch (error) {
+    console.error("Error filtering sales report:", error);
+    res.status(500).send("Error filtering sales report");
+  }
+};
+
 module.exports = {
   loadSaleReportPage,
   generatePDF,
   generateExcel,
+  filterSalesReport,
 };

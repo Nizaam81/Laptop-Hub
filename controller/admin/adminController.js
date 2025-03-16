@@ -70,17 +70,47 @@ const logout = async (req, res) => {
 const loadDashboard = async (req, res) => {
   try {
     const currentDate = new Date();
+    const period = req.query.period || "last7days";
+
+    let startDate;
+    switch (period) {
+      case "last7days":
+        startDate = new Date(currentDate.setDate(currentDate.getDate() - 7));
+        break;
+      case "last30days":
+        startDate = new Date(currentDate.setDate(currentDate.getDate() - 30));
+        break;
+      case "last3months":
+        startDate = new Date(currentDate.setMonth(currentDate.getMonth() - 3));
+        break;
+      case "lastyear":
+        startDate = new Date(
+          currentDate.setFullYear(currentDate.getFullYear() - 1)
+        );
+        break;
+      default:
+        startDate = new Date(currentDate.setDate(currentDate.getDate() - 7));
+    }
 
     const totalCustomers = await user.countDocuments({ is_blocked: false });
 
-    const totalOrders = await order.countDocuments();
-    const completedOrders = await order.countDocuments({ status: "Delivered" });
+    const totalOrders = await order.countDocuments({
+      createdOn: { $gte: startDate },
+    });
+    const completedOrders = await order.countDocuments({
+      status: "Delivered",
+      createdOn: { $gte: startDate },
+    });
     const processingOrders = await order.countDocuments({
       status: "Processing",
+      createdOn: { $gte: startDate },
     });
-    const cancelledOrders = await order.countDocuments({ status: "Cancelled" });
+    const cancelledOrders = await order.countDocuments({
+      status: "Cancelled",
+      createdOn: { $gte: startDate },
+    });
 
-    const orders = await order.find();
+    const orders = await order.find({ createdOn: { $gte: startDate } });
     let totalRevenue = 0;
     orders.forEach((order) => {
       totalRevenue += order.totalPrice || 0;
@@ -91,7 +121,7 @@ const loadDashboard = async (req, res) => {
     const monthlyRevenue = await order.aggregate([
       {
         $match: {
-          createdOn: { $gte: new Date(currentDate.getFullYear(), 0, 1) },
+          createdOn: { $gte: startDate },
         },
       },
       {
@@ -133,6 +163,11 @@ const loadDashboard = async (req, res) => {
       },
       { $unwind: "$orderData" },
       {
+        $match: {
+          "orderData.createdOn": { $gte: startDate },
+        },
+      },
+      {
         $group: {
           _id: "$_id",
           name: { $first: "$name" },
@@ -163,6 +198,11 @@ const loadDashboard = async (req, res) => {
         },
       },
       { $unwind: "$categoryData" },
+      {
+        $match: {
+          createdOn: { $gte: startDate },
+        },
+      },
       {
         $group: {
           _id: "$productData.category",
@@ -195,6 +235,11 @@ const loadDashboard = async (req, res) => {
       },
       { $unwind: { path: "$brandData", preserveNullAndEmptyArrays: true } },
       {
+        $match: {
+          createdOn: { $gte: startDate },
+        },
+      },
+      {
         $group: {
           _id: "$productData.brand",
           brandName: {
@@ -208,7 +253,7 @@ const loadDashboard = async (req, res) => {
     ]);
 
     const recentOrders = await order
-      .find()
+      .find({ createdOn: { $gte: startDate } })
       .sort({ createdOn: -1 })
       .limit(5)
       .populate("userId", "FirstName LastName");
@@ -243,6 +288,11 @@ const loadDashboard = async (req, res) => {
         },
       },
       { $unwind: { path: "$categoryData", preserveNullAndEmptyArrays: true } },
+      {
+        $match: {
+          createdOn: { $gte: startDate },
+        },
+      },
       {
         $group: {
           _id: "$productData.category",

@@ -56,7 +56,7 @@ const AddCart = async (req, res) => {
     }
 
     const variantDetails = await variant.findOne({ _id: varientId });
-    console.log(variantDetails);
+
     if (!variantDetails) {
       return res.json({ variantDetails: "Variant not found." });
     }
@@ -83,7 +83,6 @@ const AddCart = async (req, res) => {
 };
 
 const deleteCart = async (req, res) => {
-  console.log("hai");
   const { id } = req.body;
   try {
     const cartItem = await cart.findById(id);

@@ -68,8 +68,8 @@ routes.put(
 
 //Order Managment Route
 routes.get("/OrderManagment", isSessionAdmin, orderController.loadOrder);
-routes.post("/OrderManagment", orderController.updateOrderStatus);
-
+routes.post("/OrderStatus", orderController.updateOrderStatus);
+routes.get("/OrderDetails/:id", orderController.loadFulldetailsOrder);
 // varient
 routes.get("/varient/:id", isSessionAdmin, varientController.loadvarient);
 routes.post("/add-varient", varientController.addVarient);
@@ -83,13 +83,25 @@ routes.put("/coupon/toggle-block", coupon.toggleBlockCoupon);
 
 //sales Report
 
+// Load sales report page
 routes.get("/SalesReport", isSessionAdmin, sales.loadSaleReportPage);
-routes.get("/SalesReport/pdf", sales.generatePDF);
-routes.get("/SalesReport/excel", sales.generateExcel);
+
+// Generate PDF with filter support
+routes.get("/SalesReport/pdf", isSessionAdmin, sales.generatePDF);
+
+// Generate Excel with filter support
+routes.get("/SalesReport/excel", isSessionAdmin, sales.generateExcel);
+
+// Filter sales report data
+routes.post("/SalesReport/filter", isSessionAdmin, sales.filterSalesReport);
 
 // dashbord
 routes.get("/dashboard", isSessionAdmin, admincontroller.loadDashboard);
 
 //page not founded
 routes.get("/pageNotFounded", admincontroller.pageNot);
+
+//approve requested
+routes.post("/approveReturn", orderController.approveRequest);
+
 module.exports = routes;

@@ -909,55 +909,16 @@
       
         <div class="header">
           <h1>E-commerce Dashboard</h1>
-          <select class="date-selector">
-            <option>Last 7 days</option>
-            <option>Last 30 days</option>
-            <option>Last 3 months</option>
-            <option>Last year</option>
-          </select>
+<select class="date-selector" id="dateFilter">
+  <option value="last7days">Last 7 days</option>
+  <option value="last30days">Last 30 days</option>
+  <option value="last3months">Last 3 months</option>
+  <option value="lastyear">Last year</option>
+</select>
         </div>
 
        
-        <div class="stats-container">
-          <div class="stat-card">
-            <div class="stat-header">
-              <h3 class="stat-label">Total Revenue</h3>
-              <div class="stat-icon">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#3498db"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <line x1="12" y1="1" x2="12" y2="23"></line>
-                  <path
-                    d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
-                  ></path>
-                </svg>
-              </div>
-            </div>
-            <div class="stat-value">$24,780</div>
-            <div class="stat-trend">
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                <polyline points="17 6 23 6 23 12"></polyline>
-              </svg>
-              +12.5% from last month
-            </div>
-          </div>
+        
 
         <div class="stat-card">
   <div class="stat-header">
@@ -1097,7 +1058,7 @@
           
           <div class="chart-card">
             <div class="chart-header">
-              <div class="chart-title">Revenue & Orders</div>
+              <div class="chart-title"> Orders</div>
               <div class="chart-filters">
                 <select>
                   <option>Revenue</option>
@@ -1142,46 +1103,7 @@
           </div>
 
          
-          <div class="chart-card">
-            <div class="chart-header">
-              <div class="chart-title">Sales by Category</div>
-            </div>
-            <div class="pie-chart">
-              <div class="pie-container">
-                <div class="pie-center"></div>
-              </div>
-              <div class="pie-legend">
-                <div class="legend-item">
-                  <div
-                    class="legend-color"
-                    style="background-color: #3498db"
-                  ></div>
-                  <span>Electronics (36%)</span>
-                </div>
-                <div class="legend-item">
-                  <div
-                    class="legend-color"
-                    style="background-color: #2ecc71"
-                  ></div>
-                  <span>Clothing (27%)</span>
-                </div>
-                <div class="legend-item">
-                  <div
-                    class="legend-color"
-                    style="background-color: #f1c40f"
-                  ></div>
-                  <span>Home & Kitchen (27%)</span>
-                </div>
-                <div class="legend-item">
-                  <div
-                    class="legend-color"
-                    style="background-color: #e74c3c"
-                  ></div>
-                  <span>Books & Others (10%)</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          
         </div>
 
        
@@ -1285,6 +1207,16 @@
       darkModeToggle.addEventListener("click", () => {
         document.body.classList.toggle("dark-mode");
       });
+ document.getElementById("dateFilter").addEventListener("change", function () {
+    const selectedPeriod = this.value;
+    window.location.href = `/admin/dashboard?period=${selectedPeriod}`;
+});
+  // Set the selected option based on the current period in the URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const period = urlParams.get("period");
+  if (period) {
+    document.getElementById("dateFilter").value = period;
+  }
     </script>
   </body>
 </html>

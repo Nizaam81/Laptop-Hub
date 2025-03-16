@@ -358,12 +358,9 @@ const loadproductDetails = async (req, res) => {
     const catagories = await catagory.find({});
     const brands = await brand.find({});
 
-    // Build the filter query
     const filterQuery = {};
 
-    // Add category filter if selected
     if (selectedCategories.length > 0) {
-      // First get product IDs that match the selected categories
       const productsWithCategory = await product.find(
         { category: { $in: selectedCategories } },
         { _id: 1 }
@@ -373,9 +370,7 @@ const loadproductDetails = async (req, res) => {
       filterQuery.product = { $in: productIds };
     }
 
-    // Add brand filter if selected
     if (selectedBrands.length > 0) {
-      // First get product IDs that match the selected brands
       const productsWithBrand = await product.find(
         { brand: { $in: selectedBrands } },
         { _id: 1 }
@@ -384,7 +379,6 @@ const loadproductDetails = async (req, res) => {
       const productIds = productsWithBrand.map((p) => p._id);
 
       if (filterQuery.product) {
-        // If we already have product filter, ensure it's an intersection
         filterQuery.product = {
           $in: productIds.filter((id) =>
             filterQuery.product.$in.some((existingId) => existingId.equals(id))
@@ -395,10 +389,8 @@ const loadproductDetails = async (req, res) => {
       }
     }
 
-    // Get total count for pagination
     const totalProducts = await variant.countDocuments(filterQuery);
 
-    // Base aggregation pipeline with filters
     let aggregationPipeline = [
       { $match: filterQuery },
       {
@@ -411,7 +403,6 @@ const loadproductDetails = async (req, res) => {
       },
     ];
 
-    // Add sorting based on value parameter
     if (value === "ltoH") {
       aggregationPipeline.push({ $sort: { price: 1 } });
     } else if (value === "htoL") {
@@ -422,14 +413,11 @@ const loadproductDetails = async (req, res) => {
       aggregationPipeline.push({ $sort: { "productDetails.0.name": -1 } });
     }
 
-    // Add pagination
     aggregationPipeline.push({ $skip: skip });
     aggregationPipeline.push({ $limit: limit });
 
-    // Execute the query
     const Products = await variant.aggregate(aggregationPipeline);
 
-    // Add wishlist status for each product
     if (req.session.user) {
       const userId = req.session.user._id;
       const userWishlist = (await wishlist.findOne({ user: userId })) || {
@@ -474,13 +462,16 @@ const loadproductView = async (req, res) => {
     const User = req.session.user;
 
     const products = await product.findOne({ _id: productId });
+
+    const category = await catagory.findOne({ _id: products.category });
+
     if (varientId == "") {
       Variants = await variant.findOne({ product: productId });
     } else {
       Variants = await variant.findOne({ _id: varientId });
     }
 
-    res.render("user/productView", { products, varient, Variants });
+    res.render("user/productView", { products, varient, Variants, category });
   } catch (error) {
     console.error(error.message);
     res.render("user/pageNotfound");
@@ -595,9 +586,8 @@ const newPassword = async (req, res) => {
 
 const resetPassword = async (req, res) => {
   try {
-    console.log("haii rest paswword function is working");
     const { newPassword, confirmPassword } = req.body;
-    console.log(req.body);
+
     const email = req.session.resetPasswordEmail;
 
     if (!email) {

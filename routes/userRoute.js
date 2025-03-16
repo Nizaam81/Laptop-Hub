@@ -12,6 +12,7 @@ const placeOrder = require("../controller/user/placeOrder");
 const wishlist = require("../controller/user/wishlistController");
 const wallet = require("../controller/user/walletController");
 const coupon = require("../controller/user/couponController");
+const invoiceController = require("../controller/user/invoiceController");
 
 routes.get("/pageNotfound", usercontroller.pageNotfound);
 routes.get("/home", userAuth.userAuth, usercontroller.loadHomepage);
@@ -52,7 +53,7 @@ routes.get(
     failureFlash: true,
   }),
   (req, res) => {
-    console.log("User authenticated:", req.user);
+    req.session.user = req.user._id;
     res.redirect("/user/home");
   }
 );
@@ -125,6 +126,9 @@ routes.post("/cancelItem", orderController.cancelItem);
 routes.get("/PlaceOrderr", userAuth.userAuth, placeOrder.loadPlaceOrder);
 routes.post("/placeOrder", userAuth.userAuth, placeOrder.placeOrder);
 routes.post("/verifyPayment", userAuth.userAuth, placeOrder.verifyPayment);
+routes.post("/retryPayment", placeOrder.retryPayment);
+
+routes.post("/getWalletBalance", userAuth.userAuth, placeOrder.walletPayment);
 
 //wishlist
 routes.get("/wishlist", wishlist.loadWishlist);
@@ -134,11 +138,17 @@ routes.get("/empty", wishlist.empty);
 
 //wallet
 routes.get("/wallet", wallet.loadWallet);
-routes.post("/Wallett", wallet.addMoney);
 
 //coupon
 
 routes.post("/availableCoupons", coupon.getAvailableCoupons);
 routes.post("/couponApplied", coupon.applyCoupon);
+
+//invoice
+// Route for downloading invoice
+routes.get("/download-invoice/:id", invoiceController.invoice);
+routes.post("/paymentFailed", placeOrder.paymentFailed);
+//return
+routes.post("/returnItem", orderController.returnItem);
 
 module.exports = routes;

@@ -1,56 +1,59 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const walletSchema = new mongoose.Schema({
+const walletSchema = new mongoose.Schema(
+  {
     userId: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
-        unique: true
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      unique: true,
     },
-    totalBalance:{
-        type:Number,
-        required:true,
-        default:0
+    totalBalance: {
+      type: Number,
+      required: true,
+      default: 0,
     },
     transactions: [
-        {
-            type: {
-                type: String,
-                enum: ['Deposit', 'Withdrawal', 'Purchase', 'Refund', 'Referal'],
-                required: true
-            },
-            amount: {
-                type: Number,
-                required: true
-            },
-            orderId: {
-                type: String,
-                ref: 'Order',
-                required: function() {
-                    return this.type === 'Purchase' || this.type === 'Refund';
-                }
-            },
-            status: {
-                type: String,
-                enum: ['Completed', 'Failed', 'Pending'],
-                default: 'Completed'
-            },
-            description: {
-                type: String,
-                required: false
-            },
-            date: {
-                type: Date,
-                default: Date.now
-            }
-        }
+      {
+        type: {
+          type: String,
+          enum: ["Deposit", "Withdrawal", "Purchase", "Refund", "Referal"],
+          required: true,
+        },
+        amount: {
+          type: Number,
+          required: true,
+        },
+        // orderId: {
+        //     type: String,
+        //     ref: 'Order',
+        //     required: function() {
+        //         return this.type === 'Purchase' || this.type === 'Refund';
+        //     }
+        // },
+        status: {
+          type: String,
+          enum: ["Completed", "Failed", "Pending"],
+          default: "Completed",
+        },
+        description: {
+          type: String,
+          required: false,
+        },
+        date: {
+          type: Date,
+          default: Date.now,
+        },
+      },
     ],
-},{timestamps:true});
-walletSchema.pre('save', function (next) {
-    this.lastUpdated = Date.now();
-    next();
+  },
+  { timestamps: true }
+);
+walletSchema.pre("save", function (next) {
+  this.lastUpdated = Date.now();
+  next();
 });
 
-const Wallet = mongoose.model('Wallet', walletSchema);
+const Wallet = mongoose.model("Wallet", walletSchema);
 module.exports = Wallet;
