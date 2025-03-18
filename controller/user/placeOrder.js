@@ -132,15 +132,12 @@ const placeOrder = async (req, res) => {
   }
 };
 
-// Verify Payment Controller (Updated)
-// Update your existing verifyPayment controller
 const verifyPayment = async (req, res) => {
   try {
     const { razorpayOrderId, razorpayPaymentId, razorpaySignature } = req.body;
 
     console.log("Verification attempt for order:", razorpayOrderId);
 
-    // Find the order first to make sure it exists
     const orderExists = await order.findOne({ razorpayOrderId });
     if (!orderExists) {
       console.log("Order not found:", razorpayOrderId);
@@ -150,7 +147,6 @@ const verifyPayment = async (req, res) => {
       });
     }
 
-    // Validate signature
     const generatedSignature = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
       .update(`${razorpayOrderId}|${razorpayPaymentId}`)
@@ -183,7 +179,6 @@ const verifyPayment = async (req, res) => {
       });
     }
 
-    // Update successful payment
     console.log("Signature valid, marking payment as paid");
 
     const updateResult = await order.findOneAndUpdate(
@@ -222,7 +217,6 @@ const paymentFailed = async (req, res) => {
     console.log("Payment failed for order:", razorpayOrderId);
     console.log("Error message:", errorMessage);
 
-    // Find the order first to make sure it exists
     const orderExists = await order.findOne({ razorpayOrderId });
     if (!orderExists) {
       console.log("Order not found:", razorpayOrderId);
@@ -275,7 +269,6 @@ const walletPayment = async (req, res) => {
   }
 };
 
-// Update your existing retryPayment controller
 const retryPayment = async (req, res) => {
   try {
     const { orderId } = req.body;
@@ -305,7 +298,6 @@ const retryPaymentOrderDetails = async (req, res) => {
     const { orderId } = req.body;
     const userId = req.session.user;
 
-    // Check if orderId is valid
     if (!orderId || !mongoose.Types.ObjectId.isValid(orderId)) {
       return res.status(400).json({ error: "Invalid order ID" });
     }

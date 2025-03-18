@@ -6,7 +6,7 @@ const loadAddress = async (req, res) => {
   try {
     const userId = req.session.user;
     if (!userId) {
-      return res.redirect("/login"); // Redirect if user is not logged in
+      return res.redirect("/login");
     }
 
     const addreses = await Address.find({ userId });

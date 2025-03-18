@@ -204,7 +204,6 @@ const returnItem = async (req, res) => {
   try {
     const { orderId, itemId, reason } = req.body;
 
-    // Validate request body
     if (!orderId || !itemId || !reason) {
       return res.status(400).json({
         message: "Missing required fields: orderId, itemId, or reason",
@@ -230,7 +229,7 @@ const returnItem = async (req, res) => {
         .json({ message: "Item is not delivered and cannot be returned" });
     }
 
-    // Update the item status and add return request details
+    // Update the item status
     item.status = "Return Request";
     item.returnRequest = {
       reason: reason,
