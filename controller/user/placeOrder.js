@@ -7,7 +7,7 @@ const ObjectId = mongoose.Types.ObjectId;
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
 const Wallet = require("../../model/walletSchema");
-
+require("dotenv").config();
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET,
@@ -57,6 +57,7 @@ const loadPlaceOrder = async (req, res) => {
 
 const placeOrder = async (req, res) => {
   try {
+    console.log("HAIIIII");
     const userId = req.session.user;
     const { orderItems, totalPrice, address, paymentMethod } = req.body;
     if (paymentMethod === "cod" && totalPrice > 1000) {
@@ -98,13 +99,16 @@ const placeOrder = async (req, res) => {
 
     if (paymentMethod === "razorpay") {
       const options = {
-        amount: totalPrice * 100,
+        amount: Math.round(totalPrice * 100),
         currency: "INR",
         receipt: `order_rcptid_${userId}`,
         payment_capture: 1,
       };
-
+      console.log(options);
+      console.log(razorpay);
       const response = await razorpay.orders.create(options);
+      console.log(response);
+      console.log("HELOOOOOOOOOO");
 
       newOrder.razorpayOrderId = response.id;
       await newOrder.save();
@@ -125,7 +129,6 @@ const placeOrder = async (req, res) => {
     return res.json({ success: "Order Placed successfully" });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ error: "Something went wrong!" });
   }
 };
 
@@ -229,7 +232,6 @@ const paymentFailed = async (req, res) => {
       });
     }
 
-    // Update order with failed payment status
     const updateResult = await order.findOneAndUpdate(
       { razorpayOrderId },
       {
@@ -298,6 +300,146 @@ const retryPayment = async (req, res) => {
     res.status(500).json({ error: "Payment retry failed" });
   }
 };
+const retryPaymentOrderDetails = async (req, res) => {
+  try {
+    const { orderId } = req.body;
+    const userId = req.session.user;
+
+    // Check if orderId is valid
+    if (!orderId || !mongoose.Types.ObjectId.isValid(orderId)) {
+      return res.status(400).json({ error: "Invalid order ID" });
+    }
+
+    const orderDetails = await order
+      .findOne({
+        _id: orderId,
+        userId,
+      })
+      .select(
+        "totalPrice paymentMethod status razorpayOrderId paymentAttempts"
+      );
+
+    if (!orderDetails) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    if (orderDetails.status === "Paid") {
+      return res.status(400).json({ error: "This order is already paid" });
+    }
+
+    if (orderDetails.paymentMethod !== "razorpay") {
+      return res
+        .status(400)
+        .json({ error: "Payment retry only available for Razorpay orders" });
+    }
+
+    if (!orderDetails.totalPrice || orderDetails.totalPrice <= 0) {
+      return res.status(400).json({ error: "Invalid order amount" });
+    }
+
+    const options = {
+      amount: Math.round(orderDetails.totalPrice * 100),
+      currency: "INR",
+      receipt: `RTRY_${orderId.slice(-6)}_${Date.now().toString().slice(-4)}`,
+
+      payment_capture: 1,
+    };
+
+    try {
+      const razorpayOrder = await razorpay.orders.create(options);
+
+      await order.findByIdAndUpdate(orderId, {
+        $set: {
+          razorpayOrderId: razorpayOrder.id,
+          status: "Pending",
+          paymentStatus: "Pending",
+        },
+        $inc: { paymentAttempts: 1 },
+        $push: {
+          paymentHistory: {
+            attemptDate: new Date(),
+            amount: orderDetails.totalPrice,
+            status: "Pending",
+          },
+        },
+      });
+
+      res.json({
+        key: process.env.RAZORPAY_KEY_ID,
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency,
+        order_id: razorpayOrder.id,
+      });
+    } catch (error) {
+      res.status(500).json({
+        error: "Failed to create Razorpay order",
+        details: error.message,
+      });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Payment initialization failed", details: error.message });
+  }
+};
+
+const paymentFailedorderdetails = async (req, res) => {
+  try {
+    const { razorpayOrderId, errorMessage } = req.body;
+
+    if (!razorpayOrderId) {
+      return res.status(400).json({ error: "Missing Razorpay Order ID" });
+    }
+
+    if (!razorpayOrderId || typeof razorpayOrderId !== "string") {
+      return res.status(400).json({ error: "Invalid Razorpay Order ID" });
+    }
+
+    try {
+      const updatedOrder = await Order.findOneAndUpdate(
+        { razorpayOrderId },
+        {
+          $set: {
+            paymentStatus: "Failed",
+            paymentErrorMessage: errorMessage?.substring(0, 255),
+            status: "Payment Failed",
+          },
+          $push: {
+            paymentHistory: {
+              attemptDate: new Date(),
+              status: "Failed",
+              errorMessage: errorMessage?.substring(0, 255),
+            },
+          },
+        },
+        { new: true, select: "-__v -paymentHistory._id" }
+      );
+      console.log("🛠️ Creating Razorpay order with options:", options);
+
+      if (!updatedOrder) {
+        return res.status(404).json({ error: "Order not found" });
+      }
+
+      res.json({
+        success: true,
+        orderId: updatedOrder._id,
+        status: updatedOrder.status,
+      });
+    } catch (error) {
+      console.error("Error updating order:", error);
+      res.status(500).json({
+        error: "Failed to update order",
+        details: error.message,
+      });
+    }
+  } catch (error) {
+    console.error("Payment failure recording error:", error);
+    res.status(500).json({
+      error: "Failed to record payment failure",
+      details: error.message,
+    });
+  }
+};
 
 module.exports = {
   loadPlaceOrder,
@@ -306,4 +448,6 @@ module.exports = {
   walletPayment,
   retryPayment,
   paymentFailed,
+  paymentFailedorderdetails,
+  retryPaymentOrderDetails,
 };

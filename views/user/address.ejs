@@ -30,8 +30,8 @@
 
         <!-- Address List -->
         <div id="addressList">
-            <% if (addreses && addreses.address) { %>
-                <% addreses.address.forEach(element => { %>
+
+                <% addreses.forEach(element => { %>
                     <div class="address-card">
                         <div class="action-buttons">
                             <a href="/user/editAddress/<%= element._id %>" class="btn btn-warning btn-sm">Edit</a>
@@ -46,9 +46,9 @@
                         <h6>Phone: +91 <%= element.phone %></h6>
                     </div>
                 <% }) %>
-            <% } else { %>
-                <p>No addresses found.</p>
-            <% } %>
+         
+               
+          
             
            
            

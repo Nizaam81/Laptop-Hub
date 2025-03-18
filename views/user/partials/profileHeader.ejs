@@ -34,7 +34,7 @@
         left: 0;
         top: 0;
         bottom: 0;
-        overflow-y: auto; /* ✅ Enables scrolling if needed */
+        overflow-y: auto;
       }
 
       .profile-header {
@@ -109,6 +109,21 @@
         width: calc(100% - 250px);
         display: block; /* Change from flex to block */
       }
+      .option.referral {
+        position: relative;
+      }
+
+      .option.referral:hover::after {
+        position: absolute;
+        left: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #000;
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 5px;
+        white-space: nowrap;
+      }
 
       /* Mobile Responsive Sidebar */
       @media (max-width: 768px) {
@@ -178,6 +193,12 @@
             ><i class="fas fa-home"></i> Home</a
           >
         </li>
+        <li>
+          <a href="/user/referal" class="option referral">
+            <i class="fas fa-user-plus"></i> Invite Your Friends
+          </a>
+        </li>
+
         <li>
           <a href="/user/logout" class="option logout"
             ><i class="fas fa-sign-out-alt"></i> Logout</a

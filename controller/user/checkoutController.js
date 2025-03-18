@@ -31,7 +31,7 @@ const loadcheckout = async (req, res) => {
       },
     ]);
 
-    const Adress = await address.findOne({ userId: userId });
+    const Adress = await address.find({ userId: userId });
 
     const totalPrice = carts.reduce((sum, num) => sum + num.totalPrice, 0);
 

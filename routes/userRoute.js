@@ -145,10 +145,30 @@ routes.post("/availableCoupons", coupon.getAvailableCoupons);
 routes.post("/couponApplied", coupon.applyCoupon);
 
 //invoice
-// Route for downloading invoice
+
 routes.get("/download-invoice/:id", invoiceController.invoice);
 routes.post("/paymentFailed", placeOrder.paymentFailed);
 //return
 routes.post("/returnItem", orderController.returnItem);
+routes.post(
+  "/retryPayments",
+  (req, res, next) => {
+    next();
+  },
+  async (req, res, next) => {
+    try {
+      await placeOrder.retryPaymentOrderDetails(req, res);
+    } catch (error) {
+      console.error("🚨 ERROR in retryPayment route:", error);
+      res
+        .status(500)
+        .json({ error: "Something went wrong", details: error.message });
+    }
+  }
+);
 
+//referal
+routes.get("/referal", usercontroller.referal);
+
+routes.post("/paymentFailed", placeOrder.paymentFailedorderdetails);
 module.exports = routes;

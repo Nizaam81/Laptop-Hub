@@ -1,4 +1,4 @@
- 
+   <%- include("partials/profileHeader.ejs") %>
     <title>Shopping Cart</title>
     <style>
         body {
@@ -14,6 +14,8 @@
             padding: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
+            width: 800px;
+            height: 600px;
         }
         .cart-header {
             display: flex;
@@ -110,12 +112,12 @@
                 <h3><%= element.productDetails[0].name %></h3>
                 <p>Type : <%= element.variantDetails[0].ramSize %></p> 
                 <p>Stock : <%=element.variantDetails[0].quantity  %></p>
-                <p>Price: <%= element.variantDetails[0].price %> ₹ <span style="color: green;"></span></p>
+                <p>Price: <%= element.price %> ₹ <span style="color: green;"></span></p>
             </div>
             <div class="quantity">
-                <button onclick="decreaseQuantity('<%=element._id%>', '<%= element.variantDetails[0].price %>')">-</button>
+                <button onclick="decreaseQuantity('<%=element._id%>', '<%= element.price %>')">-</button>
                 <span id="quantity-<%=element._id%>" style="margin: 0 10px;"><%= element.quantity %></span>
-                <button onclick="updateQuantity('<%=element._id%>', '<%= element.variantDetails[0].price %>', '<%= element.variantDetails[0].quantity %>')">+</button>
+                <button onclick="updateQuantity('<%=element._id%>', '<%= element.price %>', '<%= element.variantDetails[0].quantity %>')">+</button>
             </div>
             <button class="remove-btn" onclick="deleteCart('<%=element._id %>')">Remove</button>
         </div>
@@ -123,9 +125,17 @@
         
        <% }) %>
         <div class="summary">
-          
+         <% if (carts.length>0) { %>
+                <a href="/user/checkout"><button class="checkout-btn">Check Out</button></a> 
+                <% } else { %>
+                                 <a href="/user/checkout"><button class="checkout-btn" disabled>Check Out</button></a> 
 
-           <a href="/user/checkout"><button class="checkout-btn">Check Out</button></a> 
+
+         <% } %>
+        
+
+            
+
         </div>
     </div>
     <!-- SweetAlert2 CDN -->

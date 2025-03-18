@@ -1,8 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<%- include("partials/header.ejs") %>
     <title>Order Details</title>
      <style>
       * {
@@ -450,11 +446,11 @@
        <div class="address-section">
     <div class="section-title">Shipping Address</div>
        <% if (Orderr[0].addressDetails) { %>
-         <div class="address-line"><%= Orderr[0].addressDetails.address[0].name %></div>
-        <div class="address-line"><%= Orderr[0].addressDetails.address[0].city %></div>
-        <div class="address-line"><%= Orderr[0].addressDetails.address[0].state %> - <%= Orderr[0].addressDetails.address[0].pincode %></div>
+         <div class="address-line"><%= Orderr[0].addressDetails.name %></div>
+        <div class="address-line"><%= Orderr[0].addressDetails.city %></div>
+        <div class="address-line"><%= Orderr[0].addressDetails.state %> - <%= Orderr[0].addressDetails.pincode %></div>
         <div class="address-line">
-            <span class="info-label">Landmark:</span> <%= Orderr[0].addressDetails.address[0].landMark %>
+            <span class="info-label">Landmark:</span> <%= Orderr[0].addressDetails.landMark %>
         </div>
          <% } else { %>
                   <div class="address-line"><span class="not-available">Address Not Available</span></div>

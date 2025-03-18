@@ -42,7 +42,7 @@ const loadCart = async (req, res) => {
 const AddCart = async (req, res) => {
   try {
     const userId = req.session.user;
-    const { productId, varientId, quantities } = req.body;
+    const { productId, varientId, quantities, price } = req.body;
 
     const existingCartItem = await cart.findOne({
       userId,
@@ -60,7 +60,6 @@ const AddCart = async (req, res) => {
     if (!variantDetails) {
       return res.json({ variantDetails: "Variant not found." });
     }
-    const price = variantDetails.price;
 
     const TotalPrice = quantities * price;
 
@@ -68,7 +67,7 @@ const AddCart = async (req, res) => {
       userId: userId,
       productId: productId,
       quantity: quantities,
-      price: price,
+      price: Math.round(price),
       totalPrice: TotalPrice,
       VariantId: varientId,
     });

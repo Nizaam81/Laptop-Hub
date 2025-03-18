@@ -37,7 +37,8 @@ const loadOrder = async (req, res) => {
           productDetails: { $push: { $arrayElemAt: ["$productDetails", 0] } },
           totalPrice: { $first: "$totalPrice" },
           createdOn: { $first: "$createdOn" },
-          status: { $first: "$orderItem.status" },
+
+          paymentStatus: { $first: "$paymentStatus" },
         },
       },
       { $sort: { createdOn: -1 } },
@@ -95,7 +96,7 @@ const loadorderFullDetails = async (req, res) => {
       return res.status(404).send("Product not found in this order.");
     }
 
-    const Addres = await address.findOne({ userId: userId });
+    const Addres = await address.find({ userId: userId });
 
     const totalPrice = orders[0].orderItem.price * orders[0].orderItem.quantity;
 

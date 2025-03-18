@@ -9,55 +9,55 @@ const loadOrder = async (req, res) => {
     const Order = await order.aggregate([
       {
         $lookup: {
-          from: "users", // Collection to join with
-          localField: "userId", // Field from the orders collection
-          foreignField: "_id", // Field from the users collection
-          as: "userDetails", // Output array field
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "userDetails",
         },
       },
       {
         $unwind: {
-          path: "$orderItem", // Unwind the orderItem array
-          preserveNullAndEmptyArrays: true, // Keep documents with empty or null orderItem arrays
+          path: "$orderItem",
+          preserveNullAndEmptyArrays: true,
         },
       },
       {
         $lookup: {
-          from: "products", // Collection to join with
-          localField: "orderItem.product", // Field from the orders collection
-          foreignField: "_id", // Field from the products collection
-          as: "productDetails", // Output array field
+          from: "products",
+          localField: "orderItem.product",
+          foreignField: "_id",
+          as: "productDetails",
         },
       },
       {
         $unwind: {
-          path: "$productDetails", // Unwind the productDetails array
-          preserveNullAndEmptyArrays: true, // Keep documents if productDetails is empty or null
+          path: "$productDetails",
+          preserveNullAndEmptyArrays: true,
         },
       },
       {
         $group: {
-          _id: "$_id", // Group by order ID
-          userId: { $first: "$userId" }, // Retain the userId field
-          userDetails: { $first: "$userDetails" }, // Retain the userDetails field
+          _id: "$_id",
+          userId: { $first: "$userId" },
+          userDetails: { $first: "$userDetails" },
           orderItems: {
             $push: {
-              productDetails: "$productDetails", // Collect productDetails for each orderItem
-              quantity: "$orderItem.quantity", // Retain the quantity field
-              price: "$orderItem.price", // Retain the price field
-              status: "$orderItem.status", // Retain the status field
+              productDetails: "$productDetails",
+              quantity: "$orderItem.quantity",
+              price: "$orderItem.price",
+              status: "$orderItem.status",
             },
           },
-          totalPrice: { $first: "$totalPrice" }, // Retain the totalPrice field
-          address: { $first: "$address" }, // Retain the address field
-          invoiceDate: { $first: "$invoiceDate" }, // Retain the invoiceDate field
-          createdOn: { $first: "$createdOn" }, // Retain the createdOn field
-          couponApplied: { $first: "$couponApplied" }, // Retain the couponApplied field
-          paymentMethod: { $first: "$paymentMethod" }, // Retain the paymentMethod field
-          razorpayOrderId: { $first: "$razorpayOrderId" }, // Retain the razorpayOrderId field
-          razorpayPaymentId: { $first: "$razorpayPaymentId" }, // Retain the razorpayPaymentId field
-          razorpaySignature: { $first: "$razorpaySignature" }, // Retain the razorpaySignature field
-          paymentStatus: { $first: "$paymentStatus" }, // Retain the paymentStatus field
+          totalPrice: { $first: "$totalPrice" },
+          address: { $first: "$address" },
+          invoiceDate: { $first: "$invoiceDate" },
+          createdOn: { $first: "$createdOn" },
+          couponApplied: { $first: "$couponApplied" },
+          paymentMethod: { $first: "$paymentMethod" },
+          razorpayOrderId: { $first: "$razorpayOrderId" },
+          razorpayPaymentId: { $first: "$razorpayPaymentId" },
+          razorpaySignature: { $first: "$razorpaySignature" },
+          paymentStatus: { $first: "$paymentStatus" },
         },
       },
     ]);
@@ -83,7 +83,7 @@ const loadFulldetailsOrder = async (req, res) => {
   try {
     const Orderr = await order.aggregate([
       {
-        $match: { _id: new mongoose.Types.ObjectId(req.params.id) }, // Fetch only the required order
+        $match: { _id: new mongoose.Types.ObjectId(req.params.id) },
       },
       {
         $lookup: {
@@ -141,8 +141,7 @@ const loadFulldetailsOrder = async (req, res) => {
       "Return Request",
       "Returnedd",
     ];
-    console.log(Orderr);
-    console.log(Orderr[0].addressDetails.address);
+    console.log("orderDataaaaaaaaaaaaaaaaa", Orderr);
     res.render("admin/OrderManagmentFullDetails", {
       status,
       Orderr: Orderr,
@@ -165,12 +164,12 @@ const updateOrderStatus = async (req, res) => {
     const updatedOrder = await order.findOneAndUpdate(
       {
         _id: new mongoose.Types.ObjectId(orderId),
-        "orderItem._id": new mongoose.Types.ObjectId(specificId), // Match the specific product
+        "orderItem._id": new mongoose.Types.ObjectId(specificId),
       },
       {
-        $set: { "orderItem.$.status": status }, // Update only the matched product status
+        $set: { "orderItem.$.status": status },
       },
-      { new: true } // Return the updated document
+      { new: true }
     );
 
     console.log(updatedOrder);
@@ -196,13 +195,11 @@ const approveRequest = async (req, res) => {
       return res.status(400).json({ message: "Missing orderId or specificId" });
     }
 
-    // Find the order
     const Order = await order.findById(orderId);
     if (!Order) {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    // Find the specific item in the order
     const item = Order.orderItem.find(
       (item) => item._id.toString() === specificId
     );
@@ -210,7 +207,6 @@ const approveRequest = async (req, res) => {
       return res.status(404).json({ message: "Item not found in the order" });
     }
 
-    // Check if the item has a return request with status "Pending"
     if (
       item.status !== "Return Request" ||
       item.returnRequest.status !== "Pending"
@@ -220,10 +216,8 @@ const approveRequest = async (req, res) => {
         .json({ message: "No pending return request for this item" });
     }
 
-    // Calculate the refund amount
     const refundAmount = item.price * item.quantity;
 
-    // Find the user's wallet
     const wallet = await Wallet.findOne({ userId: Order.userId });
     if (!wallet) {
       const newWallet = new Wallet({
@@ -231,7 +225,6 @@ const approveRequest = async (req, res) => {
       });
     }
 
-    // Update the wallet balance and add a refund transaction
     wallet.totalBalance += refundAmount;
     wallet.transactions.push({
       type: "Refund",
@@ -240,15 +233,12 @@ const approveRequest = async (req, res) => {
       description: `Refund for order ${orderId}, item ${specificId}`,
     });
 
-    // Save the updated wallet
     await wallet.save();
 
-    // Update the return request status to "Approved"
     item.returnRequest.status = "Approved";
     item.returnRequest.returnDate = new Date();
     item.returnRequest.refundStatus = "Completed";
 
-    // Save the updated order
     await Order.save();
 
     res.status(200).json({

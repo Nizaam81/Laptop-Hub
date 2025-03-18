@@ -6,15 +6,23 @@ const invoice = async (req, res) => {
   try {
     const orderId = req.params.id;
     const orderObjectId = new mongoose.Types.ObjectId(orderId);
-    console.log("orderId:", orderId);
 
     const orderData = await Order.aggregate([
       { $match: { _id: orderObjectId } },
+      { $unwind: "$orderItem" },
+      {
+        $lookup: {
+          from: "products",
+          localField: "orderItem.product",
+          foreignField: "_id",
+          as: "productDetails",
+        },
+      },
       {
         $lookup: {
           from: "addresses",
-          localField: "userId",
-          foreignField: "userId",
+          localField: "address",
+          foreignField: "_id",
           as: "addressDetails",
         },
       },
@@ -29,7 +37,6 @@ const invoice = async (req, res) => {
       },
       { $unwind: "$userDetails" },
     ]);
-    console.log("orderdata:", orderData);
 
     if (!orderData || orderData.length === 0) {
       return res.status(404).json({ message: "Order not found" });
@@ -39,121 +46,185 @@ const invoice = async (req, res) => {
     const address = order.addressDetails || {};
     const user = order.userDetails || {};
     const orderItems = order.orderItem || [];
-    console.log("adress:", address);
+    const products = order.productDetails || [];
 
-    // Debugging Logs
-    console.log("Fetched Order Items:", orderItems);
-    console.log("Fetched Address:", user);
-
-    // Generate PDF
-    const doc = new PDFDocument();
+    const doc = new PDFDocument({
+      margins: { top: 50, bottom: 50, left: 50, right: 50 },
+      size: "A4",
+    });
     const filename = `invoice-${orderId}.pdf`;
 
     res.setHeader("Content-disposition", `attachment; filename="${filename}"`);
     res.setHeader("Content-type", "application/pdf");
     doc.pipe(res);
 
-    // Header
-    doc.fontSize(25).text("Laptop Hub", { align: "center" });
-    doc.moveDown();
-    doc.fontSize(18).text("Invoice", { align: "center" });
-    doc.moveDown();
+    const primaryColor = "#333333";
+    const secondaryColor = "#f8f8f8";
+    const accentColor = "#2c3e50";
+    const borderColor = "#cccccc";
 
-    // Order Metadata
     doc
-      .fontSize(12)
-      .text(`Order ID: ${order._id}`, 50, 150)
-      .text(`Date: ${new Date(order.createdOn).toLocaleDateString()}`, 50, 170)
-      .text(`Customer: ${user.FirstName || "N/A"}`, 50, 190)
-      .text(`Email: ${user.email || "N/A"}`, 300, 190);
+      .rect(20, 20, doc.page.width - 40, doc.page.height - 40)
+      .lineWidth(0.5)
+      .stroke(borderColor);
 
-    // Line Separator
-    doc.moveTo(50, 220).lineTo(550, 220).stroke();
-
-    // Order Items Table
-    doc.fontSize(14).text("Order Details", 50, 240);
     doc
-      .fontSize(12)
-      .text("Item", 50, 270)
-      .text("Quantity", 250, 270)
-      .text("Price", 350, 270)
-      .text("Total", 450, 270);
-    doc.moveTo(50, 290).lineTo(550, 290).stroke();
+      .fontSize(22)
+      .font("Helvetica-Bold")
+      .fillColor(primaryColor)
+      .text("Laptop Hub", 50, 50, { width: 300 });
 
-    // Populate Order Items
-    let yPosition = 310;
+    doc
+      .fontSize(10)
+      .font("Helvetica")
+      .fillColor(primaryColor)
+      .text("Professional Tech Solutions || mnizamudheen81@gmail.com", 50, 75, {
+        width: 300,
+      });
+
+    doc
+      .fontSize(18)
+      .font("Helvetica-Bold")
+      .fillColor(primaryColor)
+      .text("INVOICE", 450, 50, { align: "right" });
+
+    doc.moveTo(50, 100).lineTo(550, 100).lineWidth(1).stroke(borderColor);
+
+    doc
+      .fontSize(10)
+      .font("Helvetica-Bold")
+      .fillColor(primaryColor)
+      .text("Invoice Number:", 50, 120)
+      .text("Date:", 50, 135)
+      .text("Payment Method:", 50, 150);
+
+    doc
+      .fontSize(10)
+      .font("Helvetica")
+      .text(order._id.toString(), 150, 120)
+      .text(new Date(order.createdOn).toLocaleDateString(), 150, 135)
+      .text(order.paymentMethod || "Online Payment", 150, 150);
+
+    doc
+      .fontSize(10)
+      .font("Helvetica-Bold")
+      .text("Customer:", 350, 120)
+      .text("Email:", 350, 135)
+      .text("Phone:", 350, 150);
+
+    doc
+      .fontSize(10)
+      .font("Helvetica")
+      .text(`${user.FirstName || "N/A"} ${user.LastName || ""}`, 420, 120)
+      .text(user.email || "N/A", 420, 135)
+      .text(user.phone || address.phone || "N/A", 420, 150);
+
+    doc.moveTo(50, 175).lineTo(550, 175).lineWidth(1).stroke(borderColor);
+
+    doc.rect(50, 190, 500, 25).fillAndStroke(accentColor, accentColor);
+
+    doc
+      .fillColor("white")
+      .fontSize(10)
+      .font("Helvetica-Bold")
+      .text("Item", 60, 198)
+      .text("Description", 200, 198)
+      .text("Qty", 350, 198)
+      .text("Unit Price", 400, 198)
+      .text("Amount", 480, 198);
+
+    let yPosition = 215;
     let grandTotal = 0;
 
-    if (orderItems.length > 0) {
-      orderItems.forEach((item) => {
-        const quantity = item.quantity || 1;
-        const price = item.price || 0;
+    if (orderData.length > 0) {
+      orderData.forEach((item, index) => {
+        const productName = item.productDetails[0]?.name || "Dell G15-5530";
+        const productDesc =
+          item.productDetails[0]?.description?.substring(0, 25) ||
+          "Gaming Laptop";
+        const quantity = item.orderItem.quantity || 1;
+        const price = item.orderItem.price || 0;
         const total = quantity * price;
 
+        if (index % 2 === 0) {
+          doc.rect(50, yPosition, 500, 20).fill(secondaryColor);
+        }
+
         doc
-          .text(item.name || "Dell G15-5530", 50, yPosition)
-          .text(`${quantity}`, 250, yPosition)
-          .text(`₹ ${price}`, 350, yPosition)
-          .text(`₹ ${total}`, 450, yPosition);
+          .fillColor(primaryColor)
+          .fontSize(9)
+          .font("Helvetica")
+          .text(productName, 60, yPosition + 5, { width: 130 })
+          .text(productDesc, 200, yPosition + 5, { width: 140 })
+          .text(quantity.toString(), 350, yPosition + 5, { width: 30 })
+          .text(` ${price.toLocaleString("en-IN")}`, 400, yPosition + 5, {
+            width: 70,
+          })
+          .text(` ${total.toLocaleString("en-IN")}`, 480, yPosition + 5, {
+            width: 70,
+          });
 
         grandTotal += total;
         yPosition += 20;
       });
     } else {
-      doc.text("No order items found", 50, yPosition);
+      doc
+        .fillColor(primaryColor)
+        .text("No order items found", 60, yPosition + 5);
       yPosition += 20;
     }
 
-    // Total Section
     doc
       .moveTo(50, yPosition + 10)
       .lineTo(550, yPosition + 10)
-      .stroke();
-    doc
-      .fontSize(14)
-      .text("Grand Total:", 350, yPosition + 30)
-      .text(`₹ ${order.totalPrice || grandTotal}`, 450, yPosition + 30);
+      .lineWidth(0.5)
+      .stroke(borderColor);
 
-    // Shipping Information
-    const shippingY = yPosition + 70;
-    doc.fontSize(14).text("Shipping Information", 50, shippingY);
+    yPosition += 20;
+
+    doc
+      .fontSize(10)
+      .font("Helvetica-Bold")
+      .text("TOTAL:", 400, yPosition)
+      .font("Helvetica")
+      .text(` ${grandTotal.toLocaleString("en-IN")}`, 480, yPosition);
+
+    doc
+      .moveTo(50, yPosition + 45)
+      .lineTo(550, yPosition + 45)
+      .lineWidth(0.5)
+      .stroke(borderColor);
+
+    yPosition += 65;
+    doc
+      .fillColor(primaryColor)
+      .fontSize(12)
+      .font("Helvetica-Bold")
+      .text("SHIPPING INFORMATION", 50, yPosition);
+
+    yPosition += 20;
+    doc.rect(50, yPosition, 500, 100).lineWidth(0.5).stroke(borderColor);
 
     if (address && Object.keys(address).length > 0) {
       doc
-        .fontSize(12)
+        .fontSize(10)
+        .font("Helvetica-Bold")
+        .text("Shipping Address:", 60, yPosition + 10)
+        .font("Helvetica")
+        .text(`${address.name || user.FirstName || "N/A"}`, 60, yPosition + 25)
+        .text(`${address.landMark || "N/A"}`, 60, yPosition + 40)
         .text(
-          `Recipient: ${address.address[0].name || "N/A"}`,
-          50,
-          shippingY + 30
+          `${address.city || "N/A"}, ${address.state || "N/A"} - ${address.pincode || "N/A"}`,
+          60,
+          yPosition + 55
         )
-        .text(
-          `Street: address${address.address[0].landMark || "N/A"}`,
-          50,
-          shippingY + 50
-        )
-        .text(`City: ${address.address[0].city || "N/A"}`, 50, shippingY + 70)
-        .text(`State: ${address.address[0].state || "N/A"}`, 50, shippingY + 90)
-        .text(
-          `ZIP: ${address.address[0].pincode || "N/A"}`,
-          50,
-          shippingY + 110
-        )
-        .text(
-          `Phone: ${address.address[0].phone || "N/A"}`,
-          50,
-          shippingY + 130
-        );
+        .text(`Phone: ${address.phone || "N/A"}`, 60, yPosition + 70);
     } else {
-      doc.text("Shipping Address: Not provided", 50, shippingY + 30);
+      doc
+        .fontSize(10)
+        .font("Helvetica")
+        .text("Shipping Address: Not provided", 60, yPosition + 15);
     }
-
-    // Footer
-    doc
-      .fontSize(10)
-      .text("Thank you for your purchase!", 50, 700, { align: "center" })
-      .text("Computer-generated invoice. No signature needed.", 50, 720, {
-        align: "center",
-      });
 
     doc.end();
   } catch (error) {

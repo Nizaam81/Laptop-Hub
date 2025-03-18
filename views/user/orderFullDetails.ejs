@@ -1,8 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Order Details</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <%- include("partials/profileHeader.ejs") %>
     <style>
        body {
             font-family: Arial, sans-serif;
@@ -17,6 +13,8 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 870px;
+            height: 800px;
         }
 
         .back-button {
@@ -150,10 +148,7 @@
             color: white;
         }
 
-        .download-btn {
-            background-color: #007bff;
-            color: white;
-        }
+        
 
         /* Modal styles */
         .modal {
@@ -270,7 +265,7 @@
             </div>
         </div>
 
-        <% Addres.address.forEach(element => { %>
+        <% Addres.forEach(element => { %>
             <div class="section">
                 <h4>Shipping Address</h4>
                 <p><strong><%= element.name %></strong></p>
@@ -290,7 +285,7 @@
            <button class="btn cancel-btn" data-order-id="<%= orders[0]._id %>" data-item-id="<%= orders[0].orderItem._id %>">❌ Cancel Item</button>
            <button class="btn return-btn" id="returnBtn" data-order-id="<%= orders[0]._id %>" data-item-id="<%= orders[0].orderItem._id %>">↩ Request Return</button>
 
-          <button class="btn download-btn" onclick="downloadInvoice('<%= orders[0]._id %>')">📥 Download Invoice</button>
+        
         </div>
     </div>
 
@@ -347,7 +342,7 @@
         }
 
       
-      // Function to handle the cancel button click
+     
 async function handleCancelItem(orderId, specificItemId) {
     try {
         const response = await fetch('/user/cancelItem', {
@@ -409,34 +404,6 @@ function showToast(message, icon = "info") {
 }
 
 
-   function downloadInvoice(orderId) {
-            fetch(`/user/download-invoice/${orderId}`, {
-                method: 'GET',
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.blob();
-            })
-            .then(blob => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `invoice-${orderId}.pdf`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-            })
-            .catch(error => {
-                console.error('Error downloading invoice:', error);
-                alert('Failed to download invoice.');
-            });
-        }
-
-
-
-//return 
 document.addEventListener("DOMContentLoaded", function () {
     const returnBtn = document.getElementById("returnBtn");
     const modal = document.getElementById("returnModal");

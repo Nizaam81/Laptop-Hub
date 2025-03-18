@@ -1,0 +1,281 @@
+<%- include("partials/profileHeader.ejs") %>
+    <title>Refer & Earn UI</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        background-color: #f5f7fa;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .card {
+        background-color: #1e2a47;
+        border-radius: 10px;
+        padding: clamp(20px, 5vw, 30px);
+        width: 100%;
+        max-width: 480px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .card::after {
+        content: "";
+        position: absolute;
+        top: -100px;
+        right: -100px;
+        width: 300px;
+        height: 300px;
+        background-color: rgba(83, 91, 230, 0.2);
+        border-radius: 50%;
+        z-index: 0;
+      }
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .gift-icon {
+        background-color: transparent;
+        margin-right: 15px;
+        font-size: clamp(20px, 5vw, 24px);
+      }
+
+      .card-title {
+        font-size: clamp(18px, 5vw, 24px);
+        font-weight: bold;
+      }
+
+      .card-description {
+        margin-bottom: 30px;
+        line-height: 1.5;
+        position: relative;
+        z-index: 1;
+        font-size: clamp(14px, 4vw, 16px);
+      }
+
+      .referral-section {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: clamp(15px, 4vw, 20px);
+        margin-bottom: 20px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .referral-section-title {
+        color: #c0c5d0;
+        margin-bottom: 15px;
+        font-size: clamp(14px, 4vw, 16px);
+      }
+
+      .referral-link-container {
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        padding: clamp(10px, 3vw, 15px);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: nowrap;
+      }
+
+      .referral-link {
+        color: white;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 80%;
+        font-size: clamp(12px, 3.5vw, 14px);
+      }
+
+      .copy-button {
+        background-color: transparent;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: clamp(16px, 4vw, 20px);
+        padding: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+      }
+
+      .dot-indicator {
+        text-align: center;
+        margin: 5px 0;
+        position: relative;
+        z-index: 1;
+      }
+
+      .dot {
+        height: 6px;
+        width: 6px;
+        background-color: #e74c3c;
+        border-radius: 50%;
+        display: inline-block;
+      }
+
+      .share-button {
+        background-color: white;
+        color: #5351db;
+        border: none;
+        border-radius: 8px;
+        padding: clamp(12px, 3vw, 15px);
+        width: 100%;
+        font-size: clamp(14px, 4vw, 16px);
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+        transition:
+          transform 0.2s ease,
+          background-color 0.2s ease;
+      }
+
+      .share-button:hover {
+        transform: translateY(-2px);
+        background-color: #f8f8f8;
+      }
+
+      .share-button:active {
+        transform: translateY(0);
+      }
+
+      .share-icon {
+        margin-right: 10px;
+        font-size: clamp(14px, 4vw, 16px);
+      }
+
+      /* Media Queries */
+      @media screen and (max-width: 480px) {
+        .card {
+          padding: 20px;
+        }
+
+        .card-header {
+          margin-bottom: 15px;
+        }
+
+        .card-description {
+          margin-bottom: 20px;
+        }
+
+        .referral-section {
+          padding: 15px;
+        }
+
+        .referral-link {
+          max-width: 70%;
+        }
+      }
+
+      @media screen and (max-width: 350px) {
+        .card-header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .gift-icon {
+          margin-bottom: 10px;
+          margin-right: 0;
+        }
+
+        .referral-link {
+          max-width: 65%;
+          font-size: 11px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="card-header">
+        <div class="gift-icon">🎁</div>
+        <h1 class="card-title">Refer & Earn</h1>
+      </div>
+
+      <p class="card-description">
+        Invite your friends and family to join us. Both of you will receive
+        rewards when they sign up using your referral link.
+      </p>
+
+      <div class="referral-section">
+        <h2 class="referral-section-title">Your Referral Link</h2>
+        <div class="referral-link-container">
+          <span class="referral-link"
+            >http://localhost:3001/user/signup?ref=<%=data.referralCode  %></span
+          >
+          <button class="copy-button" aria-label="Copy referral link">
+            📋
+          </button>
+        </div>
+      </div>
+
+      <div class="dot-indicator">
+        <span class="dot"></span>
+      </div>
+
+      <button class="share-button">
+        <span class="share-icon">🔗</span>
+        Share Your Link
+      </button>
+    </div>
+
+    <script>
+      // Copy functionality
+      document
+        .querySelector(".copy-button")
+        .addEventListener("click", function () {
+          const referralLink =
+            document.querySelector(".referral-link").textContent;
+          navigator.clipboard
+            .writeText(referralLink)
+            .then(() => {
+             
+              const toast = document.createElement("div");
+              toast.style.position = "fixed";
+              toast.style.bottom = "20px";
+              toast.style.left = "50%";
+              toast.style.transform = "translateX(-50%)";
+              toast.style.backgroundColor = "#4CAF50";
+              toast.style.color = "white";
+              toast.style.padding = "12px 24px";
+              toast.style.borderRadius = "4px";
+              toast.style.zIndex = "1000";
+              toast.textContent = "Referral link copied!";
+
+              document.body.appendChild(toast);
+
+              setTimeout(() => {
+                toast.style.opacity = "0";
+                toast.style.transition = "opacity 0.5s ease";
+                setTimeout(() => {
+                  document.body.removeChild(toast);
+                }, 500);
+              }, 2000);
+            })
+            .catch((err) => {
+              console.error("Failed to copy: ", err);
+            });
+        });
+    </script>
+  </body>
+</html>

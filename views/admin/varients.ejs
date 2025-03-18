@@ -112,6 +112,7 @@
     <table>
         <thead>
             <tr>
+                <th style="display: none;">id</th>
                 <th>Product Name</th>
                 <th>Variant RAM</th>
                 <th>Variant Price</th>
@@ -123,6 +124,7 @@
         <tbody>
             <% varients.forEach(element => { %>
                 <tr>
+                    <td style="display: none;"><%= element._id %></td>
                     <td><%= element.productDetails[0].name %></td>
                     <td><%= element.ramSize %></td>
                     <td>₹<%= element.price %></td>
@@ -172,15 +174,15 @@
             <span class="close" id="closeEditModal">&times;</span>
             <h3>Edit Variant</h3>
             
-            <input type="text" readonly placeholder="Enter Product Name" id="editProductName" value="<%= products.name %>">
+            <input type="text" readonly placeholder="Enter Product Name" id="editProductName" value="">
             <select id="editVariant" required>
                 <option value="8GB">8GB</option>
                 <option value="16GB">16GB</option>
                 <option value="32GB">32GB</option>
             </select>
-            <input type="hidden" id="variantId" value="<%= varients._id %>">
-            <input type="number" placeholder="Enter Variant Price" id="editVariantPrice" required value="<%= varients.price %>">
-            <input type="number" placeholder="Enter Variant Quantity" id="editQuantity" required value="<%= varients.quantity %>">
+            <input type="hidden" placeholder="Enter Variant Price"  id="varientId"  value="">
+            <input type="number" placeholder="Enter Variant Price" id="editVariantPrice" required value="">
+            <input type="number" placeholder="Enter Variant Quantity" id="editQuantity" required value="">
             <input type="hidden" id="editProductId">
             <button type="submit" class="btn btn-edit">Update</button>
         </div>
@@ -272,12 +274,13 @@
 function handleEdit(event) {
     const editModal = document.getElementById("editModal");
     const row = event.target.closest("tr");
+    console.log("row",row)
     
-   
-    document.getElementById("editProductName").value = row.cells[0].textContent;
-    document.getElementById("editVariant").value = row.cells[1].textContent;
-    document.getElementById("editVariantPrice").value = row.cells[2].textContent.replace("₹", "");
-    document.getElementById("editQuantity").value = row.cells[3].textContent;
+   document.getElementById("varientId").value=row.cells[0].textContent
+    document.getElementById("editProductName").value = row.cells[1].textContent;
+    document.getElementById("editVariant").value = row.cells[2].textContent;
+    document.getElementById("editVariantPrice").value = row.cells[3].textContent.replace("₹", "");
+    document.getElementById("editQuantity").value = row.cells[4].textContent;
     
     
     editModal.style.display = "block";
@@ -338,7 +341,7 @@ document.getElementById("editVariant").addEventListener("submit", async (event) 
     const editVariant = document.getElementById("editVariant").value.trim();
     const editVariantPrice = document.getElementById("editVariantPrice").value.trim();
     const quantity = document.getElementById("editQuantity").value.trim();
-    const variantId = document.getElementById("variantId").value.trim();
+    const variantId = document.getElementById("varientId").value
 
     
 
@@ -361,7 +364,7 @@ document.getElementById("editVariant").addEventListener("submit", async (event) 
             Swal.fire("Updated!", "Variant updated successfully.", "success");
             document.getElementById("editVariant").reset();
             document.getElementById("editModal").style.display = "none";
-            location.reload(); // Refresh the page to show updated data
+            location.reload(); 
         }
     } catch (error) {
         Swal.fire("Error", error.message, "error");

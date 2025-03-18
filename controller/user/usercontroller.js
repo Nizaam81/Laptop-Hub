@@ -7,6 +7,9 @@ const variant = require("../../model/varient");
 const catagory = require("../../model/categorySchema");
 const brand = require("../../model/brandschema");
 const wishlist = require("../../model/wishlistSchema");
+const { generateReferralCode } = require("./referal");
+const session = require("express-session");
+const Wallet = require("../../model/walletSchema");
 
 const generateOtp = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -109,8 +112,13 @@ const loadlogin = async (req, res) => {
 };
 const loadsignup = async (req, res) => {
   try {
+    console.log(req.query);
+    const { ref } = req.query;
+    req.session.ref = ref;
+    console.log(req.session.ref);
     res.render("user/signup");
   } catch (error) {
+    console.log(error);
     res.status(500).send("Internal server error");
     console.log("signup page is not founded");
   }
@@ -118,8 +126,6 @@ const loadsignup = async (req, res) => {
 
 const signup = async (req, res) => {
   const { Fname, Lname, phone, email, password, cpassword } = req.body;
-  console.log(req.body);
-
   try {
     if (!Fname || !Lname || !phone || !email || !password || !cpassword) {
       return res.status(400).json({
@@ -197,7 +203,7 @@ const signup = async (req, res) => {
     };
 
     console.log("OTP sent", otp);
-    res.render("user/verifyOTP");
+    res.redirect("/user/verifyOTP");
   } catch (error) {
     console.error("Detailed error:", error);
 
@@ -236,6 +242,7 @@ const verifyOTP = async (req, res) => {
     const storedOTP = req.session.userOtp;
     const userData = req.session.userData;
     const otpTimestamp = req.session.otpTimestamp;
+    const referal = req.session.ref;
 
     if (otp !== storedOTP) {
       return res.status(400).json({
@@ -246,6 +253,27 @@ const verifyOTP = async (req, res) => {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(userData.password, salt);
+    const referralCode = generateReferralCode(userData.Fname, userData.Lname);
+
+    if (referal) {
+      const referree = await user.findOne({ referralCode: referal });
+      if (!referree) return res.status(404).json({ message: "user not found" });
+
+      const userId = referree._id;
+
+      const referrerWallet = await Wallet.findOne({ userId });
+      if (!referrerWallet)
+        return res.status(404).json({ message: "wallet not found" });
+
+      referrerWallet.totalBalance += 100;
+      referrerWallet.transactions.push({
+        amount: 100,
+        description: `Referal bonus for reffering ${userData?.Fname}`,
+        status: "Completed",
+        type: "Referal",
+      });
+      referrerWallet.save();
+    }
 
     const newUser = new user({
       FirstName: userData.Fname,
@@ -254,10 +282,17 @@ const verifyOTP = async (req, res) => {
       email: userData.email,
       password: hashedPassword,
       isVerified: true,
+      referralCode,
       googleId: userData.email + "_local",
     });
 
     await newUser.save();
+
+    await Wallet.create({
+      userId: newUser._id,
+      totalBalance: 0,
+      transactions: [],
+    });
 
     // Clear session data
     req.session.userOtp = null;
@@ -308,7 +343,7 @@ const login = async (req, res) => {
     }
 
     req.session.user = findUser._id;
-    res.redirect("/user/home"); // Note the leading slash
+    res.redirect("/user/home");
   } catch (error) {
     console.error("/user/login error", error);
     res.render("user/login", { message: "Login failed. Please try again" });
@@ -550,8 +585,6 @@ const verifyForgotPasswordOTP = async (req, res) => {
 
     const otpAge = Date.now() - req.session.otpTimestamp;
     if (otpAge > 60000) {
-      // 1 minute in milliseconds
-
       req.session.resetPasswordOtp = null;
       req.session.otpTimestamp = null;
 
@@ -647,6 +680,18 @@ const profile = async (req, res) => {
   }
 };
 
+const referal = async (req, res) => {
+  try {
+    const userId = req.session.user;
+    const data = await user.findById(userId);
+
+    res.render("user/referal", { users: "", firstLetter: "", data });
+  } catch (error) {
+    console.log(error);
+    console.log("error in referal get controler in user controller");
+  }
+};
+
 module.exports = {
   loadHomepage,
   loadlogin,
@@ -668,4 +713,5 @@ module.exports = {
   loadForgotpassword,
   loadOtp,
   newPassword,
+  referal,
 };

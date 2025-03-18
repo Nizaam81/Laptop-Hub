@@ -92,7 +92,7 @@ const loadDashboard = async (req, res) => {
         startDate = new Date(currentDate.setDate(currentDate.getDate() - 7));
     }
 
-    const totalCustomers = await user.countDocuments({ is_blocked: false });
+    const totalCustomers = await user.countDocuments({ isBlocked: false });
 
     const totalOrders = await order.countDocuments({
       createdOn: { $gte: startDate },
@@ -333,6 +333,7 @@ const loadDashboard = async (req, res) => {
       formattedOrders,
       salesByCategory: salesByCategoryWithPercentage,
     };
+    console.log(dashboardData);
 
     res.render("admin/dashboard", { dashboardData });
   } catch (error) {

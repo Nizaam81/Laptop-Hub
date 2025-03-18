@@ -20,7 +20,6 @@ const loadvarient = async (req, res) => {
         },
       },
     ]);
-    console.log(products);
 
     res.render("admin/varients", { varients, products });
   } catch (error) {
@@ -91,7 +90,7 @@ const updatevariant = async (req, res) => {
         .json({ success: false, message: "All fields are required." });
     }
 
-    const updatedVariant = await Variant.findByIdAndUpdate(
+    const updatedVariant = await variant.findByIdAndUpdate(
       variantId,
       {
         $set: {

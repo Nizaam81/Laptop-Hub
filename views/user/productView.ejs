@@ -188,6 +188,13 @@
             <!-- Price Section -->
             <div class="pricing mb-4">
               <input type="hidden" id="variantId" value="<%= Variants._id %>">
+              <input type="hidden" value="<% if (products.offerPercentage ==0 && category.offerPercentage==0) { %>
+               <%= Variants.price %>
+               <% } else if (products.offerPercentage > category.offerPercentage) { %>
+                <%= Variants.price - Variants.price*products.offerPercentage/100 %>
+                <% } else { %>
+                 <%= Variants.price - Variants.price*category.offerPercentage/100 %>
+              <% } %> "  id="priceValue">
 
                 <h2 class="current-price" id="salePrice" >₹ <% if (products.offerPercentage ==0 && category.offerPercentage==0) { %>
                  <%= Variants.price %>
@@ -277,6 +284,7 @@
     const productId = document.getElementById("ProductId").value;
     const varientId = document.getElementById("variantId").value;
     const quantities = document.getElementById("quantities").textContent.trim();
+    const price = document.getElementById('priceValue').value;
 
 
     try {
@@ -285,7 +293,7 @@
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ productId, varientId, quantities }) 
+            body: JSON.stringify({ productId, varientId, quantities ,price}) 
         });
 
         const data = await response.json();

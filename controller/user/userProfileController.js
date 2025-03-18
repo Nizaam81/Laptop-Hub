@@ -37,22 +37,18 @@ const changeProfile = async (req, res) => {
     // Validate phone number (must be 10 digits)
     const phoneRegex = /^[0-9]{10}$/;
     if (!phoneRegex.test(phone)) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Invalid phone number. Must be 10 digits.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Invalid phone number. Must be 10 digits.",
+      });
     }
 
     if (currentpassword || NewPassword || Cpassword) {
       if (!currentpassword || !NewPassword || !Cpassword) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "All password fields are required.",
-          });
+        return res.status(400).json({
+          success: false,
+          message: "All password fields are required.",
+        });
       }
 
       const passwordMatch = await bcrypt.compare(
@@ -66,12 +62,10 @@ const changeProfile = async (req, res) => {
       }
 
       if (NewPassword !== Cpassword) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "New password and confirm password do not match.",
-          });
+        return res.status(400).json({
+          success: false,
+          message: "New password and confirm password do not match.",
+        });
       }
 
       const salt = await bcrypt.genSalt(10);
@@ -109,49 +103,22 @@ const Addaddress = async (req, res) => {
       alt_phone,
     } = req.body;
 
-    let userAddress = await address.findOne({ userId });
-
-    const newAddress = {
+    const neWaddress = new address({
+      userId: userId,
       addressType: address_type,
-      name,
-      city,
+      name: name,
+      city: city,
       landMark: landmark,
-      state,
-      pincode,
-      phone,
+      state: state,
+      pincode: pincode,
+      phone: phone,
       altPhone: alt_phone,
-    };
-
-    if (!userAddress) {
-      userAddress = new address({
-        userId,
-        address: [newAddress],
-      });
-    } else {
-      const isDuplicate = userAddress.address.some(
-        (addr) =>
-          addr.city === city &&
-          addr.state === state &&
-          addr.pincode === pincode &&
-          addr.landMark === landmark &&
-          addr.phone === phone
-      );
-
-      if (isDuplicate) {
-        return res.status(400).json({ message: "Address already exists" });
-      }
-
-      userAddress.address.push(newAddress);
-    }
-
-    await userAddress.save();
-
-    res
-      .status(201)
-      .json({ message: "Address added successfully", userAddress });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal Server Error" });
+    });
+    await neWaddress.save();
+    res.json({ message: "Added succesfully" });
+  } catch {
+    console.log(error);
+    console.log("error in add address controller in userProfileController");
   }
 };
 

@@ -503,10 +503,11 @@
   
         </div>
 
-        <div class="order-summary">
-          <div class="order-summary-label">ITEMS (<%= order.orderItem.length %>)</div>
-          <div class="status-badge"><%= order.status %></div>
-        </div>
+      <div class="order-summary">
+  <div class="order-summary-label">ITEMS (<%= order.orderItem.length %>)</div>
+  <!-- Individual item statuses instead of overall order status -->
+  <div class="status-badge">Payment: <%= order.paymentStatus %></div>
+</div>
 
         <div class="card">
           <div class="order-summary">
@@ -543,12 +544,14 @@
               </div>
             <% }) %>
           </div>
+         
 
           <div class="card-footer">
             <button class="btn btn-danger cancel-order-btn" data-order-id="<%= order._id %>">
               Cancel Order
             </button>
             <button class="btn btn-support">Need Help?</button>
+            <button class="btn download-btn" onclick="downloadInvoice('<%= order._id %>')">📥 Download Invoice</button>
           </div>
         </div>
       </div>
@@ -565,173 +568,259 @@
       <% } %>
     </div>
   </div>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-  <script>
- document.addEventListener('DOMContentLoaded', function() {
-  const cancelButtons = document.querySelectorAll('.cancel-order-btn');
-
-  cancelButtons.forEach(button => {
-    button.addEventListener('click', async function() {
-      const orderId = this.getAttribute('data-order-id');
-      const button = this;
-
-      try {
-        const response = await fetch('/user/cancelOrder', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ orderId }),
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-          showToast('Order cancelled successfully!', 'success');
-
-          button.textContent = 'Cancelled';
-          button.disabled = true;
-          button.classList.remove('btn-danger');
-          button.classList.add('btn-secondary');
-
-          const statusBadge = button.closest('.card').querySelector('.status-badge');
-          if (statusBadge) {
-            statusBadge.textContent = 'Cancelled';
-            statusBadge.style.backgroundColor = '#ffe6e6';
-            statusBadge.style.color = '#ff4d4d';
-          }
-        } else {
-          showToast(result.message || 'Failed to cancel the order.', 'error');
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        showToast('An error occurred while cancelling the order.', 'error');
-      }
-    });
-  });
-});
-
-
-function showToast(message, icon = 'info') {
-  Swal.fire({
-    toast: true,
-    position: 'top-end',
-    icon: icon, 
-    title: message,
-    showConfirmButton: false,
-    timer: 3000, 
-    timerProgressBar: true,
-  });
-}
-
- 
-  // Retry Payment Handler - Fixed implementation
+<script>
 document.addEventListener('DOMContentLoaded', function() {
-  const retryButtons = document.querySelectorAll('.retry-btn');
+  // Prevent multiple initializations
+  if (window.razorpayInitialized) return;
+  window.razorpayInitialized = true;
   
-  retryButtons.forEach(button => {
-    button.addEventListener('click', async function() {
-      const orderId = this.getAttribute('data-order-id');
+  // Load Razorpay script if not already loaded
+  if (typeof Razorpay === 'undefined') {
+    console.log('Loading Razorpay script...');
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    document.head.appendChild(script);
+    script.onload = function() {
+      console.log('Razorpay script loaded');
+      initializeButtons();
+    };
+  } else {
+    console.log('Razorpay already loaded');
+    initializeButtons();
+  }
+
+  function initializeButtons() {
+    // Initialize all retry payment buttons
+    console.log('Initializing retry buttons');
+    const retryButtons = document.querySelectorAll('.retry-btn');
+    console.log('Found retry buttons:', retryButtons.length);
+    
+    retryButtons.forEach(button => {
+      // Remove existing event listeners to prevent duplicates
+      const newButton = button.cloneNode(true);
+      button.parentNode.replaceChild(newButton, button);
       
-      try {
-        const response = await fetch('/user/retryPayment', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ orderId })
-        });
+      newButton.addEventListener('click', async function() {
+        console.log('Retry button clicked');
+        const orderId = this.getAttribute('data-order-id');
+        console.log('Order ID:', orderId);
         
-        if (!response.ok) {
-          throw new Error('Failed to initiate payment');
-        }
-        
-        const { key, amount, currency, order_id } = await response.json();
-        
-        const options = {
-          key: key,
-          amount: amount,
-          currency: currency,
-          order_id: order_id,
-          name: "Laptop Hub",
-          description: "Payment for order",
-          handler: async function(response) {
+        // Store original button text before any operations
+        const originalText = this.innerHTML;
+          console.log('Sending fetch request to /user/retryPayment with orderId:', orderId);
+
+        try {
+          // Disable button and show loading state
+          this.disabled = true;
+          this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+
+          const response = await fetch('/user/retryPayments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId })
+          });
+          console.log("✅ Received response from server:", response);
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to initiate payment');
+          }
+          
+          const data = await response.json();
+          console.log('Razorpay init response:', data);
+          
+          const options = {
+            key: data.key,
+            amount: data.amount,
+            currency: data.currency,
+            order_id: data.order_id,
+            name: "Laptop Hub",
+            description: "Payment for order",
+            handler: async function(response) {
+              console.log('Payment successful:', response);
+              try {
+                const verifyResponse = await fetch('/user/verifyPayment', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    razorpayOrderId: data.order_id,
+                    razorpayPaymentId: response.razorpay_payment_id,
+                    razorpaySignature: response.razorpay_signature
+                  })
+                });
+                
+                if (verifyResponse.ok) {
+                  showToast('Payment successful!', 'success');
+                  window.location.reload();
+                } else {
+                  const errorData = await verifyResponse.json();
+                  showToast(errorData.error || 'Payment verification failed', 'error');
+                  newButton.disabled = false;
+                  newButton.innerHTML = originalText;
+                }
+              } catch (error) {
+                console.error('Payment verification error:', error);
+                showToast('Payment verification error', 'error');
+                newButton.disabled = false;
+                newButton.innerHTML = originalText;
+              }
+            },
+            prefill: {
+              name: "Customer",
+              email: "customer@example.com"
+            },
+            theme: {
+              color: "#6c7ae0"
+            },
+            modal: {
+              ondismiss: function() {
+                console.log('Modal dismissed');
+                newButton.disabled = false;
+                newButton.innerHTML = originalText;
+              }
+            }
+          };
+          
+          console.log('Opening Razorpay with options:', options);
+          const rzp = new Razorpay(options);
+          
+          rzp.on('payment.failed', async function(response) {
+            console.error('Payment failed:', response.error);
             try {
-              const verifyResponse = await fetch('/user/verifyPayment', {
+              await fetch('/user/paymentFailed', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  razorpayOrderId: order_id,
-                  razorpayPaymentId: response.razorpay_payment_id,
-                  razorpaySignature: response.razorpay_signature
+                body: JSON.stringify({ 
+                  razorpayOrderId: response.error.metadata.order_id,
+                  errorMessage: response.error.description
                 })
               });
-              
-              if (verifyResponse.ok) {
-                showToast('Payment successful!', 'success');
-                window.location.reload();
-              } else {
-                showToast('Payment verification failed', 'error');
-              }
+              showToast('Payment failed: ' + response.error.description, 'error');
+              newButton.disabled = false;
+              newButton.innerHTML = originalText;
             } catch (error) {
-              showToast('Payment verification error', 'error');
+              console.error('Failed to record payment failure:', error);
+              showToast('Failed to record payment failure', 'error');
+              newButton.disabled = false;
+              newButton.innerHTML = originalText;
             }
-          },
-          prefill: {
-            name: "Customer",
-            email: "customer@example.com"
-          },
-          theme: {
-            color: "#6c7ae0"
-          }
-        };
-        
-        const rzp = new Razorpay(options);
-        
-        rzp.on('payment.failed', async function(response) {
-          try {
-            await fetch('/user/paymentFailed', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ 
-                razorpayOrderId: response.error.metadata.order_id,
-                errorMessage: response.error.description
-              })
-            });
-            showToast('Payment failed: ' + response.error.description, 'error');
-          } catch (error) {
-            showToast('Failed to record payment failure', 'error');
-          }
-        });
-        
-        rzp.open();
-      } catch (error) {
-        showToast('Failed to initiate payment. Please try again.', 'error');
-        console.error('Error:', error);
-      }
+          });
+          
+          rzp.open();
+        } catch (error) {
+          console.error('Error initiating payment:', error);
+          showToast('Failed to initiate payment: ' + error.message, 'error');
+          this.disabled = false;
+          this.innerHTML = originalText;
+        }
+      });
     });
-  });
-});
 
-    // Cancel Order Handler
-    document.querySelectorAll('.cancel-order-btn').forEach(button => {
-      button.addEventListener('click', async function() {
-        const orderId = this.dataset.order-id;
+    // Initialize cancel order buttons
+    console.log('Initializing cancel buttons');
+    const cancelButtons = document.querySelectorAll('.cancel-order-btn');
+    console.log('Found cancel buttons:', cancelButtons.length);
+    
+    cancelButtons.forEach(button => {
+      // Remove existing event listeners to prevent duplicates
+      const newButton = button.cloneNode(true);
+      button.parentNode.replaceChild(newButton, button);
+      
+      newButton.addEventListener('click', async function() {
+        const orderId = this.getAttribute('data-order-id');
+        console.log('Cancel button clicked for order:', orderId);
+        
         try {
           const response = await fetch('/user/cancelOrder', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ orderId })
           });
-          
-          if (response.ok) {
-            this.disabled = true;
+
+          const result = await response.json();
+
+          if (result.success) {
+            showToast('Order cancelled successfully!', 'success');
+            
             this.textContent = 'Cancelled';
-            Swal.fire('Success!', 'Order cancelled successfully.', 'success');
+            this.disabled = true;
+            this.classList.remove('btn-danger');
+            this.classList.add('btn-secondary');
+
+            const statusBadge = this.closest('.card').querySelector('.status-badge');
+            if (statusBadge) {
+              statusBadge.textContent = 'Cancelled';
+              statusBadge.style.backgroundColor = '#ffe6e6';
+              statusBadge.style.color = '#ff4d4d';
+            }
+          } else {
+            showToast(result.message || 'Failed to cancel the order.', 'error');
           }
         } catch (error) {
-          Swal.fire('Error!', 'Failed to cancel order.', 'error');
+          console.error('Error cancelling order:', error);
+          showToast('An error occurred while cancelling the order.', 'error');
         }
       });
     });
+  }
+
+  // Ensure initialization runs
+  if (typeof Razorpay !== 'undefined') {
+    initializeButtons();
+  }
+});
+
+function showToast(message, icon = 'info') {
+  console.log('Showing toast:', message, icon);
+  if (typeof Swal !== 'undefined') {
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: icon,
+      title: message,
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true
+    });
+  } else {
+    // Fallback if SweetAlert is not available
+    alert(message);
+  }
+}
+
+
+
+
+
+    function downloadInvoice(orderId) {
+             fetch(`/user/download-invoice/${orderId}`, {
+                 method: 'GET',
+             })
+             .then(response => {
+                 if (!response.ok) {
+                     throw new Error('Network response was not ok');
+                 }
+                 return response.blob();
+             })
+             .then(blob => {
+                 const url = window.URL.createObjectURL(blob);
+                 const a = document.createElement('a');
+                 a.href = url;
+                 a.download = `invoice-${orderId}.pdf`;
+                 document.body.appendChild(a);
+                 a.click();
+                 a.remove();
+             })
+             .catch(error => {
+                 console.error('Error downloading invoice:', error);
+                 alert('Failed to download invoice.');
+             });
+         }
+
+
   </script>
 </body>
 </html>

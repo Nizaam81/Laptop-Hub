@@ -6,8 +6,8 @@ const products = require("../../model/productSchema");
 const loadWishlist = async (req, res) => {
   try {
     const wish = await wishhlist.find();
-    console.log("wishlist data", wish);
-    res.render("user/wishlist", { wish });
+
+    res.render("user/wishlist", { wish, firstLetter: "", users: "" });
   } catch (error) {
     console.log("error in wiahlist get route");
     console.error(error);
@@ -114,7 +114,7 @@ const deleteWishlist = async (req, res) => {
 
 const empty = async (req, res) => {
   try {
-    res.render("user/EmptyWishlist");
+    res.render("user/EmptyWishlist", { firstLetter: "", users: "" });
   } catch (error) {
     console.log("error in empty wishlist");
     console.error(error);

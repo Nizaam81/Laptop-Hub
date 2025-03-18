@@ -601,10 +601,10 @@
                 
                 <!-- Address List -->
                 <% if (Adress) { %>
-                 <% Adress.address.forEach((element, index) => { %>
+                 <% Adress.forEach((element) => { %>
                     <div class="static-address">
-                        <input type="radio" name="selectedAddress" value="<%= element._id %>" id="address-<%= index %>">
-                        <label for="address-<%= index %>">
+                        <input type="radio" name="selectedAddress" value="<%= element._id %>" id="addressId">
+                        <label for="address">
                             <p><%= element.name %></p>
                             <p><i class="fas fa-tag"></i> <%= element.addressType %></p>
                             <p><i class="fas fa-city"></i> <%= element.city %></p>
