@@ -31,12 +31,17 @@ const loadSaleReportPage = async (req, res) => {
       })
       .sort({ createdOn: -1 })
       .populate("userId", "FirstName LastName");
-    console.log("total orde", orderData);
+    console.log("total order", orderData);
+    const totalSale = orderData.reduce((sum, num) => {
+      return (sum += num.totalPrice);
+    }, 0);
     res.render("admin/salesReport", {
       dateRange: dateRange || "last7days",
       startDate: parsedStartDate.toISOString().split("T")[0],
       endDate: parsedEndDate.toISOString().split("T")[0],
       orderData: orderData,
+      totalSale,
+      totalOrder: orderData.length,
     });
   } catch (error) {
     console.error("Error loading sales report page:", error);
