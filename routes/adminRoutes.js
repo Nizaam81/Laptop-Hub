@@ -80,6 +80,7 @@ routes.post("/edit-variant", varientController.updatevariant);
 routes.get("/coupon", isSessionAdmin, coupon.loadcoupon);
 routes.post("/add-coupon", coupon.addCoupon);
 routes.put("/coupon/toggle-block", coupon.toggleBlockCoupon);
+routes.post("/EditCoupon", coupon.editCoupon);
 
 //sales Report
 

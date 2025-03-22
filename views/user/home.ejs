@@ -1,20 +1,17 @@
 <%- include('partials/head') %>
 <%- include('partials/header') %>
 
-<!-- Banner Section -->
+<!-- Banner Section with Enhanced Animation -->
 <div class="banner_bg_main">
    <div class="logo_section">
       <div class="container">
          <div class="row">
             <div class="col-sm-12 text-center">
-               <div class="logo">
-                  <a href="index.html"><img src="/images/logoL.png" style="width:66px;"></a>
-               </div>
             </div>
          </div>
       </div>
    </div>
-   <!-- Banner Content -->
+   <!-- Banner Content with Enhanced Text Animation -->
    <div class="banner_section layout_padding">
       <div class="container">
          <div id="my_slider" class="carousel slide" data-ride="carousel">
@@ -22,8 +19,63 @@
                <div class="carousel-item active">
                   <div class="row">
                      <div class="col-sm-12">
-                        <h1 class="banner_taital">Get Start <br>Your favorite shopping</h1>
+                        <h1 class="banner_taital text-slide-up">Get Start <br>Your favorite shopping</h1>
+                       
                      </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="wave-container">
+         <div class="wave wave1"></div>
+         <div class="wave wave2"></div>
+         <div class="wave wave3"></div>
+      </div>
+   </div>
+</div>
+<button class="btn btn-shop-now" onclick="window.location.href='/user/ProductsDetails'">Buy Now</button>
+
+<!-- Featured Laptops Section with Enhanced Cards -->
+<div class="featured_laptops">
+   <div class="container">
+      <h2 class="section_title"><strong><span class="highlight-text">Featured</span> Laptops</strong></h2>
+      <div class="row">
+         <div class="col-lg-4 col-sm-6">
+            <div class="featured_box">
+               <div class="featured-card">
+                  <div class="featured-badge">PREMIUM</div>
+                  <img src="/images/static1.jpg" class="img-fluid featured-image">
+                  <div class="overlay-info">
+                     <h4>Premium Design</h4>
+                     <p>Sleek, lightweight aluminum chassis</p>
+                     <div class="featured-btn">Learn More</div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="col-lg-4 col-sm-6">
+            <div class="featured_box">
+               <div class="featured-card">
+                  <div class="featured-badge">POWERFUL</div>
+                  <img src="/images/static2.jpg" class="img-fluid featured-image">
+                  <div class="overlay-info">
+                     <h4>Powerful Performance</h4>
+                     <p>Latest generation processors</p>
+                     <div class="featured-btn">Learn More</div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="col-lg-4 col-sm-6">
+            <div class="featured_box">
+               <div class="featured-card">
+                  <div class="featured-badge">DISPLAY</div>
+                  <img src="/images/static4.jpg" class="img-fluid featured-image">
+                  <div class="overlay-info">
+                     <h4>Ultra Display</h4>
+                     <p>Crystal clear 4K resolution</p>
+                     <div class="featured-btn">Learn More</div>
                   </div>
                </div>
             </div>
@@ -31,56 +83,37 @@
       </div>
    </div>
 </div>
-<button class="btn btn-primary" style="margin-left:700px;margin-top:-100px" onclick="window.location.href='/user/ProductsDetails'">Buy Now</button>
 
-
-
-<!-- Featured Laptops Section -->
-<div class="featured_laptops">
-   <div class="container">
-      <h2 class="section_title"><strong>Featured Laptops</strong></h2>
-      <div class="row">
-         <div class="col-lg-4 col-sm-6">
-            <div class="featured_box">
-               <img src="/images/static1.jpg" class="img-fluid animated-image">
-            </div>
-         </div>
-         <div class="col-lg-4 col-sm-6">
-            <div class="featured_box">
-               <img src="/images/static2.jpg" class="img-fluid animated-image">
-            </div>
-         </div>
-         <div class="col-lg-4 col-sm-6">
-            <div class="featured_box">
-               <img src="/images/static4.jpg" class="img-fluid animated-image">
-            </div>
-         </div>
-      </div>
-   </div>
-</div>
-
-<!-- Laptops Section -->
- <a href="/user/ProductsDetails">
-
-
-
-   
- </a>
+<!-- Laptops Section with Enhanced Product Cards -->
+<a href="/user/ProductsDetails"></a>
 <div class="fashion_section">
    <div class="container">
-      <h1 class="fashion_taital">Laptops</h1>
+      <h1 class="fashion_taital"><span class="highlight-text">Laptops</span> Collection</h1>
       <div class="row">
          <% Products.forEach(element => { %>
          <div class="col-lg-4 col-sm-6">
-            <div class="box_main animated-box">
+            <div class="box_main product-card">
+               <div class="product-badge">New</div>
+          
                <h4 class="shirt_text"><%= element.name %></h4>
-               <p class="price_text">Price: <span><%= element.salePrice %></span></p>
+               <p class="price_text">Price: <span class="price-highlight"><%= element.salePrice %></span></p>
                <div class="tshirt_img">
-                  <img src="<%= element.images[0] %>" class="img-fluid">
+                  <img src="<%= element.images[0] %>" class="img-fluid product-image">
+                  <div class="quick-view">Quick View</div>
+               </div>
+               <div class="specs-preview">
+                  <div class="spec-item"><i class="fa fa-microchip"></i> Intel i7</div>
+                  <div class="spec-item"><i class="fa fa-memory"></i> 16GB RAM</div>
+                  <div class="spec-item"><i class="fa fa-hdd"></i> 512GB SSD</div>
                </div>
                <div class="btn_main">
                   <div class="buy_bt"><a href="/user/ProductsDetails">Buy Now</a></div>
                   <div class="seemore_bt"><a href="/user/ProductsDetails">See More</a></div>
+               </div>
+               <div class="product-stats">
+                  <span><i class="fa fa-star"></i> 4.8</span>
+                  <span><i class="fa fa-heart"></i> 120</span>
+                  <span><i class="fa fa-eye"></i> 350</span>
                </div>
             </div>
          </div>
@@ -89,34 +122,675 @@
    </div>
 </div>
 
-
 <%- include('partials/footer') %>
 
 <style>
-   .animated-box {
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+   /* Overall Page Styling */
+   body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8f9fa;
    }
-   .animated-box:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+   
+   .highlight-text {
+      color: #ff6600;
+      position: relative;
+      text-shadow: 0 0 1px rgba(255, 102, 0, 0.2);
    }
-   .btn_main a:hover {
-      background-color: #ff6600;
-      color: #fff;
-      transition: 0.3s;
+   
+   /* Banner Section Styling */
+   .banner_bg_main {
+      background: linear-gradient(135deg, #2c3e50, #3498db, #8e44ad);
+      background-size: 300% 300%;
+      animation: gradientBackground 15s ease infinite;
+      padding-bottom: 60px;
+      position: relative;
+      overflow: hidden;
    }
-   .featured_box {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 20px;
+   
+   @keyframes gradientBackground {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
    }
-   .animated-image {
+   
+   .banner_bg_main::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
-      border-radius: 15px;
-      transition: transform 0.3s ease;
+      height: 100%;
+      background: url('/images/pattern.png');
+      opacity: 0.1;
+      animation: backgroundMove 20s linear infinite;
    }
-   .animated-image:hover {
+   
+   @keyframes backgroundMove {
+      0% { background-position: 0 0; }
+      100% { background-position: 100% 100%; }
+   }
+   
+   .banner_taital {
+      font-size: 50px;
+      font-weight: 700;
+      color: white;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4);
+      margin-top: 30px;
+      letter-spacing: 1px;
+   }
+   
+   .banner-subtitle {
+      color: white;
+      font-size: 20px;
+      margin-top: 15px;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+      opacity: 0.9;
+   }
+   
+   .fade-in-delay {
+      opacity: 0;
+      animation: fadeIn 1s ease 0.5s forwards;
+   }
+   
+   @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 0.9; }
+   }
+   
+   .text-slide-up {
+      opacity: 0;
+      animation: slideUp 1s ease forwards;
+   }
+   
+   @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+   }
+   
+   .wave-container {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100px;
+      overflow: hidden;
+   }
+   
+   .wave {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 200%;
+      height: 100px;
+      background: url('/images/wave.png');
+      background-size: 50% 100%;
+      animation: wave 12s linear infinite;
+   }
+   
+   .wave1 {
+      opacity: 0.3;
+      animation: wave 24s linear infinite;
+      z-index: 3;
+      animation-delay: 0s;
+      bottom: 0;
+   }
+   
+   .wave2 {
+      opacity: 0.2;
+      animation: wave 18s linear infinite;
+      z-index: 2;
+      animation-delay: -5s;
+      bottom: 10px;
+   }
+   
+   .wave3 {
+      opacity: 0.1;
+      animation: wave 30s linear infinite;
+      z-index: 1;
+      animation-delay: -2s;
+      bottom: 15px;
+   }
+   
+   @keyframes wave {
+      0% { transform: translateX(0); }
+      50% { transform: translateX(-50%); }
+      100% { transform: translateX(-100%); }
+   }
+   
+   .pulse-logo {
+      animation: pulse 2s infinite;
+   }
+   
+   @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+   }
+   
+   /* Button Styling */
+   .btn-shop-now {
+      background: linear-gradient(45deg, #ff6600, #ff9966);
+      color: white;
+      font-weight: bold;
+      padding: 12px 30px;
+      border-radius: 30px;
+      border: none;
+      box-shadow: 0 5px 15px rgba(255, 102, 0, 0.4);
+      position: relative;
+      margin-left: 700px;
+      margin-top: -100px;
+      z-index: 10;
+      transition: all 0.3s ease;
+      overflow: hidden;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+   }
+   
+   .btn-shop-now:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(255, 102, 0, 0.6);
+   }
+   
+   .btn-shop-now::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: 0.5s;
+   }
+   
+   .btn-shop-now:hover::before {
+      left: 100%;
+      animation: shimmer 1.5s infinite;
+   }
+   
+   @keyframes shimmer {
+      0% { left: -100%; }
+      100% { left: 100%; }
+   }
+   
+   .btn-shop-now::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 10px;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+   }
+   
+   .btn-shop-now:active::after {
+      animation: ripple 0.6s ease-out;
+   }
+   
+   @keyframes ripple {
+      0% { width: 0; height: 0; opacity: 0.5; }
+      100% { width: 200px; height: 200px; opacity: 0; }
+   }
+   
+   /* Featured Section Styling */
+   .featured_laptops {
+      padding: 90px 0;
+      background: #ffffff;
+      position: relative;
+   }
+   
+   .featured_laptops::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('/images/dot-pattern.png');
+      opacity: 0.05;
+      pointer-events: none;
+   }
+   
+   .section_title {
+      text-align: center;
+      margin-bottom: 50px;
+      font-size: 38px;
+      position: relative;
+      padding-bottom: 15px;
+   }
+   
+   .section_title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 4px;
+      background: linear-gradient(to right, #ff6600, #ff9966);
+      border-radius: 2px;
+   }
+   
+   .featured-card {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+      transition: all 0.4s ease;
+      height: 300px;
+      cursor: pointer;
+   }
+   
+   .featured-card:hover {
+      transform: translateY(-15px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+   }
+   
+   .featured-badge {
+      position: absolute;
+      top: 20px;
+      left: 0;
+      background: #ff6600;
+      color: white;
+      padding: 8px 15px;
+      font-size: 12px;
+      font-weight: bold;
+      z-index: 2;
+      border-top-right-radius: 20px;
+      border-bottom-right-radius: 20px;
+      box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2);
+      letter-spacing: 1px;
+   }
+   
+   .featured-image {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      transition: transform 0.8s ease;
+   }
+   
+   .featured-card:hover .featured-image {
       transform: scale(1.1);
+   }
+   
+   .overlay-info {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.5), transparent);
+      color: white;
+      padding: 30px 20px 20px;
+      transform: translateY(70%);
+      transition: transform 0.5s ease;
+   }
+   
+   .featured-card:hover .overlay-info {
+      transform: translateY(0);
+   }
+   
+   .overlay-info h4 {
+      margin: 0;
+      font-weight: 600;
+      font-size: 22px;
+   }
+   
+   .overlay-info p {
+      margin: 8px 0 15px;
+      font-size: 14px;
+      opacity: 0.8;
+   }
+   
+   .featured-btn {
+      display: inline-block;
+      background: #ff6600;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s ease 0.2s;
+      cursor: pointer;
+   }
+   
+   .featured-card:hover .featured-btn {
+      opacity: 1;
+      transform: translateY(0);
+   }
+   
+   /* Products Section Styling */
+   .fashion_section {
+      padding: 90px 0;
+      background: linear-gradient(to bottom, #f8f9fa, #eaeaea);
+      position: relative;
+   }
+   
+   .fashion_section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('/images/tech-pattern.png');
+      opacity: 0.05;
+      background-size: 200px;
+      pointer-events: none;
+   }
+   
+   .fashion_taital {
+      text-align: center;
+      margin-bottom: 50px;
+      font-size: 38px;
+      position: relative;
+      padding-bottom: 15px;
+   }
+   
+   .fashion_taital::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 4px;
+      background: linear-gradient(to right, #ff6600, #ff9966);
+      border-radius: 2px;
+   }
+   
+   .product-card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      padding: 25px;
+      margin-bottom: 40px;
+      position: relative;
+      transition: all 0.4s ease;
+      height: 450px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+   }
+   
+   .product-card:hover {
+      transform: translateY(-15px);
+      box-shadow: 0 20px 35px rgba(0, 0, 0, 0.15);
+   }
+   
+   .product-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, transparent, transparent, rgba(255, 255, 255, 0.7));
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+   }
+   
+   .product-card:hover::after {
+      opacity: 0.1;
+   }
+   
+   .product-badge {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: #ff6600;
+      color: white;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      z-index: 1;
+      box-shadow: 0 3px 6px rgba(255, 102, 0, 0.2);
+   }
+   
+   .stock-badge {
+      position: absolute;
+      top: 50px;
+      right: 15px;
+      background: #4CAF50;
+      color: white;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      z-index: 1;
+      box-shadow: 0 3px 6px rgba(76, 175, 80, 0.2);
+   }
+   
+   .discount-badge {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: #E91E63;
+      color: white;
+      padding: 8px;
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+      z-index: 1;
+      box-shadow: 0 3px 6px rgba(233, 30, 99, 0.2);
+      transform: rotate(-5deg);
+   }
+   
+   .shirt_text {
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+      margin-top: 15px;
+      margin-bottom: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+   }
+   
+   .price_text {
+      font-size: 16px;
+      color: #666;
+      margin-bottom: 20px;
+      position: relative;
+      display: inline-block;
+   }
+   
+   .price-highlight {
+      color: #ff6600;
+      font-weight: bold;
+      font-size: 20px;
+      position: relative;
+   }
+   
+   .tshirt_img {
+      text-align: center;
+      margin-bottom: 25px;
+      flex-grow: 1;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      border-radius: 10px;
+      background: linear-gradient(145deg, #f0f0f0, #ffffff);
+      padding: 20px;
+   }
+   
+   .product-image {
+      max-height: 180px;
+      transition: transform 0.5s ease;
+      filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.1));
+   }
+   
+   .product-card:hover .product-image {
+      transform: scale(1.1) translateY(-5px);
+   }
+   
+   .quick-view {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      opacity: 0;
+      transition: all 0.3s ease;
+      cursor: pointer;
+   }
+   
+   .product-card:hover .quick-view {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+   }
+   
+   .specs-preview {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      border-top: 1px dashed rgba(0, 0, 0, 0.1);
+      padding-top: 15px;
+   }
+   
+   .spec-item {
+      font-size: 12px;
+      color: #666;
+      display: flex;
+      align-items: center;
+   }
+   
+   .spec-item i {
+      margin-right: 5px;
+      color: #ff6600;
+   }
+   
+   .btn_main {
+      display: flex;
+      justify-content: space-between;
+      margin-top: auto;
+      margin-bottom: 15px;
+   }
+   
+   .buy_bt a, .seemore_bt a {
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      letter-spacing: 0.5px;
+   }
+   
+   .buy_bt a {
+      background: linear-gradient(45deg, #ff6600, #ff9966);
+      color: white;
+      box-shadow: 0 5px 15px rgba(255, 102, 0, 0.3);
+   }
+   
+   .seemore_bt a {
+      background: #f5f5f5;
+      color: #333;
+      border: 1px solid #e0e0e0;
+   }
+   
+   .buy_bt a:hover {
+      background: linear-gradient(45deg, #e55b00, #ff8c52);
+      box-shadow: 0 7px 15px rgba(255, 102, 0, 0.4);
+      transform: translateY(-3px);
+   }
+   
+   .seemore_bt a:hover {
+      background: #eeeeee;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+   }
+   
+   .product-stats {
+      display: flex;
+      justify-content: space-between;
+      color: #888;
+      font-size: 14px;
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      padding-top: 15px;
+   }
+   
+   .product-stats span {
+      display: flex;
+      align-items: center;
+   }
+   
+   .product-stats i {
+      margin-right: 5px;
+      color: #ff6600;
+   }
+   
+   /* Responsive Adjustments */
+   @media (max-width: 991px) {
+      .product-card {
+         height: 420px;
+      }
+      
+      .featured-card {
+         height: 250px;
+      }
+      
+      .featured-image {
+         height: 250px;
+      }
+   }
+   
+   @media (max-width: 767px) {
+      .banner_taital {
+         font-size: 36px;
+      }
+      
+      .banner-subtitle {
+         font-size: 16px;
+      }
+      
+      .btn-shop-now {
+         margin-left: 50%;
+         transform: translateX(-50%);
+      }
+      
+      .product-card {
+         height: 400px;
+      }
+      
+      .overlay-info h4 {
+         font-size: 18px;
+      }
+   }
+   
+   /* Additional Animations */
+   @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+   }
+   
+   @keyframes shine {
+      0% { background-position: -100px; }
+      40%, 100% { background-position: 140px; }
+   }
+   
+   @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
    }
 </style>

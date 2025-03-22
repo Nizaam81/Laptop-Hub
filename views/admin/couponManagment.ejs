@@ -8,7 +8,40 @@
     margin: 0;
     padding: 0;
    
-}
+}   /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+    .modal-content {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 400px;
+        margin: 10% auto;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        animation: fadeIn 0.3s;
+    }
+    .close {
+        float: right;
+        cursor: pointer;
+        font-size: 20px;
+    }
+    .edit-btn {
+        background-color: blue;
+        color: white;
+        padding: 5px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
         .container {
             width: 90%;
             max-width: 600px;
@@ -108,22 +141,22 @@
         .delete-btn:hover {
             transform: scale(1.1);
         }.block-btn {
-  background-color: #ff5722;
-  color: white;
-  border: none;
-  padding: 5px;
-  border-radius: 5px;
-  cursor: pointer;
+           background-color: #ff5722;
+           color: white;
+           border: none;
+           padding: 5px;
+           border-radius: 5px;
+           cursor: pointer;
 }
 
-.unblock-btn {
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 5px;
-  border-radius: 5px;
-  cursor: pointer;
-}
+    .unblock-btn {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
         @media (max-width: 600px) {
             .container {
                 width: 95%;
@@ -182,7 +215,7 @@
                     <th>Minimum Price</th>
                     <th>Status</th>
                     <th>Action</th>
-                  <!-- <th>Edit</th> -->
+                    <th>Edit</th>
                 </tr>
                      <% Coupons.forEach(element => { %>
                 <tr>
@@ -206,7 +239,7 @@
 >
   <%= element.isList ? 'Unblock' : 'Block' %>
 </button>
-                     <!-- <td><button class="delete-btn">Edit</button></td> -->
+                     <td><button  onclick='openModal("<%= element.id %>","<%= element.name %>","<%= element.createdOn %>","<%= element.expireOn %>","<%= element.offerPrice %>","<%= element.minimumPrice %>")' class="delete-btn">Edit</button></td>
                   
                    <% }) %>  
                 </tr>
@@ -214,7 +247,90 @@
             </table>
         </div>
     </div>
+    <!-- Edit Modal -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Edit Coupon</h2>
+        <form id="editCouponForm">
+            <input type="hidden" id="editCouponId">
+            <div class="form-group">
+                <label>Coupon Name</label>
+                <input type="text" id="editCouponName">
+            </div>
+            <div class="form-group">
+                <label>Start Date</label>
+                <input type="date" id="editCouponDate">
+            </div>
+            <div class="form-group">
+                <label>End Date</label>
+                <input type="date" id="editCouponEndDate">
+            </div>
+            <div class="form-group">
+                <label>Offer Price</label>
+                <input type="number" id="editOfferPrice">
+            </div>
+            <div class="form-group">
+                <label>Minimum Price</label>
+                <input type="number" id="editMinimumPrice">
+            </div>
+            <button class="add-btn" type="submit">Save Changes</button>
+        </form>
+    </div>
+</div>
+<script>
+
+    function formatDate(date) {
+    const d = new Date(date);
+    return d.toISOString().split('T')[0]; 
+}
+
+    function openModal(id,name,createdOn,expireOn,offerPrice,minimumPrice) {
+        document.getElementById("editCouponId").value = id;
+        document.getElementById("editCouponName").value = name;
+        document.getElementById("editCouponDate").value = formatDate(createdOn);
+        document.getElementById("editCouponEndDate").value = formatDate(expireOn);
+        document.getElementById("editOfferPrice").value = offerPrice;
+        document.getElementById("editMinimumPrice").value = minimumPrice;
+        document.getElementById("editModal").style.display = "block";
+    }
+    function closeModal() {
+        document.getElementById("editModal").style.display = "none";
+    }
+    document.getElementById("editCouponForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    
+    const id = document.getElementById("editCouponId").value;
+    const name = document.getElementById("editCouponName").value;
+    const startDate = document.getElementById("editCouponDate").value;
+    const endDate = document.getElementById("editCouponEndDate").value;
+    const offerPrice = document.getElementById("editOfferPrice").value;
+    const minimumPrice = document.getElementById("editMinimumPrice").value;
+
+    try {
+        const response = await fetch("/admin/EditCoupon", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id, name, startDate, endDate, offerPrice, minimumPrice })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {  // Check if the request was successful
+            showToast(result.message || "Coupon edited successfully");
+            setTimeout(() => window.location.reload(), 2000);
+        } else {
+            showToast(result.message || "Failed to update coupon");
+        }
+    } catch (error) {
+        console.error("Error updating coupon:", error);
+        showToast("An error occurred while updating the coupon");
+    }
+});
+
+</script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
 </body>
 <script>
 
@@ -260,16 +376,7 @@ document.getElementById("couponForm").addEventListener("submit", async (event) =
     }
 });
 
-function showToast(message, type) {
-    Toastify({
-        text: message,
-        duration: 3000,
-        close: true,
-        gravity: "top", 
-        position: "right", 
-        backgroundColor: type === "success" ? "green" : "red",
-    }).showToast();
-}
+
 
  async function toggleBlock(CouponId) {
     try {
@@ -294,7 +401,7 @@ function showToast(message, type) {
     } catch (error) {
         console.error("Error toggling coupon status:", error);
         showToast("Failed to toggle coupon status. Please try again.", "error");
-    }
+    } 
 }
 
 

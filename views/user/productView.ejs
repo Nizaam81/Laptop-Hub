@@ -1,291 +1,509 @@
 <%- include('partials/head') %>
-    
-<%- include('partials/header') %> 
+
+<%- include('partials/header') %>
+
 <!-- SweetAlert2 CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
-   .product-images {
+  /* Main Container */
+  .product-container {
+    max-width: 1200px;
+    margin: 30px auto;
+    background-color: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  /* Breadcrumb */
+  .custom-breadcrumb {
+    padding: 10px 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .custom-breadcrumb ol {
+    margin: 0;
+  }
+
+  /* Product Images Section */
+  .product-images {
     display: flex;
-    gap: 20px;
-    position: relative; /* Add this */
-}
-.thumbnail-gallery {
+    gap: 15px;
+    position: relative;
+    margin-bottom: 20px;
+  }
+
+  .thumbnail-gallery {
     width: 80px;
     display: flex;
     flex-direction: column;
     gap: 10px;
-}
-    
-    .thumbnail-item img {
-      width: 100%;
-      border: 1px solid #ddd;
-      cursor: pointer;
-      transition: border-color 0.3s;
-    }
-    
-    .thumbnail-item img:hover {
-      border-color: #2874f0;
-    }
-    
-    .main-image-container {
+  }
+
+  .thumbnail-item img {
+    width: 100%;
+    border: 1px solid #f0f0f0;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .thumbnail-item img:hover {
+    border-color: #2874f0;
+    transform: scale(1.05);
+  }
+
+  .main-image-container {
     position: relative;
-    width: 500px; /* Increased from 400px */
-    height: 500px; /* Added fixed height */
+    width: 100%;
+    max-width: 450px;
+    height: 450px;
     display: flex;
     justify-content: center;
     align-items: center;
-}
-    
-.main-product-image {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-}
-    
-    .product-title {
-      font-size: 1.5rem;
-      color: #212121;
-    }
-    
-    .current-price {
-      font-size: 28px;
-      font-weight: 500;
-    }
-    
-    .offers-list {
-      list-style: none;
-      padding: 0;
-    }
-    
-    .offer-item {
-      margin-bottom: 8px;
-    }
-    
-    .offer-item i {
-      margin-right: 8px;
-    }
-    
-    .action-buttons {
-      margin-top: 20px;
-    }
-    
-    .add-to-cart, .buy-now {
-      padding: 15px 45px;
-      font-size: 16px;
-      text-transform: uppercase;
-    }
-    .main-image-container {
-    position: relative;
-    width: 400px;
-    height: 400px;
-}
+    border: 1px solid #f5f5f5;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #fafafa;
+  }
 
-.main-product-image {
-    width: 100%;
-    height: 100%;
+  .main-product-image {
+    max-width: 90%;
+    max-height: 90%;
     object-fit: contain;
+  }
+
+  /* Zoom Lens */
+  .zoom-lens {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border: 1px solid #e0e0e0;
+  background-color: rgba(255, 255, 255, 0.5);
+  cursor: crosshair;
+  display: none;
+  z-index: 1001;
 }
 
 .zoom-result {
-    position: fixed;
-    width: 800px;
-    height: 800px;
-    left: 45%; /* Adjust this value based on your layout */
-    top: 50%;
-    transform: translateY(-50%);
-    border: 1px solid #ddd;
-    background-repeat: no-repeat;
-    display: none;
-    z-index: 1000;
-    background-color: white;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}.zoom-lens {
-    display: none;
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  top: 0;
+  right: -320px; /* Adjust this value based on your layout */
+  border: 1px solid #e0e0e0;
+  background-repeat: no-repeat;
+  display: none;
+  z-index: 1000;
+  background-color: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  pointer-events: none;
 }
 
+  /* Product Details Section */
+  .product-details {
+    padding-left: 15px;
+  }
 
-    .variant-btn {
-      padding: 10px 20px;
-      margin: 5px;
-      border: 1px solid #ddd;
-      background-color: white;
-      cursor: pointer;
+  .product-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #212121;
+    margin-bottom: 10px;
+  }
+
+  .ratings {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .rating-badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  /* Price Section */
+  .pricing {
+    padding: 15px 0;
+    border-top: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 20px;
+  }
+
+  .current-price {
+    font-size: 28px;
+    font-weight: 600;
+    color: #212121;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .original-price {
+    text-decoration: line-through;
+    color: #757575;
+    font-size: 18px;
+    font-weight: normal;
+  }
+
+  .discount-tag {
+    display: inline-block;
+    background-color: #ff4141;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    margin-left: 10px;
+  }
+
+  .stock-info {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #388e3c;
+    display: flex;
+    align-items: center;
+  }
+
+  .stock-info i {
+    margin-right: 5px;
+  }
+
+  /* Variants Section */
+  .product-variants {
+    margin: 20px 0;
+  }
+
+  .variant-label {
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: block;
+    color: #212121;
+  }
+
+  .variant-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 25px;
+  }
+
+  .variant-btn {
+    padding: 8px 16px;
+    border: 1px solid #e0e0e0;
+    background-color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .variant-btn:hover,
+  .variant-btn.active {
+    border-color: #2874f0;
+    background-color: #2874f0;
+    color: #fff;
+  }
+
+  /* Quantity Selector */
+  .quantity-section {
+    margin-top: 20px;
+  }
+
+  .quantity {
+    display: flex;
+    align-items: center;
+    max-width: 120px;
+    margin-top: 10px;
+  }
+
+  .quantity-btn {
+    width: 36px;
+    height: 36px;
+    border: 1px solid #e0e0e0;
+    background: white;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .quantity-btn:hover {
+    background-color: #f5f5f5;
+  }
+
+  .quantity span {
+    padding: 0 15px;
+    font-weight: 500;
+    min-width: 40px;
+    text-align: center;
+  }
+
+  /* Action Buttons */
+  .action-buttons {
+    margin-top: 30px;
+    display: flex;
+    gap: 15px;
+  }
+
+  .add-to-cart {
+    padding: 12px 30px;
+    font-size: 16px;
+    text-transform: uppercase;
+    font-weight: 500;
+    border-radius: 4px;
+    background-color: #ff9f00;
+    border: none;
+    transition: all 0.2s ease;
+  }
+
+  .add-to-cart:hover {
+    background-color: #e99200;
+  }
+
+  .add-to-cart i {
+    margin-right: 8px;
+  }
+
+  /* Description Section */
+  .description {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  .description h6 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #212121;
+    margin-bottom: 15px;
+  }
+
+  .description p {
+    color: #424242;
+    line-height: 1.6;
+  }
+
+  /* Responsive styles */
+  @media (max-width: 991.98px) {
+    .product-images {
+      justify-content: center;
     }
-    .variant-btn:hover, .variant-btn.active {
-      border-color: #2874f0;
-      color: #fff;
-      background-color: #2874f0;
+
+    .product-details {
+      padding-left: 0;
+      margin-top: 20px;
     }
-    
-    .quantity-btn {
-      width: 40px;
-      height: 40px;
-      border: 1px solid #ddd;
-      background: white;
-      cursor: pointer;
+
+    .zoom-result {
+      display: none !important; /* Disable zoom on tablets */
     }
-    .quantity-btn:hover {
-      background-color: #f0f0f0;
+  }
+
+  @media (max-width: 767.98px) {
+    .product-container {
+      padding: 15px;
     }
-  
 
+    .main-image-container {
+      height: 350px;
+    }
 
+    .product-title {
+      font-size: 1.5rem;
+    }
 
-    </style>
+    .current-price {
+      font-size: 24px;
+    }
 
-    <div class="container-fluid mt-4">
-      <div class="breadcrumb">
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">Home</a></li>
-            <li class="breadcrumb-item"><a href="/products">Products</a></li>
-            <li class="breadcrumb-item active" aria-current="page"><%= products.name %></li>
-          </ol>
-        </nav>
-      </div>
-    
-      <div class="row">
-       
-        <div class="col-md-5">
-          <div class="product-images">
-           
-            <div class="thumbnail-gallery">
-              <% products.images.forEach((image, index) => { %>
-                <div class="thumbnail-item mb-2">
-                  <img src="<%= image %>" 
-                       alt="Product view <%= index + 1 %>"
-                       class="img-fluid thumbnail"
-                       onclick="updateMainImage(this.src)">
-                </div>
-              <% }) %>
-            </div>
-            
-            
-            <div class="main-image-container">
-              <div class="zoom-lens"></div>
-              <img src="<%= products.images[0] %>" 
-                   id="mainImage"
-                   alt="<%= products.name %>"
-                   class="img-fluid main-product-image">
-              <div class="zoom-result"></div> 
+    .action-buttons {
+      flex-direction: column;
+    }
+
+    .add-to-cart {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 575.98px) {
+    .product-images {
+      flex-direction: column-reverse;
+      align-items: center;
+    }
+
+    .thumbnail-gallery {
+      width: 100%;
+      flex-direction: row;
+      overflow-x: auto;
+      padding-bottom: 10px;
+    }
+
+    .thumbnail-item {
+      min-width: 60px;
+    }
+
+    .main-image-container {
+      height: 280px;
+    }
+  }
+</style>
+
+<div class="container-fluid">
+  <div class="product-container">
+    <!-- Breadcrumb -->
+    <div class="custom-breadcrumb">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/">Home</a></li>
+          <li class="breadcrumb-item"><a href="/products">Products</a></li>
+          <li class="breadcrumb-item active" aria-current="page"><%= products.name %></li>
+        </ol>
+      </nav>
+    </div>
+
+    <div class="row">
+      <!-- Product Images Section -->
+      <div class="col-lg-5 col-md-12">
+        <div class="product-images">
+          <div class="thumbnail-gallery">
+            <% products.images.forEach((image, index) => { %>
+              <div class="thumbnail-item mb-2">
+                <img src="<%= image %>" alt="Product view <%= index + 1 %>" class="img-fluid thumbnail" onclick="updateMainImage(this.src)">
+              </div>
+            <% }) %>
           </div>
-          
+
+          <div class="main-image-container">
+            <div class="zoom-lens" id="zoomLens"></div>
+            <img src="<%= products.images[0] %>" id="mainImage" alt="<%= products.name %>" class="img-fluid main-product-image">
+            <div class="zoom-result" id="zoomResult"></div>
           </div>
         </div>
-    
-      
-        <div class="col-md-7">
-          <div class="product-details ps-4">
-            <h1 class="product-title mb-2"><%= products.name %></h1>
-            
-            <!-- Ratings -->
-            <div class="ratings mb-3">
-              <span class="badge bg-success"><%= products.rating %> ★</span>
-              <span class="text-muted ms-2"><%= products.reviews %> Reviews</span>
-            </div>
-    
-            <!-- Price Section -->
-            <div class="pricing mb-4">
-              <input type="hidden" id="variantId" value="<%= Variants._id %>">
-              <input type="hidden" value="<% if (products.offerPercentage ==0 && category.offerPercentage==0) { %>
-               <%= Variants.price %>
-               <% } else if (products.offerPercentage > category.offerPercentage) { %>
+      </div>
+
+      <!-- Product Details Section -->
+      <div class="col-lg-7 col-md-12">
+        <div class="product-details">
+          <h1 class="product-title"><%= products.name %></h1>
+
+          <!-- Ratings -->
+          <div class="ratings">
+            <span class="badge bg-success rating-badge"><%= products.rating %> <i class="fas fa-star"></i></span>
+            <span class="text-muted ms-2"><%= products.reviews %> Reviews</span>
+          </div>
+
+          <!-- Price Section -->
+          <div class="pricing">
+            <input type="hidden" id="variantId" value="<%= Variants._id %>">
+            <input type="hidden" value="<% if (products.offerPercentage ==0 && category.offerPercentage==0) { %>
+              <%= Variants.price %>
+              <% } else if (products.offerPercentage > category.offerPercentage) { %>
                 <%= Variants.price - Variants.price*products.offerPercentage/100 %>
                 <% } else { %>
-                 <%= Variants.price - Variants.price*category.offerPercentage/100 %>
-              <% } %> "  id="priceValue">
+                <%= Variants.price - Variants.price*category.offerPercentage/100 %>
+              <% } %>" id="priceValue">
 
-                <h2 class="current-price" id="salePrice" >₹ <% if (products.offerPercentage ==0 && category.offerPercentage==0) { %>
-                 <%= Variants.price %>
-                 <% } else if (products.offerPercentage > category.offerPercentage) { %>
-                  <del><%= Variants.price %></del>   <%= Variants.price - Variants.price*products.offerPercentage/100 %>
-                  <% } else { %>
-                   <del><%= Variants.price %></del>   <%= Variants.price - Variants.price*category.offerPercentage/100 %>
-                <% } %></h2>
-                 <h3>Available Stock<%= Variants.quantity %></h3>
-                  <h1 style="height: 40px; width: 150px;" class="text-danger" > <% if (products.offerPercentage > category.offerPercentage) { %>
-                   <%= products.offerPercentage %> 
-                   <% } else { %>
-                    <%= category.offerPercentage %> 
-                  <% } %> % OFF</h1>
-                 
-             
-              <div class="product-variants mb-3">
-                <label class="fw-bold">System Memory:</label>
-                <div class="variant-options">
-                  <% varient.forEach(element => { %>
-                    <button class="variant-btn" data-variant="8GB" onclick="window.location.href='/user/productView?productId=<%= products._id %>&varientId=<%= element._id  %>'"><%= element.ramSize %></button>
-                  <% }) %>
-                  <div class="quantity">
-                    <button class="btn btn-info">-</button>
-                    <span id="quantities" style="margin: 0 10px;" data-max="<%= Variants.quantity %>">1</span>
-                    <button class="btn btn-info">+</button>
-                </div>
-               
-                </div>
+            <div class="current-price">
+              ₹ <% if (products.offerPercentage ==0 && category.offerPercentage==0) { %>
+                <%= Variants.price %>
+              <% } else if (products.offerPercentage > category.offerPercentage) { %>
+                <%= Variants.price - Variants.price*products.offerPercentage/100 %>
+                <span class="original-price">₹<%= Variants.price %></span>
+                <span class="discount-tag"><%= products.offerPercentage %>% OFF</span>
+              <% } else { %>
+                <%= Variants.price - Variants.price*category.offerPercentage/100 %>
+                <span class="original-price">₹<%= Variants.price %></span>
+                <span class="discount-tag"><%= category.offerPercentage %>% OFF</span>
+              <% } %>
+            </div>
+
+            <div class="stock-info">
+              <i class="fas fa-check-circle"></i> In Stock: <%= Variants.quantity %> units available
+            </div>
+          </div>
+
+          <!-- Product Variants -->
+          <div class="product-variants">
+            <label class="variant-label">System Memory:</label>
+            <div class="variant-options">
+              <% varient.forEach(element => { %>
+                <button class="variant-btn" onclick="window.location.href='/user/productView?productId=<%= products._id %>&varientId=<%= element._id  %>'"><%= element.ramSize %></button>
+              <% }) %>
+            </div>
+
+            <!-- Quantity Selector -->
+            <div class="quantity-section">
+              <label class="variant-label">Quantity:</label>
+              <div class="quantity">
+                <button class="quantity-btn btn-info"><i class="fas fa-minus"></i></button>
+                <span id="quantities" data-max="<%= Variants.quantity %>">1</span>
+                <button class="quantity-btn btn-info"><i class="fas fa-plus"></i></button>
               </div>
-              
-           
-             
+            </div>
+          </div>
 
-            </div>
-    
-           
-    
-            <!-- Action Buttons -->
-            <div class="action-buttons">
-              <button class="btn btn-warning btn-lg me-2 add-to-cart" id="addToCart">
-                <i class="fas fa-shopping-cart"></i> ADD TO CART
-              </button>
-             
-            </div>
-    
-            <!-- Product Description -->
-            <div class="description mt-4">
-              <h6>Description</h6>
-              <p class="mt-2"><%= products.description %></p>
-              <input type="hidden" id="ProductId" value="<%= products._id %>">
-            </div>
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <button class="btn btn-lg add-to-cart" id="addToCart">
+              <i class="fas fa-shopping-cart"></i> ADD TO CART
+            </button>
+          </div>
+
+          <!-- Product Description -->
+          <div class="description">
+            <h6>Product Description</h6>
+            <p><%= products.description %></p>
+            <input type="hidden" id="ProductId" value="<%= products._id %>">
           </div>
         </div>
       </div>
     </div>
-  
- 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+  // Quantity controls
+  const minusBtn = document.querySelector(".quantity .quantity-btn:first-child");
+  const plusBtn = document.querySelector(".quantity .quantity-btn:last-child");
+  const quantitySpan = document.querySelector(".quantity span");
 
-        const minusBtn = document.querySelector(".quantity .btn:first-child");
-        const plusBtn = document.querySelector(".quantity .btn:last-child");
-        const quantitySpan = document.querySelector(".quantity span");
+  const maxQuantity = parseInt(quantitySpan.getAttribute("data-max"));
 
-        
-        const maxQuantity = parseInt(quantitySpan.getAttribute("data-max"));
+  plusBtn.addEventListener("click", function () {
+    let currentValue = parseInt(quantitySpan.textContent);
+    if (currentValue < maxQuantity) {  // Restrict to max quantity
+      quantitySpan.textContent = currentValue + 1;
+    }
+  });
 
-        plusBtn.addEventListener("click", function () {
-            let currentValue = parseInt(quantitySpan.textContent);
-            if (currentValue < maxQuantity) {  // Restrict to max quantity
-                quantitySpan.textContent = currentValue + 1;
-            }
-        });
+  minusBtn.addEventListener("click", function () {
+    let currentValue = parseInt(quantitySpan.textContent);
+    if (currentValue > 1) {
+      quantitySpan.textContent = currentValue - 1;
+    }
+  });
 
-        minusBtn.addEventListener("click", function () {
-            let currentValue = parseInt(quantitySpan.textContent);
-            if (currentValue > 1) { 
-                quantitySpan.textContent = currentValue - 1;
-            }
-        });
-      
-  document.getElementById("addToCart").addEventListener("click", async function(event){
-    event.preventDefault(); 
+
+  document.getElementById("addToCart").addEventListener("click", async function (event) {
+    event.preventDefault();
 
     const productId = document.getElementById("ProductId").value;
     const varientId = document.getElementById("variantId").value;
     const quantities = document.getElementById("quantities").textContent.trim();
     const price = document.getElementById('priceValue').value;
-
 
     try {
         const response = await fetch("/user/add-Cart", {
@@ -293,176 +511,259 @@
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ productId, varientId, quantities ,price}) 
+            body: JSON.stringify({ productId, varientId, quantities, price })
         });
 
         const data = await response.json();
-       console.log(data)
+
         if (data.success) {
-            Swal.fire({
-                title: "Success",
-                text: data.success,
-                icon: "success",
-            });
+            showToast(data.success, "success");
         } else if (data.existingCartItem) {
-            Swal.fire({ 
-                title: "Item Already in Cart",
-                text: data.existingCartItem,
-                icon: "warning",
-            });
+            showToast(data.existingCartItem, "warning");
         } else if (data.variantDetails) {
-            Swal.fire({
-                title: "Variant Not Found",
-                text: data.variantDetails,
-                icon: "error",
-            });
+            showToast(data.variantDetails, "error");
         } else {
-            Swal.fire({
-                title: "Error",
-                text: "Something went wrong!",
-                icon: "error",
-            });
+            showToast("Something went wrong!", "error");
         }
     } catch (error) {
         console.error("Error:", error);
-        Swal.fire({
-            title: "Error",
-            text: "Failed to add item to cart!",
-            icon: "error",
-        });
+        showToast("Failed to add item to cart!", "error");
     }
 });
 
 
-document.querySelectorAll('.variant-btn').forEach(button => {
-      button.addEventListener('click', function() {
-        document.querySelectorAll('.variant-btn').forEach(btn => btn.classList.remove('active'));
-        this.classList.add('active');
-      });
+function showToast(message, icon = "info") {
+    Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: icon,
+        title: message,
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
     });
-    
-    document.getElementById('increaseQty').addEventListener('click', function() {
-      let quantityInput = document.getElementById('quantity');
-      if (parseInt(quantityInput.value) < parseInt(quantityInput.max)) {
-        quantityInput.value = parseInt(quantityInput.value) + 1;
-      }
-    });
-    
-    document.getElementById('decreaseQty').addEventListener('click', function() {
-      let quantityInput = document.getElementById('quantity');
-      if (parseInt(quantityInput.value) > parseInt(quantityInput.min)) {
-        quantityInput.value = parseInt(quantityInput.value) - 1;
-      }
-    });
+}
 
-    function updateMainImage(src) {
-      document.getElementById('mainImage').src = src;
+
+  document.querySelectorAll('.variant-btn').forEach(button => {
+   
+    if (window.location.href.includes(button.getAttribute('onclick').match(/varientId=([^&'"]+)/)[1])) {
+      button.classList.add('active');
     }
 
-   
+    button.addEventListener('click', function () {
+      document.querySelectorAll('.variant-btn').forEach(btn => btn.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+
+  function updateMainImage(src) {
+    const mainImage = document.getElementById('mainImage');
+    mainImage.src = src;
+
+    const zoomResult = document.getElementById('zoomResult');
+    if (zoomResult) {
+      zoomResult.style.backgroundImage = `url(${src})`;
+      zoomResult.style.display = 'none';
+    }
+  }
+
+
+function initImageZoom() {
+  const container = document.querySelector('.main-image-container');
+  const mainImage = document.getElementById('mainImage');
+  
+
+  if (!container || !mainImage) {
+    console.error("Required zoom elements not found");
+    return;
+  }
+  
+
+  let zoomLens = document.getElementById('zoomLens');
+  let zoomResult = document.getElementById('zoomResult');
+  
+  if (!zoomLens) {
+    zoomLens = document.createElement('div');
+    zoomLens.id = 'zoomLens';
+    zoomLens.className = 'zoom-lens';
+    container.appendChild(zoomLens);
+  }
+  
+  if (!zoomResult) {
+    zoomResult = document.createElement('div');
+    zoomResult.id = 'zoomResult';
+    zoomResult.className = 'zoom-result';
+    container.appendChild(zoomResult);
+  }
+  
+
+  const zoomStyles = `
+    .main-image-container {
+      position: relative;
+      overflow: visible !important;
+      cursor: crosshair;
+    }
+    
+    .zoom-lens {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      border: 2px solid #ff9f00;
+      background-color: rgba(255, 255, 255, 0.4);
+      cursor: crosshair;
+      display: none;
+      z-index: 100;
+    }
+    
+    .zoom-result {
+      position: absolute;
+      width: 350px;
+      height: 350px;
+      border: 1px solid #e0e0e0;
+      background-color: #fff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      z-index: 200;
+      display: none;
+      top: 0;
+      left: 110%; /* Position to the right of the main image */
+      pointer-events: none;
+      background-repeat: no-repeat;
+    }
+    
+    @media (max-width: 991.98px) {
+      .zoom-result, .zoom-lens {
+        display: none !important;
+      }
+    }
+  `;
+  
+
+  if (!document.getElementById('zoom-styles')) {
+    const styleElem = document.createElement('style');
+    styleElem.id = 'zoom-styles';
+    styleElem.textContent = zoomStyles;
+    document.head.appendChild(styleElem);
+  }
+  
+
+  const zoomRatio = 3;
+  
+
+  function updateZoom(e) {
+  
+    const imgRect = mainImage.getBoundingClientRect();
+    
  
-function updateMainImage(src) {
-    const mainImage = document.getElementById('mainImage');
-    mainImage.src = src;
+    let mouseX = e.clientX - imgRect.left;
+    let mouseY = e.clientY - imgRect.top;
     
   
-    mainImage.setAttribute('data-highres', src);
-    
-   
-    const zoomLens = document.querySelector(".zoom-lens");
-    const zoomResult = document.querySelector(".zoom-result");
-    zoomLens.style.display = "none";
-    zoomResult.style.display = "none";
-}
-
-
-const mainImage = document.getElementById("mainImage");
-    const zoomLens = document.querySelector(".zoom-lens");
-    const zoomResult = document.querySelector(".zoom-result");
-
-    function moveLens(e) {
-        e.preventDefault();
-        let rect = mainImage.getBoundingClientRect();
-        let lensSize = zoomLens.offsetWidth / 2;
-
-        let x = e.clientX - rect.left - lensSize;
-        let y = e.clientY - rect.top - lensSize;
-
-        x = Math.max(0, Math.min(x, rect.width - zoomLens.offsetWidth));
-        y = Math.max(0, Math.min(y, rect.height - zoomLens.offsetHeight));
-
-        zoomLens.style.left = x + "px";
-        zoomLens.style.top = y + "px";
-
-        let zoomLevel = 2;
-        zoomResult.style.backgroundPosition = `-${x * zoomLevel}px -${y * zoomLevel}px`;
+    if (mouseX < 0 || mouseY < 0 || mouseX > imgRect.width || mouseY > imgRect.height) {
+      zoomLens.style.display = 'none';
+      zoomResult.style.display = 'none';
+      return;
     }
-
-    function initZoom() {
-    const container = document.querySelector('.main-image-container');
-    const mainImage = document.getElementById('mainImage');
-    const zoomResult = document.querySelector('.zoom-result');
     
-    function handleZoom(e) {
-        const bounds = mainImage.getBoundingClientRect();
-        
-       
-        const x = (e.clientX - bounds.left) / bounds.width;
-        const y = (e.clientY - bounds.top) / bounds.height;
-        
-       
-        const clampedX = Math.max(0, Math.min(1, x));
-        const clampedY = Math.max(0, Math.min(1, y));
 
-        
-        zoomResult.style.backgroundImage = `url(${mainImage.src})`;
-        zoomResult.style.backgroundSize = '100%';
-        
-       
-        const posX = clampedX * 100;
-        const posY = clampedY * 100;
-        zoomResult.style.backgroundPosition = `${-posX}% ${-posY}%`;
-    }
-
+    const lensWidth = zoomLens.offsetWidth;
+    const lensHeight = zoomLens.offsetHeight;
     
-    container.addEventListener('mouseenter', () => {
-        zoomResult.style.display = 'block';
-        
-       
-        zoomResult.style.backgroundImage = `url(${mainImage.src})`;
-        zoomResult.style.backgroundSize = '100%';
-    });
 
-   
-    container.addEventListener('mousemove', handleZoom);
+    let lensX = mouseX - lensWidth / 2;
+    let lensY = mouseY - lensHeight / 2;
 
+    lensX = Math.max(0, Math.min(lensX, imgRect.width - lensWidth));
+    lensY = Math.max(0, Math.min(lensY, imgRect.height - lensHeight));
+
+    zoomLens.style.left = `${lensX}px`;
+    zoomLens.style.top = `${lensY}px`;
+    zoomLens.style.display = 'block';
     
-    container.addEventListener('mouseleave', () => {
-        zoomResult.style.display = 'none';
-    });
-}
 
-
-function updateMainImage(src) {
-    const mainImage = document.getElementById('mainImage');
-    mainImage.src = src;
+    zoomResult.style.display = 'block';
     
   
-    const zoomResult = document.querySelector('.zoom-result');
+    const resultToLensRatioX = zoomResult.offsetWidth / lensWidth;
+    const resultToLensRatioY = zoomResult.offsetHeight / lensHeight;
+    
+
+    zoomResult.style.backgroundImage = `url('${mainImage.src}')`;
+    
+
+    const bgWidth = imgRect.width * resultToLensRatioX;
+    const bgHeight = imgRect.height * resultToLensRatioY;
+    zoomResult.style.backgroundSize = `${bgWidth}px ${bgHeight}px`;
+    
+
+    const bgPosX = -lensX * resultToLensRatioX;
+    const bgPosY = -lensY * resultToLensRatioY;
+    zoomResult.style.backgroundPosition = `${bgPosX}px ${bgPosY}px`;
+  }
+  
+
+  container.addEventListener('mouseenter', () => {
+
+    const imgSrc = mainImage.src;
+    const preloadImg = new Image();
+    preloadImg.src = imgSrc;
+  });
+  
+  container.addEventListener('mousemove', updateZoom);
+  
+  container.addEventListener('mouseleave', () => {
+    zoomLens.style.display = 'none';
     zoomResult.style.display = 'none';
-    
-   
-    initZoom();
+  });
+  
+
+  container.addEventListener('touchstart', (e) => {
+    e.preventDefault(); 
+    if (window.innerWidth > 992) {
+      updateZoom(e.touches[0]);
+    }
+  });
+  
+  container.addEventListener('touchmove', (e) => {
+    e.preventDefault(); 
+    if (window.innerWidth > 992) { 
+      updateZoom(e.touches[0]);
+    }
+  });
+  
+  container.addEventListener('touchend', () => {
+    zoomLens.style.display = 'none';
+    zoomResult.style.display = 'none';
+  });
 }
 
 
-window.addEventListener('load', initZoom);
+document.addEventListener('DOMContentLoaded', initImageZoom);
 
 
+function updateMainImage(src) {
+  const mainImage = document.getElementById('mainImage');
+  if (mainImage) {
+    mainImage.src = src;
+    
 
+    const zoomLens = document.getElementById('zoomLens');
+    const zoomResult = document.getElementById('zoomResult');
+    if (zoomLens) zoomLens.style.display = 'none';
+    if (zoomResult) zoomResult.style.display = 'none';
+  }
+}
 
-    </script>
+window.addEventListener('resize', () => {
+  const zoomLens = document.getElementById('zoomLens');
+  const zoomResult = document.getElementById('zoomResult');
+  if (zoomLens) zoomLens.style.display = 'none';
+  if (zoomResult) zoomResult.style.display = 'none';
+  
 
-
+  setTimeout(initImageZoom, 200);
+});
+</script>
 
 <%- include('partials/footer') %>

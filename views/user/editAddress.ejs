@@ -92,9 +92,9 @@
 </head>
 <body>
     <form id="editAddress">
-        <input type="text" id="addressId" value="<%= address._id %>" >
+        <input type="hidden" id="addressId" value="<%= address._id %>" >
        
-        <input type="text" id="userid" value="<%= address.userId %>">
+        <input type="hidden" id="userid" value="<%= address.userId %>">
     
         <div class="form-group">
             <label>Address Type:</label>

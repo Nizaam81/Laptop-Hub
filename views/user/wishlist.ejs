@@ -97,24 +97,29 @@
     </style>
   </head>
   <body>
-    <% if (wish.length === 0 || wish.every(item => item.products.length === 0)) { %>
+    <% if (!wish || wish.products.length===0) { %>
   <script>
     window.location.href = "/user/empty";
   </script>
 <% } else { %>
-  <div class="wishlist-wrapper" onclick="window.location.href='/user/ProductsDetails'">
-    <% wish.forEach(element => { %>
-      <% element.products.forEach(product => { %>
+  <div class="wishlist-wrapper">
+
+      <% if (wish.products.length>0) { %>
+       <% wish.products.forEach(product => { %>
         <div class="wishlist-container">
-         <a href="#" onclick="event.preventDefault(); event.stopPropagation(); deleteWishlist('<%=element._id%>', '<%=product._id%>')">
+         <a href="#" onclick="event.preventDefault(); event.stopPropagation(); deleteWishlist('<%=wish._id%>', '<%=product._id%>')">
                <div class="delete-icon">🗑️</div></a>
 
           <img src="<%= product.productImage %>" alt="<%= product.productName %>" />
           <p class="product-name"><%= product.productName %></p>
           <p class="price"><%= product.Price %></p>
+           <a href="#" class="add-to-cart" id="addToCartt">
+            Add to Cart
+          </a>
+          <input type="text" id="PrroductId" value="<%=product.productId  %>">
         </div>
       <% }) %>
-    <% }) %>
+      <% } %>
   </div>
 <% } %>
 
@@ -187,7 +192,60 @@
         });
     }
 }
+document.getElementById("addToCartt").addEventListener("click", async function(event){
+    event.preventDefault(); 
 
+    const productId = document.getElementById("PrroductId").value;
+    const varientId = document.getElementById("variantId").value;
+    const quantities = 1;
+    const price = document.getElementById('priceValue').value;
+
+
+    try {
+        const response = await fetch("/user/add-Cart", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ productId, varientId, quantities ,price}) 
+        });
+
+        const data = await response.json();
+       console.log(data)
+        if (data.success) {
+            Swal.fire({
+                title: "Success",
+                text: data.success,
+                icon: "success",
+            });
+        } else if (data.existingCartItem) {
+            Swal.fire({ 
+                title: "Item Already in Cart",
+                text: data.existingCartItem,
+                icon: "warning",
+            });
+        } else if (data.variantDetails) {
+            Swal.fire({
+                title: "Variant Not Found",
+                text: data.variantDetails,
+                icon: "error",
+            });
+        } else {
+            Swal.fire({
+                title: "Error",
+                text: "Something went wrong!",
+                icon: "error",
+            });
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        Swal.fire({
+            title: "Error",
+            text: "Failed to add item to cart!",
+            icon: "error",
+        });
+    }
+});
 
   </script>
 </html>

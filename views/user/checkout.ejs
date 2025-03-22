@@ -689,17 +689,19 @@
     <h4>💳 Available Coupons</h4>
     <div class="coupon-list">
         <% availableCoupons.forEach(element => { %>
-            <div class="coupon-card">
-                <div class="coupon-left">
-                    <h5><%= element.name %></h5>
-                    <p>Minimum Purchase: $<%= element.minimumPrice %></p>
+            <% if (!element.expireOn || new Date(element.expireOn) >= new Date()) { %>
+                <div class="coupon-card">
+                    <div class="coupon-left">
+                        <h5><%= element.name %></h5>
+                        <p>Minimum Purchase: $<%= element.minimumPrice %></p>
+                    </div>
+                    <% if (totalPrice >= element.minimumPrice) { %>
+                        <button class="copy-btn" onclick="applyCoupon('<%= element.name %>')">Apply</button>
+                    <% } else { %>
+                        <button class="copy-btn" disabled>Not Eligible</button>
+                    <% } %>
                 </div>
-                <% if (totalPrice === element.minimumPrice) { %>
-                    <button class="copy-btn" onclick="applyCoupon('<%= element.name %>')">Apply</button>
-                <% } else { %>
-                    <button class="copy-btn" disabled>Not Eligible</button>
-                <% } %>
-            </div>
+            <% } %>
         <% }) %>
     </div>
 </div>
@@ -725,7 +727,8 @@
 
             <div class="total-price">
                 <span>Total</span>
-                <span>₹<span id="finalPrice"><%= totalPrice %></span></span>
+               <span>₹<span id="finalPrice"><%= Math.round(totalPrice) %></span></span>
+
             </div>
             
 </div>

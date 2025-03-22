@@ -15,7 +15,6 @@ const addCoupon = async (req, res) => {
   try {
     const { couponName, startDate, endDate, offerPrice, minimumPrice } =
       req.body;
-    console.log("Coupon Data Received:", req.body);
 
     if (!couponName || !startDate || !endDate || !offerPrice || !minimumPrice) {
       return res.status(400).json({ message: "All fields are required!" });
@@ -85,8 +84,38 @@ const toggleBlockCoupon = async (req, res) => {
   }
 };
 
+const editCoupon = async (req, res) => {
+  try {
+    console.log("Edit data in coupon:", req.body);
+
+    const { id, name, startDate, endDate, offerPrice, minimumPrice } = req.body;
+
+    if (!id) {
+      return res.status(400).json({ message: "Coupon ID is required" });
+    }
+
+    const updatedCoupon = await Coupon.findByIdAndUpdate(
+      id,
+      { name, startDate, endDate, offerPrice, minimumPrice },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedCoupon) {
+      return res.status(404).json({ message: "Coupon not found" });
+    }
+
+    res
+      .status(200)
+      .json({ message: "Coupon updated successfully", updatedCoupon });
+  } catch (error) {
+    console.error("Error updating coupon:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   loadcoupon,
   addCoupon,
   toggleBlockCoupon,
+  editCoupon,
 };

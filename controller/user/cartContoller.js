@@ -43,6 +43,7 @@ const AddCart = async (req, res) => {
   try {
     const userId = req.session.user;
     const { productId, varientId, quantities, price } = req.body;
+    console.log("when i click wishlist add to cart btn", req.body);
 
     const existingCartItem = await cart.findOne({
       userId,

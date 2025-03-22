@@ -36,6 +36,7 @@ const loadcheckout = async (req, res) => {
     const totalPrice = carts.reduce((sum, num) => sum + num.totalPrice, 0);
 
     const availableCoupons = await coupon.find({ isList: true });
+    console.log("available coupons", availableCoupons);
 
     res.render("user/checkout", {
       carts,

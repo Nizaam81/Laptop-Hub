@@ -5,11 +5,41 @@ const products = require("../../model/productSchema");
 
 const loadWishlist = async (req, res) => {
   try {
-    const wish = await wishhlist.find();
+    const userId = req.session.user;
+    const wish = await wishhlist.findOne({ userId: userId });
+
+    if (!wish || !wish.products) {
+      return res.render("user/wishlist", {
+        wish: [],
+        firstLetter: "",
+        users: "",
+      });
+    }
+
+    console.log("wishData", wish);
+    let x = wish.products;
+    console.log("products", x);
+
+    async function convert(productId) {
+      const y = await variant.findOne({ product: productId });
+      return y ? y._id : null; // Return `null` if variant is not found
+    }
+
+    // ✅ Fetch all `varientId`s in parallel
+    const variantIds = await Promise.all(
+      x.map((product) => convert(product.productId))
+    );
+
+    // ✅ Update the existing `wish.products` array correctly
+    wish.products.forEach((product, index) => {
+      product.varientId = variantIds[index]; // Assign the varientId
+    });
+
+    console.log("variantAdded", wish.products); // Should now include `varientId`
 
     res.render("user/wishlist", { wish, firstLetter: "", users: "" });
   } catch (error) {
-    console.log("error in wiahlist get route");
+    console.log("error in wishlist get route");
     console.error(error);
   }
 };
@@ -24,6 +54,7 @@ const Wishlist = async (req, res) => {
     }
 
     const productVariant = await variant.findById(productId);
+    console.log("product variant details", productVariant);
     if (!productVariant) {
       return res.status(404).json({ error: "Product variant not found" });
     }

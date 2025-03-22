@@ -317,44 +317,74 @@
   </body>
   <script>
    
-  function filterReport() {
-    const dateRange = document.getElementById('dateRange').value;
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
-
-    
-    fetch('/admin/SalesReport/filter', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ dateRange, startDate, endDate }),
+ function filterReport() {
+  const dateRange = document.getElementById('dateRange').value;
+  const startDate = document.getElementById('startDate').value;
+  const endDate = document.getElementById('endDate').value;
+  
+  fetch('/admin/SalesReport/filter', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ dateRange, startDate, endDate }),
+  })
+    .then(response => response.json())
+    .then(data => {
+      // Update table with the orders data
+      updateTable(data.orders);
+      
+      // Update the stats cards
+      updateStats(data.totalSale, data.totalOrder);
+      
+      // Update export links with new parameters
+      updateExportLinks(dateRange, startDate, endDate);
     })
-      .then(response => response.json())
-      .then(data => {
-        
-        updateTable(data);
-      })
-      .catch(error => console.error('Error:', error));
+    .catch(error => console.error('Error:', error));
+}
+
+function updateTable(orders) {
+  const tbody = document.querySelector('.report tbody');
+  tbody.innerHTML = ''; 
+
+  if (orders.length === 0) {
+    const row = document.createElement('tr');
+    row.innerHTML = '<td colspan="6">No orders found for the selected date range.</td>';
+    tbody.appendChild(row);
+    return;
   }
 
-  function updateTable(data) {
-    const tbody = document.querySelector('.report tbody');
-    tbody.innerHTML = ''; 
+  orders.forEach(order => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${new Date(order.createdOn).toLocaleDateString()}</td>
+      <td>#${order._id}</td>
+      <td>${order.userId.FirstName} ${order.userId.LastName}</td>
+      <td>$ ${order.totalPrice}</td>
+      <td>${order.paymentMethod}</td>
+      <td class="${order.paymentStatus}">${order.paymentStatus}</td>
+    `;
+    tbody.appendChild(row);
+  });
+}
 
-    data.forEach(order => {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${new Date(order.createdOn).toLocaleDateString()}</td>
-        <td>#${order._id}</td>
-        <td>${order.userId.FirstName} ${order.userId.LastName}</td>
-        <td>$ ${order.totalPrice}</td>
-        <td>${order.paymentMethod}</td>
-        <td class="${order.paymentStatus}">${order.paymentStatus}</td>
-      `;
-      tbody.appendChild(row);
-    });
-  }
+function updateStats(totalSale, totalOrder) {
+  // Update the stats cards with new values
+  document.querySelector('.card:nth-child(1) p').textContent = '$' + totalSale;
+  document.querySelector('.card:nth-child(2) p').textContent = totalOrder;
+}
+
+function updateExportLinks(dateRange, startDate, endDate) {
+  // Update the href of export links to include the new filter parameters
+  const pdfLink = document.querySelector('.export-btn-pdf');
+  const excelLink = document.querySelector('.export-btn-excel');
+  
+  pdfLink.href = `/admin/SalesReport/pdf?dateRange=${dateRange}&startDate=${startDate}&endDate=${endDate}`;
+  excelLink.href = `/admin/SalesReport/excel?dateRange=${dateRange}&startDate=${startDate}&endDate=${endDate}`;
+}
+
+
+
 
   </script>
 </html>

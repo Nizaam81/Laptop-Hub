@@ -25,13 +25,7 @@ const walletSchema = new mongoose.Schema(
           type: Number,
           required: true,
         },
-        // orderId: {
-        //     type: String,
-        //     ref: 'Order',
-        //     required: function() {
-        //         return this.type === 'Purchase' || this.type === 'Refund';
-        //     }
-        // },
+
         status: {
           type: String,
           enum: ["Completed", "Failed", "Pending"],
