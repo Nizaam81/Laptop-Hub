@@ -326,7 +326,11 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const findUser = await user.findOne({ isVerified: true, email: email });
+    const findUser = await user.findOne({
+      isVerified: true,
+      email: email,
+      isAdmin: false,
+    });
     if (!findUser) {
       return res.render("user/login", { message: "User not found" });
     }
