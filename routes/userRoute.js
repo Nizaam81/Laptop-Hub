@@ -135,6 +135,7 @@ routes.get("/wishlist", wishlist.loadWishlist);
 routes.post("/Wishlist", wishlist.Wishlist);
 routes.delete("/Wishlist/delete", wishlist.deleteWishlist);
 routes.get("/empty", wishlist.empty);
+routes.post("/wishlit-addtocart", wishlist.WishlistAddCart);
 
 //wallet
 routes.get("/wallet", wallet.loadWallet);

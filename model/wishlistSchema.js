@@ -14,6 +14,11 @@ const wishlistSchema = new Schema({
         ref: "Product", // Ensure consistency with your Product model
         required: true,
       },
+      varientId: {
+        type: Schema.Types.ObjectId,
+        ref: "variants",
+        required: true,
+      },
       productImage: {
         type: String,
         required: true,

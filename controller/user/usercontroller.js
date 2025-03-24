@@ -331,12 +331,16 @@ const login = async (req, res) => {
       email: email,
       isAdmin: false,
     });
+
     if (!findUser) {
       return res.render("user/login", { message: "User not found" });
     }
 
     if (findUser.isBlocked) {
       return res.render("user/login", { message: "User is blocked by admin" });
+    }
+    if (findUser.isAdmin) {
+      return res.render("user/login", { messagee: "This is not a User" });
     }
 
     const passwordMatch = await bcrypt.compare(password, findUser.password);
@@ -432,6 +436,7 @@ const loadproductDetails = async (req, res) => {
 
     let aggregationPipeline = [
       { $match: filterQuery },
+      { $match: { ramSize: "8GB" } },
       {
         $lookup: {
           from: "products",
@@ -469,6 +474,8 @@ const loadproductDetails = async (req, res) => {
         );
       });
     }
+
+    console.log(Products);
 
     const totalPages = Math.ceil(totalProducts / limit);
     const User = req.session.user;

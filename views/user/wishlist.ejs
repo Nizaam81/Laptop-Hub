@@ -97,26 +97,27 @@
     </style>
   </head>
   <body>
-    <% if (!wish || wish.products.length===0) { %>
+    <% if (wish.length==0) { %>
   <script>
     window.location.href = "/user/empty";
   </script>
 <% } else { %>
   <div class="wishlist-wrapper">
 
-      <% if (wish.products.length>0) { %>
-       <% wish.products.forEach(product => { %>
+      <% if (wish.length>0) { %>
+       <% wish.forEach(product => { %>
         <div class="wishlist-container">
-         <a href="#" onclick="event.preventDefault(); event.stopPropagation(); deleteWishlist('<%=wish._id%>', '<%=product._id%>')">
+         <a href="#" onclick="event.preventDefault(); event.stopPropagation(); deleteWishlist('<%=wish[0]._id%>', '<%=product.products._id%>')">
                <div class="delete-icon">🗑️</div></a>
 
-          <img src="<%= product.productImage %>" alt="<%= product.productName %>" />
-          <p class="product-name"><%= product.productName %></p>
-          <p class="price"><%= product.Price %></p>
+          <img src="<%= product.products.productImage %>" alt="<%= product.products.productName %>" />
+          <p class="product-name"><%= product.products.productName %></p>
+          <p class="price"><%= product.products.Price %></p>
            <a href="#" class="add-to-cart" id="addToCartt">
             Add to Cart
           </a>
-          <input type="text" id="PrroductId" value="<%=product.productId  %>">
+          <input type="hidden" id="varientId" value="<%=product.products.varientId  %>">
+          <input type="hidden" id="productId" value="<%=product.products.productId  %>">
         </div>
       <% }) %>
       <% } %>
@@ -195,19 +196,19 @@
 document.getElementById("addToCartt").addEventListener("click", async function(event){
     event.preventDefault(); 
 
-    const productId = document.getElementById("PrroductId").value;
-    const varientId = document.getElementById("variantId").value;
+    const productId = document.getElementById("productId").value;
+    const varientId = document.getElementById("varientId").value;
     const quantities = 1;
-    const price = document.getElementById('priceValue').value;
+    
 
 
     try {
-        const response = await fetch("/user/add-Cart", {
+        const response = await fetch("/user/wishlit-addtocart", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ productId, varientId, quantities ,price}) 
+            body: JSON.stringify({ productId, varientId, quantities }) 
         });
 
         const data = await response.json();
@@ -217,7 +218,10 @@ document.getElementById("addToCartt").addEventListener("click", async function(e
                 title: "Success",
                 text: data.success,
                 icon: "success",
-            });
+            }).then(()=>{
+                  window.location.reload()
+            })
+            
         } else if (data.existingCartItem) {
             Swal.fire({ 
                 title: "Item Already in Cart",

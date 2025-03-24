@@ -57,7 +57,6 @@ const loadPlaceOrder = async (req, res) => {
 
 const placeOrder = async (req, res) => {
   try {
-    console.log("HAIIIII");
     const userId = req.session.user;
     const { orderItems, totalPrice, address, paymentMethod } = req.body;
     if (paymentMethod === "cod" && totalPrice > 1000) {

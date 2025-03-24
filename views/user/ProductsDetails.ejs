@@ -15,7 +15,18 @@
         --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         --hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         --border-radius: 12px;
-    }
+    } 
+.wishlist {
+    font-size: 24px;
+    cursor: pointer;
+    transition: color 0.3s ease-in-out;
+    color: black;  
+}
+
+
+.wishlist.active {
+    color: red;
+}
 
     body {
         display: flex;
@@ -156,7 +167,13 @@
     .wishlist.active {
         color: #e11d48;
         transform: scale(1.1);
+    } .wishlist {
+        font-size: 1.25rem;
+        color: #6c757d;
+        cursor: pointer;
+        transition: color 0.2s ease;
     }
+
 
     .wishlist:hover {
         transform: scale(1.15);
@@ -572,9 +589,13 @@
         <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 product-card">
             <div class="card h-100 position-relative">
                 <form action="/user/productView">
-                    <button class="product-card-btn">
-                        <div class="card-img-container">
-                            <img src="<%= product.productDetails[0].images[0] %>" 
+
+                        <div onclick="getProductViewPage('<%= product.productDetails[0]._id %>','<%= product._id %>')" class="card-img-container ">
+                            <!-- Wishlist Icon -->
+                         <i class="fa-heart wishlist far" 
+                            data-product-id="<%= product._id %>"
+                            onclick="toggleWishlist(event, this)"></i>
+                                                     <img src="<%= product.productDetails[0].images[0] %>" 
                                 class="card-img-top"
                                 alt="<%= product.productDetails[0].name %>">
                             <div class="position-absolute top-2 end-2 m-2">
@@ -606,7 +627,7 @@
                                 </span>
                             <% } %>
                         </div>
-                    </button>
+                    
                 </form>
             </div>
         </div>
@@ -646,6 +667,9 @@
         const filterSidebar = document.getElementById('filterSidebar');
         const filterOverlay = document.getElementById('filterOverlay');
         const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+       
+
+      
         
         filterToggleBtn.addEventListener('click', function() {
             filterSidebar.classList.add('open');
@@ -749,35 +773,7 @@
         });
     });
 
-    async function toggleWishlist(element) {
-        const productId = element.getAttribute("data-product-id");
-        
-        const action = element.classList.contains("active") ? "remove" : "add";
-
-        try {
-            const response = await fetch("/user/Wishlist", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ productId, action }) 
-            });
-
-            const data = await response.json();
-            
-            if (data.success) {
-                if (action === "add") {
-                    element.classList.add("active", "fas");
-                    element.classList.remove("far");
-                } else {
-                    element.classList.remove("active", "fas");
-                    element.classList.add("far");
-                }
-            } else {
-                console.log("Error updating wishlist:", data.error);
-            }
-        } catch (error) { 
-            console.error("Error:", error);
-        }
-    }
+   
 
     function sorting() {
         // Get current URL and parameters
@@ -809,4 +805,44 @@
         // Redirect with all parameters
         window.location.href = `/user/productsDetails?${urlParams.toString()}`;
     }
+
+
+
+
+ async function toggleWishlist(event,element) {
+    event.stopPropagation()
+    console.log("haiii function is working ")
+        const variantId = element.getAttribute("data-product-id");
+    
+        
+        const action = element.classList.contains("active") ? "remove" : "add";
+
+        try {
+            const response = await fetch("/user/Wishlist", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ variantId, action }) 
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                if (action === "add") {
+                    element.classList.add("active"); 
+                } else {
+                    element.classList.remove("active"); 
+                }
+            } else {
+                console.log("Error updating wishlist:", data.error);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    }
+
+    function getProductViewPage(productId,varientId){
+        console.log("working2")
+        window.location.href = `/user/productView?productId=${productId}&varientId=${varientId}`;
+    }
+
 </script>

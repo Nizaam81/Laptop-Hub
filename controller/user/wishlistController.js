@@ -2,40 +2,20 @@ const wishhlist = require("../../model/wishlistSchema");
 const user = require("../../model/usersSchema");
 const variant = require("../../model/varient");
 const products = require("../../model/productSchema");
+const mongoose = require("mongoose");
+const cart = require("../../model/cartSchema");
+const ObjectId = mongoose.Types.ObjectId;
 
 const loadWishlist = async (req, res) => {
   try {
     const userId = req.session.user;
-    const wish = await wishhlist.findOne({ userId: userId });
-
-    if (!wish || !wish.products) {
-      return res.render("user/wishlist", {
-        wish: [],
-        firstLetter: "",
-        users: "",
-      });
-    }
-
-    console.log("wishData", wish);
-    let x = wish.products;
-    console.log("products", x);
-
-    async function convert(productId) {
-      const y = await variant.findOne({ product: productId });
-      return y ? y._id : null; // Return `null` if variant is not found
-    }
-
-    // ✅ Fetch all `varientId`s in parallel
-    const variantIds = await Promise.all(
-      x.map((product) => convert(product.productId))
-    );
-
-    // ✅ Update the existing `wish.products` array correctly
-    wish.products.forEach((product, index) => {
-      product.varientId = variantIds[index]; // Assign the varientId
-    });
-
-    console.log("variantAdded", wish.products); // Should now include `varientId`
+    const wish = await wishhlist.aggregate([
+      {
+        $match: { userId: new ObjectId(userId) },
+      },
+      { $unwind: "$products" },
+    ]);
+    console.log("wish", wish);
 
     res.render("user/wishlist", { wish, firstLetter: "", users: "" });
   } catch (error) {
@@ -47,13 +27,13 @@ const loadWishlist = async (req, res) => {
 const Wishlist = async (req, res) => {
   try {
     const userId = req.session.user;
-    const { productId, action } = req.body;
+    const { variantId, action } = req.body;
 
     if (!userId) {
       return res.status(401).json({ error: "User not authenticated" });
     }
 
-    const productVariant = await variant.findById(productId);
+    const productVariant = await variant.findById(variantId);
     console.log("product variant details", productVariant);
     if (!productVariant) {
       return res.status(404).json({ error: "Product variant not found" });
@@ -73,11 +53,14 @@ const Wishlist = async (req, res) => {
           products: [
             {
               productId: productDetails._id,
+              varientId: productVariant._id,
               productImage: productDetails.images[0],
               productName: productDetails.name,
             },
           ],
         });
+
+        console.log(userWishlist);
       } else {
         const productExists = userWishlist.products.some(
           (item) => item.productId.toString() === productDetails._id.toString()
@@ -86,6 +69,7 @@ const Wishlist = async (req, res) => {
         if (!productExists) {
           userWishlist.products.push({
             productId: productDetails._id,
+            varientId: productVariant._id,
             productImage: productDetails.images[0],
             productName: productDetails.name,
           });
@@ -152,9 +136,60 @@ const empty = async (req, res) => {
   }
 };
 
+const WishlistAddCart = async (req, res) => {
+  try {
+    const userId = req.session.user;
+    const { productId, varientId, quantities } = req.body;
+    console.log(req.body);
+
+    const existingCartItem = await cart.findOne({
+      userId,
+      VariantId: varientId,
+    });
+
+    if (existingCartItem) {
+      return res.json({
+        existingCartItem: "This variant is already in your cart.",
+      });
+    }
+
+    const variantDetails = await variant.findOne({ _id: varientId });
+
+    if (!variantDetails) {
+      return res.json({ variantDetails: "Variant not found." });
+    }
+
+    const TotalPrice = quantities * variantDetails.price;
+
+    let NewCart = new cart({
+      userId: userId,
+      productId: productId,
+      quantity: quantities,
+      price: Math.round(variantDetails.price),
+      totalPrice: TotalPrice,
+      VariantId: varientId,
+    });
+
+    await NewCart.save();
+    const updatedWishlist = await wishhlist.findOneAndUpdate(
+      {
+        userId: userId,
+      },
+      { $pull: { products: { productId: productId } } },
+      { new: true }
+    );
+
+    return res.json({ success: "Cart Added Successfully" });
+  } catch (error) {
+    console.log("Error in addCart controller:", error);
+    return res.status(500).json({ Wrong: "Something went wrong" });
+  }
+};
+
 module.exports = {
   loadWishlist,
   Wishlist,
   deleteWishlist,
   empty,
+  WishlistAddCart,
 };
