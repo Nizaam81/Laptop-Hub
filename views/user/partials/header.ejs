@@ -30,6 +30,8 @@
         padding: 15px 40px;
         color: white;
         height: 55px;
+        position: relative;
+        width: 100%;
       }
 
       .nav-left,
@@ -70,33 +72,84 @@
         transform: scale(1.2);
       }
 
+      .menu-toggle {
+        display: none;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+      }
+
+      /* Responsive Styles */
       @media (max-width: 768px) {
         .navbar {
-          flex-direction: column;
-          align-items: flex-start;
+          flex-wrap: wrap;
           height: auto;
           padding: 15px 20px;
         }
+
+        .menu-toggle {
+          display: block;
+          position: absolute;
+          right: 20px;
+          top: 15px;
+        }
+
         .nav-left,
         .nav-right {
+          width: 100%;
           flex-direction: column;
           align-items: flex-start;
-          width: 100%;
           gap: 10px;
+          display: none;
         }
-        .nav-right {
-          margin-left: 0;
+
+        .nav-left.active,
+        .nav-right.active {
+          display: flex;
+          margin-top: 10px;
+        }
+
+        .nav-left a,
+        .nav-right a {
+          width: 100%;
+        }
+      }
+
+      /* Small devices (phones) */
+      @media (max-width: 480px) {
+        .navbar {
+          padding: 15px 10px;
+        }
+
+        .nav-left a,
+        .nav-right a {
+          font-size: 1rem;
+          padding: 6px 8px;
+        }
+      }
+
+      /* Extra small devices */
+      @media (max-width: 320px) {
+        .nav-left a,
+        .nav-right a {
+          font-size: 0.9rem;
+          padding: 5px 6px;
         }
       }
     </style>
   </head>
   <body>
     <nav class="navbar">
-      <div class="nav-left">
+      <button class="menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="nav-left" id="navLeft">
         <a href="/user/home">Home</a>
         <a href="/user/ProductsDetails">Products</a>
       </div>
-      <div class="nav-right">
+      <div class="nav-right" id="navRight">
         <a href="cart">
           <i class="fa fa-shopping-cart" aria-hidden="true"></i>
           <span>Cart</span>
@@ -111,5 +164,25 @@
         <a href="/user/logout" class="logout">Logout</a>
       </div>
     </nav>
+
+    <script>
+      const menuToggle = document.getElementById("menuToggle");
+      const navLeft = document.getElementById("navLeft");
+      const navRight = document.getElementById("navRight");
+
+      menuToggle.addEventListener("click", function () {
+        navLeft.classList.toggle("active");
+        navRight.classList.toggle("active");
+
+        const icon = this.querySelector("i");
+        if (icon.classList.contains("fa-bars")) {
+          icon.classList.remove("fa-bars");
+          icon.classList.add("fa-times");
+        } else {
+          icon.classList.remove("fa-times");
+          icon.classList.add("fa-bars");
+        }
+      });
+    </script>
   </body>
 </html>

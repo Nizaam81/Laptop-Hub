@@ -6,6 +6,8 @@
     <title>Login Page</title>
      <!-- SweetAlert CDN -->
      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+     <!-- Font Awesome for the eye icon -->
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -20,7 +22,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
+            padding: 20px;
         }
 
         .container {
@@ -114,6 +117,7 @@
 
         .form-group {
             margin-bottom: 20px;
+            position: relative;
         }
 
         .form-group label {
@@ -209,25 +213,55 @@
             right: 0;
         }
 
-        .google-btn {
+       .google-btn {
             width: 100%;
             padding: 12px;
             background: white;
             border: 1px solid #ddd;
-            border-radius: 15px;
+            border-radius: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+            font-weight: 600;
+            color: #444;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .google-btn svg {
+            width: 22px;
+            height: 22px;
+            flex-shrink: 0;
         }
 
         .google-btn:hover {
-            background: #f8f9fa;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background: #f1f1f1;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Subtle animation effect on click */
+        .google-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Adding a slight gradient */
+        .google-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.05));
+            z-index: 0;
+            border-radius: 50px;
         }
 
         .signup-link {
@@ -246,21 +280,62 @@
 
         .signup-link a:hover {
             color: #1d4ed8;
-        }  .toggle-password {
+        }  
+        
+        .toggle-password {
             position: absolute;
-            right: 46px;
-            top: 42%;
-            transform: translateY(-50%);
+            right: 15px;
+            top: 41px;
             cursor: pointer;
-            font-size: 18px;
-            color: #666;
-        } .error-message {
-        color: red;
-        font-size: 14px;
-        margin-top: 5px;
-        display: none;
-        line-height: 1.5;
-      }
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            transition: all 0.2s ease;
+            opacity: 0.6;
+            background-color: transparent;
+            border-radius: 50%;
+        }
+        
+        .toggle-password:hover {
+            opacity: 1;
+            background-color: rgba(37, 99, 235, 0.08);
+        }
+        
+        .toggle-password i {
+            font-size: 16px;
+            color: #555;
+            line-height: 1;
+            display: block;
+        }
+        
+        /* Style for showing active state */
+        .toggle-password.active i {
+            color: #2563eb;
+        }
+        
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+            line-height: 1.5;
+        }
+
+        /* Alert message styling */
+        .alert {
+            color: #d32f2f; 
+            font-weight: bold; 
+            padding: 12px; 
+            border-radius: 6px; 
+            background-color: #ffebee; 
+            width: 100%; 
+            text-align: center; 
+            margin-bottom: 15px; 
+            border: 1px solid #d32f2f;
+        }
 
         @media (max-width: 768px) {
             .container {
@@ -275,11 +350,82 @@
 
             .right-side {
                 border-radius: 0 0 30px 30px;
+                padding: 30px 20px;
             }
 
             .illustration {
                 width: 100px;
                 height: 100px;
+            }
+            
+            .toggle-password {
+                right: 12px;
+            }
+            
+            .google-btn {
+                font-size: 14px;
+                padding: 10px;
+            }
+            
+            .google-btn svg {
+                width: 18px;
+                height: 18px;
+            }
+        }
+        
+        /* Fix for small mobile devices */
+        @media (max-width: 350px) {
+            .remember-forgot {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .right-side {
+                padding: 20px 15px;
+            }
+            
+            .login-header h1 {
+                font-size: 20px;
+            }
+            
+            .form-group input {
+                padding: 10px;
+            }
+            
+            .submit-btn {
+                padding: 10px;
+                font-size: 14px;
+            }
+            
+            .google-btn {
+                padding: 8px;
+                font-size: 13px;
+                gap: 8px;
+            }
+            
+            .google-btn svg {
+                width: 16px;
+                height: 16px;
+            }
+        }
+
+        /* Additional responsive adjustments for various screen sizes */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                width: 95%;
+            }
+        }
+
+        /* Ensure vertical layout on portrait-oriented mobile devices */
+        @media (max-height: 600px) {
+            body {
+                align-items: flex-start;
+                padding-top: 20px;
             }
         }
     </style>
@@ -297,28 +443,27 @@
                 <h1>Sign In</h1>
             </div>
             
-            <form id="loginForm"  method="post" action="/user/login">
+            <form id="loginForm" method="post" action="/user/login">
+                <% if (locals.message && message.length > 0) { %>
+                    <div class="alert">
+                        <%= message %>
+                    </div>
+                <% } %>
+                
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" name="email" id="email"  placeholder="Enter your email">
-                     <div id="error1" class="error-message"></div>
+                    <input type="email" name="email" id="email" placeholder="Enter your email">
+                    <div id="error1" class="error-message"></div>
                 </div>
                 
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" name="password" id="password"  placeholder="Enter your password">
-                     <div id="error2" class="error-message"></div>
-                    <span class="toggle-password" onclick="togglePassword()">👁️</span>
+                    <input type="password" id="password" name="password" placeholder="Enter your password">
+                    <span class="toggle-password" id="togglePassword">
+                        <i class="fas fa-eye-slash"></i>
+                    </span>
+                    <div id="error2" class="error-message"></div>
                 </div>
-                <% if (locals.message && message.length > 0) { %>
-                    <div class="alert alert-danger text-center" 
-                        style="color: #d32f2f; font-weight: bold; padding: 12px; 
-                               border-radius: 6px; background-color: #ffebee; 
-                               width: 100%; text-align: center; margin-top: 5px; 
-                               border: 1px solid #d32f2f;">
-                        <%= message %>
-                    </div>
-                <% } %>
                 
                 <div class="remember-forgot">
                     <label class="remember-me">
@@ -334,9 +479,9 @@
                 <a href="/user/auth/google" class="google-btn" aria-label="Continue with Google">
                     <svg width="20" height="20" viewBox="0 0 24 24" role="img" aria-hidden="true">
                         <title>Google Logo</title>
-                           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"></path>
-                           <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"></path>
-                         <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"></path>
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"></path>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"></path>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"></path>
                         <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"></path>
                     </svg>
                     <span>Continue with Google</span>
@@ -351,72 +496,83 @@
 
     <script>
      document.addEventListener('DOMContentLoaded', function() {
-    const loginForm = document.getElementById('loginForm');
-    
-    const emailInput = document.getElementById('email');
-      const error1 = document.getElementById("error1")
-    const passwordInput = document.getElementById('password');
-      const error2 = document.getElementById("error2")
+        const loginForm = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const error1 = document.getElementById("error1");
+        const passwordInput = document.getElementById('password');
+        const error2 = document.getElementById("error2");
+        const togglePassword = document.getElementById('togglePassword');
 
-    loginForm.addEventListener('submit', function(event) {
-        event.preventDefault();
-        const emailValue = emailInput.value.trim();
-        const passwordValue = passwordInput.value.trim();
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regular expression for email validation
+        // Password toggle functionality
+        togglePassword.addEventListener('click', function() {
+            // Toggle the type attribute
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // Toggle the eye / eye-slash icon
+            this.querySelector('i').classList.toggle('fa-eye');
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+            
+            // Toggle active class for styling
+            this.classList.toggle('active');
+        });
 
-        if (!emailValue) {
-            error1.style.display="block"
-            error1.innerHTML="Please enter your email";
-               hideErrorAfterDelay(error1);
-            return;
-        }
-        
-        if (!emailPattern.test(emailValue)) {
-            error1.style.display="block"
-            error1.innerHTML="Please enter a valid email address";
-               hideErrorAfterDelay(error1);
-            return;
-        }
-        
-        if (!passwordValue) {
+        loginForm.addEventListener('submit', function(event) {
             event.preventDefault();
-            error2.style.display="block"
-            error2.innerHTML="Please enter your password";
-               hideErrorAfterDelay(error2);
-            return;
-        }
-        
-        if (passwordValue.length < 6) {
-            event.preventDefault();
-            error2.style.display="block"
-            error2.innerHTML="Password must be at least 6 characters long";
+            const emailValue = emailInput.value.trim();
+            const passwordValue = passwordInput.value.trim();
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regular expression for email validation
+
+            if (!emailValue) {
+                error1.style.display="block";
+                error1.innerHTML="Please enter your email";
+                hideErrorAfterDelay(error1);
+                return;
+            }
+            
+            if (!emailPattern.test(emailValue)) {
+                error1.style.display="block";
+                error1.innerHTML="Please enter a valid email address";
+                hideErrorAfterDelay(error1);
+                return;
+            }
+            
+            if (!passwordValue) {
+                error2.style.display="block";
+                error2.innerHTML="Please enter your password";
                 hideErrorAfterDelay(error2);
-            return;
-        }
+                return;
+            }
+            
+            if (passwordValue.length < 6) {
+                error2.style.display="block";
+                error2.innerHTML="Password must be at least 6 characters long";
+                hideErrorAfterDelay(error2);
+                return;
+            }
 
-        loginForm.submit();
+            loginForm.submit();
+        });
+        
+        function hideErrorAfterDelay(element) {
+            setTimeout(() => {
+                element.style.display = "none";
+            }, 3000); 
+        }
+        
+        // Function to check viewport size and make adjustments if needed
+        function checkViewportSize() {
+            if (window.matchMedia("(max-width: 768px)").matches) {
+                // Additional mobile-specific adjustments can be made here
+            }
+        }
+        
+        // Run on page load
+        checkViewportSize();
+        
+        // Run when window is resized
+        window.addEventListener('resize', checkViewportSize);
     });
-});
-function hideErrorAfterDelay(element) {
-          setTimeout(() => {
-            element.style.display = "none";
-          }, 3000); 
-        }
-
-
-function togglePassword() {
-    const passwordInput = document.getElementById('password');
-    const toggleIcon = document.querySelector('.toggle-password');
-
-    if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        toggleIcon.textContent = '👁️‍🗨️';
-    } else {
-        passwordInput.type = 'password';
-        toggleIcon.textContent = '👁️';
-    }
-}
-
     </script>
 </body>
 </html>
