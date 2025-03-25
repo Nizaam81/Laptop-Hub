@@ -74,7 +74,7 @@ const addProduct = async (req, res) => {
 
     return res.json({ success: "Product Addedd Successfully" });
   } catch (error) {
-    console.log(error);
+    console.log(error.message);
   }
 };
 module.exports = {
