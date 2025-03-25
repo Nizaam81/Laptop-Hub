@@ -13,7 +13,12 @@ const loadAddress = async (req, res) => {
     console.log("address fata ", addreses);
     const user = await User.findById(userId); // Fetch user details
 
-    res.render("user/address", { firstLetter: "", user, addreses, users: "" });
+    const userid = req.session.user;
+
+    const users = await User.findOne({ _id: userid });
+    const firstLetter = users.FirstName.charAt(0);
+
+    res.render("user/address", { firstLetter, user, addreses, users });
   } catch (error) {
     console.error("loadAddress function error", error);
     res.status(500).send("Internal Server Error");

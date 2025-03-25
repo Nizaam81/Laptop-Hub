@@ -551,7 +551,10 @@
               Cancel Order
             </button>
             <button class="btn btn-support">Need Help?</button>
-            <button class="btn download-btn" onclick="downloadInvoice('<%= order._id %>')">📥 Download Invoice</button>
+            <% if (order.paymentStatus==="Paid") { %>
+             <button class="btn download-btn" onclick="downloadInvoice('<%= order._id %>')">📥 Download Invoice</button>
+            <% } %>
+            
           </div>
         </div>
       </div>
@@ -593,13 +596,13 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function initializeButtons() {
-    // Initialize all retry payment buttons
+   
     console.log('Initializing retry buttons');
     const retryButtons = document.querySelectorAll('.retry-btn');
     console.log('Found retry buttons:', retryButtons.length);
     
     retryButtons.forEach(button => {
-      // Remove existing event listeners to prevent duplicates
+     
       const newButton = button.cloneNode(true);
       button.parentNode.replaceChild(newButton, button);
       
@@ -608,12 +611,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const orderId = this.getAttribute('data-order-id');
         console.log('Order ID:', orderId);
         
-        // Store original button text before any operations
+       
         const originalText = this.innerHTML;
           console.log('Sending fetch request to /user/retryPayment with orderId:', orderId);
 
         try {
-          // Disable button and show loading state
+         
           this.disabled = true;
           this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
 

@@ -343,9 +343,20 @@ document.getElementById("couponForm").addEventListener("submit", async (event) =
     const offer = document.getElementById("offerPrice").value.trim();
     const minimum = document.getElementById("minimumPrice").value.trim();
 
- 
     if (!coupon || !date || !endDate || !offer || !minimum) {
         showToast("Please fill all fields", "error");
+        return;
+    }
+
+    // Validate offer price - must be positive number and at least 10
+    if (!/^\d+$/.test(offer) || parseInt(offer) < 10) {
+        showToast("Offer price must be a positive number starting from 10", "error");
+        return;
+    }
+
+    // Validate minimum price - must be positive number and at least 10
+    if (!/^\d+$/.test(minimum) || parseInt(minimum) < 10) {
+        showToast("Minimum price must be a positive number starting from 10", "error");
         return;
     }
 

@@ -37,12 +37,16 @@ const loadcheckout = async (req, res) => {
 
     const availableCoupons = await coupon.find({ isList: true });
     console.log("available coupons", availableCoupons);
+    const userid = req.session.user;
+
+    const users = await user.findOne({ _id: userid });
+    const firstLetter = users.FirstName.charAt(0);
 
     res.render("user/checkout", {
       carts,
       totalPrice,
-      firstLetter: "",
-      users: "",
+      firstLetter,
+      users,
       Adress,
       availableCoupons,
     });

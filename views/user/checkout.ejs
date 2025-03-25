@@ -663,6 +663,7 @@
                     <p><strong><%= element.productDetails[0].name %></strong></p>
                     <p class="price">₹<%= element.price %></p>
                     <p><i class="fas fa-box"></i> Qty: <%= element.quantity %></p>
+                    <input type="hidden" id="varianId" value="<%= element.variantDetails[0]._id %>">
                 </div>
             </div>
         <% }) %>
@@ -897,7 +898,8 @@ document.getElementById("applyCoupon").addEventListener("click", async function(
     let cartItems = <%- JSON.stringify((carts || []).map(element => ({
         product: element?.productDetails?.[0]?._id || "",
         quantity: element?.quantity || 0,
-        price: element?.variantDetails?.[0]?.price || 0
+        price: element?.variantDetails?.[0]?.price || 0,
+        variantid:element?.variantDetails?.[0]._id|| ""
     }))) %>;
 
     let orderData = {

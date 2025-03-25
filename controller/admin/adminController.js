@@ -37,7 +37,7 @@ const login = async (req, res) => {
     req.session.admin = admin;
     res.status(200).json({
       message: "Login successful",
-      redirectUrl: "/admin/home",
+      redirectUrl: "/admin/dashboard",
     });
   } catch (error) {
     console.error("admin/login error", error);
@@ -57,7 +57,6 @@ const logout = async (req, res) => {
   try {
     req.session.destroy((err) => {
       if (err) {
-        console.log("session destruction error", err.message);
         res.redirect("user/pageNotfound");
       }
       return res.redirect("/admin/login");
@@ -152,26 +151,27 @@ const loadDashboard = async (req, res) => {
       revenueData[item._id.month - 1] = item.total;
     });
 
-    const bestProducts = await product.aggregate([
+    const bestProducts = await order.aggregate([
+      { $unwind: "$orderItem" },
       {
         $lookup: {
-          from: "orders",
-          localField: "_id",
-          foreignField: "orderItem.product",
-          as: "orderData",
+          from: "products",
+          localField: "orderItem.product",
+          foreignField: "_id",
+          as: "productData",
         },
       },
-      { $unwind: "$orderData" },
+      { $unwind: "$productData" },
       {
         $match: {
-          "orderData.createdOn": { $gte: startDate },
+          createdOn: { $gte: startDate },
         },
       },
       {
         $group: {
-          _id: "$_id",
-          name: { $first: "$name" },
-          totalSold: { $sum: "$orderData.orderItem.quantity" },
+          _id: "$productData._id",
+          name: { $first: "$productData.name" },
+          totalSold: { $sum: "$orderItem.quantity" },
         },
       },
       { $sort: { totalSold: -1 } },
@@ -333,7 +333,6 @@ const loadDashboard = async (req, res) => {
       formattedOrders,
       salesByCategory: salesByCategoryWithPercentage,
     };
-    console.log(dashboardData);
 
     res.render("admin/dashboard", { dashboardData });
   } catch (error) {

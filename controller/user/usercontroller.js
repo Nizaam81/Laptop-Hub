@@ -475,8 +475,6 @@ const loadproductDetails = async (req, res) => {
       });
     }
 
-    console.log(Products);
-
     const totalPages = Math.ceil(totalProducts / limit);
     const User = req.session.user;
 
@@ -532,7 +530,6 @@ const loadForgotpassword = async (req, res) => {
 
 const forgotPassword = async (req, res) => {
   try {
-    console.log("haai");
     const { email } = req.body;
     console.log(req.body);
 
@@ -556,11 +553,18 @@ const forgotPassword = async (req, res) => {
         message: "Failed to send verification email",
       });
     }
+    const userDetails = await user.findOne({ email: email });
 
-    // Store OTP in session
     req.session.resetPasswordOtp = otp;
     req.session.resetPasswordEmail = email;
     req.session.otpTimestamp = Date.now();
+    req.session.userData = {
+      Fname: userDetails.FirstName,
+      Lname: userDetails.LastName,
+      phone: userDetails.phone,
+      email,
+      password: await bcrypt.hash(userDetails.password, 10),
+    };
     console.log("OTP sent", otp);
 
     return res.status(200).json({
@@ -695,8 +699,12 @@ const referal = async (req, res) => {
   try {
     const userId = req.session.user;
     const data = await user.findById(userId);
+    const userid = req.session.user;
 
-    res.render("user/referal", { users: "", firstLetter: "", data });
+    const users = await user.findOne({ _id: userid });
+    const firstLetter = users.FirstName.charAt(0);
+
+    res.render("user/referal", { users, firstLetter, data });
   } catch (error) {
     console.log(error);
     console.log("error in referal get controler in user controller");

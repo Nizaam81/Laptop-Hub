@@ -1,325 +1,340 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <title>Admin Login</title>
     <!-- SweetAlert CDN -->
-   
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
 
-        body {
-            background-color: #f5f5f5;
-            background-image: linear-gradient(135deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.1) 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+      body {
+        background-color: #f5f5f5;
+        background-image: linear-gradient(
+          135deg,
+          rgba(0, 0, 0, 0.05) 0%,
+          rgba(0, 0, 0, 0.1) 100%
+        );
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
 
+      .container {
+        background: white;
+        border-radius: 30px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        width: 90%;
+        max-width: 800px;
+        overflow: hidden;
+        display: grid;
+        grid-template-columns: 35% 65%;
+        position: relative;
+      }
+
+      .container::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          45deg,
+          rgba(0, 0, 0, 0.02) 0%,
+          rgba(0, 0, 0, 0.05) 100%
+        );
+        pointer-events: none;
+        border-radius: 30px;
+      }
+
+      .left-side {
+        background: #2563eb;
+        padding: 30px;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        position: relative;
+        border-radius: 30px 0 0 30px;
+        overflow: hidden;
+      }
+
+      .left-side::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          45deg,
+          rgba(0, 0, 0, 0.1) 0%,
+          rgba(0, 0, 0, 0.2) 100%
+        );
+        pointer-events: none;
+      }
+
+      .illustration {
+        width: 150px;
+        height: 150px;
+        margin-bottom: 20px;
+        position: relative;
+        z-index: 1;
+        border-radius: 20px;
+      }
+
+      .left-side h2 {
+        font-size: 18px;
+        margin-bottom: 10px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .left-side p {
+        font-size: 14px;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+      }
+
+      .right-side {
+        padding: 40px;
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border-radius: 0 30px 30px 0;
+      }
+
+      .login-header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .login-header h1 {
+        color: #333;
+        font-size: 24px;
+        margin-bottom: 10px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 15px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.9);
+      }
+
+      .form-group input:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      }
+
+      .remember-forgot {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        font-size: 14px;
+      }
+
+      .remember-me {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .forgot-password {
+        color: #2563eb;
+        text-decoration: none;
+        transition: color 0.3s ease;
+      }
+
+      .forgot-password:hover {
+        color: #1d4ed8;
+      }
+
+      .submit-btn {
+        width: 100%;
+        padding: 12px;
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 15px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+      }
+
+      .submit-btn:hover {
+        background: #1d4ed8;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(37, 99, 235, 0.3);
+      }
+
+      .signup-link {
+        text-align: center;
+        font-size: 14px;
+        color: #666;
+        margin-top: 20px;
+      }
+
+      .signup-link a {
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+      }
+
+      .signup-link a:hover {
+        color: #1d4ed8;
+      }
+
+      @media (max-width: 768px) {
         .container {
-            background: white;
-            border-radius: 30px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            width: 90%;
-            max-width: 800px;
-            overflow: hidden;
-            display: grid;
-            grid-template-columns: 35% 65%;
-            position: relative;
-        }
-
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.05) 100%);
-            pointer-events: none;
-            border-radius: 30px;
+          grid-template-columns: 1fr;
+          max-width: 400px;
         }
 
         .left-side {
-            background: #2563eb;
-            padding: 30px;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            position: relative;
-            border-radius: 30px 0 0 30px;
-            overflow: hidden;
-        }
-
-        .left-side::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.2) 100%);
-            pointer-events: none;
-        }
-
-        .illustration {
-            width: 150px;
-            height: 150px;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
-            border-radius: 20px;
-        }
-
-        .left-side h2 {
-            font-size: 18px;
-            margin-bottom: 10px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .left-side p {
-            font-size: 14px;
-            opacity: 0.9;
-            position: relative;
-            z-index: 1;
+          border-radius: 30px 30px 0 0;
+          padding: 20px;
         }
 
         .right-side {
-            padding: 40px;
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            border-radius: 0 30px 30px 0;
+          border-radius: 0 0 30px 30px;
         }
 
-        .login-header {
-            text-align: center;
-            margin-bottom: 30px;
+        .illustration {
+          width: 100px;
+          height: 100px;
         }
-
-        .login-header h1 {
-            color: #333;
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 15px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.9);
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .remember-forgot {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-
-        .remember-me {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .forgot-password {
-            color: #2563eb;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .forgot-password:hover {
-            color: #1d4ed8;
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 12px;
-            background: #2563eb;
-            color: white;
-            border: none;
-            border-radius: 15px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
-        }
-
-        .submit-btn:hover {
-            background: #1d4ed8;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(37, 99, 235, 0.3);
-        }
-
-        .signup-link {
-            text-align: center;
-            font-size: 14px;
-            color: #666;
-            margin-top: 20px;
-        }
-
-        .signup-link a {
-            color: #2563eb;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        .signup-link a:hover {
-            color: #1d4ed8;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                grid-template-columns: 1fr;
-                max-width: 400px;
-            }
-
-            .left-side {
-                border-radius: 30px 30px 0 0;
-                padding: 20px;
-            }
-
-            .right-side {
-                border-radius: 0 0 30px 30px;
-            }
-
-            .illustration {
-                width: 100px;
-                height: 100px;
-            }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <div class="left-side">
-            <img src="https://account.asus.com/img/login_img02.png" alt="Admin Login" class="illustration">
-            <h2>Welcome, Admin!</h2>
-            <p>Sign in to manage your dashboard</p>
+      <div class="left-side">
+        <img
+          src="https://account.asus.com/img/login_img02.png"
+          alt="Admin Login"
+          class="illustration"
+        />
+        <h2>Welcome, Admin!</h2>
+        <p>Sign in to manage your dashboard</p>
+      </div>
+
+      <div class="right-side">
+        <div class="login-header">
+          <h1>Admin Login</h1>
         </div>
 
-        <div class="right-side">
-            <div class="login-header">
-                <h1>Admin Login</h1>
-            </div>
+        <form id="adminLoginForm" method="post" action="/admin/login">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input
+              type="email"
+              name="email"
+              id="email"
+              required
+              placeholder="Enter your admin email"
+            />
+          </div>
 
-           
-            <form id="adminLoginForm" method="post" action="/admin/login">
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" name="email" id="email" required placeholder="Enter your admin email">
-                </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              required
+              placeholder="Enter your password"
+            />
+          </div>
 
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" name="password" id="password" required placeholder="Enter your password">
-                </div>
+          <div class="remember-forgot">
+            <label class="remember-me">
+              <input type="checkbox" id="remember" />
+              <span>Remember me</span>
+            </label>
+          </div>
 
-                <div class="remember-forgot">
-                    <label class="remember-me">
-                        <input type="checkbox" id="remember">
-                        <span>Remember me</span>
-                    </label>
-                    <a href="#" class="forgot-password">Forgot password?</a>
-                </div>
-
-                <button type="submit" class="submit-btn" id="signin">Sign In</button>
-            </form>
-        </div>
+          <button type="submit" class="submit-btn" id="signin">Sign In</button>
+        </form>
+      </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-       async function handleLogin(e) {
-  e.preventDefault();
+      async function handleLogin(e) {
+        e.preventDefault();
 
-  try {
-    const response = await fetch('/admin/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        email: document.getElementById('email').value,
-        password: document.getElementById('password').value
-      })
-    });
+        try {
+          const response = await fetch("/admin/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: document.getElementById("email").value,
+              password: document.getElementById("password").value,
+            }),
+          });
 
-    const data = await response.json();
-
-    if (response.ok) {
-      if (typeof Swal !== 'undefined') {
-        await Swal.fire({
-          icon: 'success',
-          title: 'Login Successful!',
-          text: 'Redirecting to dashboard...',
-          timer: 1500,
-          showConfirmButton: false
-        });
+          if (response.ok) {
+            window.location.href = "/admin/dashboard"; // Directly redirect on success
+          } else {
+            Swal.fire({
+              toast: true,
+              position: "top-end",
+              icon: "error",
+              title: "Login Failed",
+              text: "Invalid credentials",
+              showConfirmButton: false,
+              timer: 2000,
+            });
+          }
+        } catch (error) {
+          console.error("Login failed:", error);
+          Swal.fire({
+            toast: true,
+            position: "top-end",
+            icon: "error",
+            title: "Something went wrong!",
+            showConfirmButton: false,
+            timer: 2000,
+          });
+        }
       }
-      window.location.href = data.redirectUrl;
-    } else {
-      if (typeof Swal !== 'undefined') {
-        await Swal.fire({
-          icon: 'error',
-          title: 'Login Failed',
-          text: data.message || 'Invalid credentials',
-          confirmButtonColor: '#2563eb'
-        });
-      } else {
-        alert(`Login failed: ${data.message || 'Invalid credentials'}`);
-      }
-    }
-  } catch (error) {
-    console.error('Login failed:', error);
-    if (typeof Swal !== 'undefined') {
-      await Swal.fire({
-        icon: 'error',
-        title: 'An error occurred',
-        text: 'Something went wrong',
-        confirmButtonColor: '#2563eb'
-      });
-    } else {
-      alert('An error occurred. Please try again later.');
-    }
-  }
-}
 
-document.getElementById('adminLoginForm').addEventListener('submit', handleLogin);
+      document
+        .getElementById("adminLoginForm")
+        .addEventListener("submit", handleLogin);
     </script>
-    
-</body>
+  </body>
 </html>

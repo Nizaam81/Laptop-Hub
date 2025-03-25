@@ -32,7 +32,12 @@ const loadCart = async (req, res) => {
     const totalPrice = carts.reduce((sum, num) => {
       return (sum += num.totalPrice);
     }, 0);
-    res.render("user/cart", { carts, totalPrice, firstLetter: "", users: "" });
+
+    const userid = req.session.user;
+
+    const users = await user.findOne({ _id: userid });
+    const firstLetter = users.FirstName.charAt(0);
+    res.render("user/cart", { carts, totalPrice, firstLetter, users });
   } catch (error) {
     console.log("Error in loadCart");
     console.error(error);
@@ -43,7 +48,6 @@ const AddCart = async (req, res) => {
   try {
     const userId = req.session.user;
     const { productId, varientId, quantities, price } = req.body;
-    console.log("when i click wishlist add to cart btn", req.body);
 
     const existingCartItem = await cart.findOne({
       userId,

@@ -13,6 +13,11 @@ const orderSchema = new Schema({
       product: { type: Schema.Types.ObjectId, ref: "product", required: true },
       quantity: { type: Number, required: true },
       price: { type: Number, default: 0 },
+      variantid: {
+        type: Schema.Types.ObjectId,
+        ref: "variant",
+        required: true,
+      },
       status: {
         type: String,
         required: true,

@@ -156,7 +156,7 @@
         // Validation Patterns
         const alphabetPattern = /^[A-Za-z\s]+$/;  // Only alphabets and spaces
         const pincodePattern = /^[1-9][0-9]{5}$/; // 6-digit positive number, cannot start with 0
-        const phonePattern = /^[6-9]\d{9}$/;      // 10-digit number, starts with 6-9
+        const phonePattern = /^[1-9]\d{9}$/;      // 10-digit number, starts with 6-9
 
         if (!addressType || !name || !city || !state || !pincode || !phone) {
             return Swal.fire("Error!", "All fields except Alternate Phone are required.", "error");

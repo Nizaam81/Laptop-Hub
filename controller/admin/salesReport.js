@@ -4,7 +4,7 @@ const ExcelJS = require("exceljs");
 
 const loadSaleReportPage = async (req, res) => {
   try {
-    const { dateRange, startDate, endDate } = req.query;
+    const { dateRange, startDate, endDate, page = 1, limit = 10 } = req.query;
 
     const isValidDate = (dateString) => {
       const date = new Date(dateString);
@@ -22,6 +22,18 @@ const loadSaleReportPage = async (req, res) => {
       ? new Date(endDate)
       : defaultEndDate;
 
+    // Count total documents for pagination
+    const totalDocs = await order.countDocuments({
+      createdOn: {
+        $gte: parsedStartDate,
+        $lte: parsedEndDate,
+      },
+    });
+
+    const totalPages = Math.ceil(totalDocs / limit);
+    const currentPage = Math.min(Math.max(1, parseInt(page)), totalPages);
+    const skip = (currentPage - 1) * limit;
+
     const orderData = await order
       .find({
         createdOn: {
@@ -30,18 +42,28 @@ const loadSaleReportPage = async (req, res) => {
         },
       })
       .sort({ createdOn: -1 })
+      .skip(skip)
+      .limit(parseInt(limit))
       .populate("userId", "FirstName LastName");
-    console.log("total order", orderData);
+
     const totalSale = orderData.reduce((sum, num) => {
       return (sum += num.totalPrice);
     }, 0);
+    console.log("price", totalSale);
     res.render("admin/salesReport", {
       dateRange: dateRange || "last7days",
       startDate: parsedStartDate.toISOString().split("T")[0],
       endDate: parsedEndDate.toISOString().split("T")[0],
       orderData: orderData,
       totalSale,
-      totalOrder: orderData.length,
+      totalOrder: totalDocs,
+      pagination: {
+        currentPage,
+        totalPages,
+        hasNextPage: currentPage < totalPages,
+        hasPrevPage: currentPage > 1,
+        limit: parseInt(limit),
+      },
     });
   } catch (error) {
     console.error("Error loading sales report page:", error);
@@ -377,44 +399,119 @@ const generateExcel = async (req, res) => {
 };
 const filterSalesReport = async (req, res) => {
   try {
-    const { dateRange, startDate, endDate } = req.body;
+    const { dateRange, startDate, endDate, page = 1, limit = 10 } = req.body;
 
-    let query = {};
-
-    if (dateRange === "1day") {
-      const oneDayAgo = new Date();
-      oneDayAgo.setDate(oneDayAgo.getDate() - 1);
-      query.createdOn = { $gte: oneDayAgo };
-    } else if (dateRange === "1week") {
-      const oneWeekAgo = new Date();
-      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-      query.createdOn = { $gte: oneWeekAgo };
-    } else if (dateRange === "1month") {
-      const oneMonthAgo = new Date();
-      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-      query.createdOn = { $gte: oneMonthAgo };
-    } else if (dateRange === "custom" && startDate && endDate) {
-      query.createdOn = { $gte: new Date(startDate), $lte: new Date(endDate) };
+    // Validate inputs
+    if (!dateRange || isNaN(page) || isNaN(limit)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid input parameters",
+      });
     }
 
-    const filteredOrders = await order
+    // Initialize query object
+    let query = {};
+    const today = new Date();
+    today.setHours(23, 59, 59, 999); // Set to end of day
+
+    // Handle date ranges
+    switch (dateRange) {
+      case "1day":
+        const oneDayAgo = new Date(today);
+        oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+        query.createdOn = { $gte: oneDayAgo, $lte: today };
+        break;
+
+      case "1week":
+        const oneWeekAgo = new Date(today);
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        query.createdOn = { $gte: oneWeekAgo, $lte: today };
+        break;
+
+      case "1month":
+        const oneMonthAgo = new Date(today);
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+        query.createdOn = { $gte: oneMonthAgo, $lte: today };
+        break;
+
+      case "custom":
+        if (!startDate || !endDate) {
+          return res.status(400).json({
+            success: false,
+            message: "Both start and end dates are required for custom range",
+          });
+        }
+
+        const customStart = new Date(startDate);
+        const customEnd = new Date(endDate);
+        customEnd.setHours(23, 59, 59, 999); // Include full end day
+
+        if (isNaN(customStart.getTime()) || isNaN(customEnd.getTime())) {
+          return res.status(400).json({
+            success: false,
+            message: "Invalid date format",
+          });
+        }
+
+        if (customStart > customEnd) {
+          return res.status(400).json({
+            success: false,
+            message: "Start date cannot be after end date",
+          });
+        }
+
+        query.createdOn = { $gte: customStart, $lte: customEnd };
+        break;
+
+      default:
+        return res.status(400).json({
+          success: false,
+          message: "Invalid date range specified",
+        });
+    }
+
+    // Get total count for pagination
+    const totalDocs = await order.countDocuments(query);
+    const totalPages = Math.ceil(totalDocs / limit);
+    const currentPage = Math.max(1, Math.min(page, totalPages));
+    const skip = (currentPage - 1) * limit;
+
+    // Fetch orders with pagination
+    const orders = await order
       .find(query)
-      .populate("userId", "FirstName LastName");
+      .sort({ createdOn: -1 })
+      .skip(skip)
+      .limit(parseInt(limit))
+      .populate("userId", "FirstName LastName")
+      .lean();
 
-    // Calculate total sales for filtered orders
-    const totalSale = filteredOrders.reduce((sum, order) => {
-      return sum + order.totalPrice;
-    }, 0);
+    // Calculate total sales
+    const totalSale = orders.reduce(
+      (sum, order) => sum + (order.totalPrice || 0),
+      0
+    );
 
-    // Return more data with the response
+    // Prepare response
     res.json({
-      orders: filteredOrders,
-      totalSale: totalSale,
-      totalOrder: filteredOrders.length,
+      success: true,
+      orders,
+      totalSale: parseFloat(totalSale.toFixed(2)),
+      totalOrder: totalDocs,
+      pagination: {
+        currentPage,
+        totalPages,
+        hasNextPage: currentPage < totalPages,
+        hasPrevPage: currentPage > 1,
+        limit: parseInt(limit),
+      },
     });
   } catch (error) {
     console.error("Error filtering sales report:", error);
-    res.status(500).send("Error filtering sales report");
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 };
 

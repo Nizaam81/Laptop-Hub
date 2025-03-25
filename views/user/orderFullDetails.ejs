@@ -1,4 +1,6 @@
   <%- include("partials/profileHeader.ejs") %>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <style>
        body {
             font-family: Arial, sans-serif;
@@ -303,7 +305,8 @@
                 </div>
                 <div class="form-buttons">
                     <button type="button" class="btn" style="background-color: #6c757d; color: white;" onclick="handleCancel('<%= orders[0]._id %>')">Cancel</button>
-                    <button type="submit" class="btn" style="background-color: #28a745; color: white;">Submit Return</button>
+                    <button type="submit" class="btn" style="background-color: #28a745; color: white;" >Submit Return</button>
+                  
                 </div>
             </form>
         </div>
@@ -333,13 +336,22 @@
             }
         }
 
-        document.querySelector(".return-form").onsubmit = function(e) {
-            e.preventDefault();
-            const reason = document.getElementById("returnReason").value;
-            console.log("Return reason:", reason);
-            modal.style.display = "none";
-            alert("Return request submitted successfully!");
-        }
+       document.querySelector(".return-form").addEventListener('submit', function(e) {
+    e.preventDefault();
+    const reason = document.getElementById("returnReason").value;
+    
+   
+    const modal = document.getElementById("returnModal");
+    modal.style.display = "none";
+    
+   
+    showToast("Return request submitted successfully!", "success");
+    
+ 
+    setTimeout(() => {
+        window.location.href = "/user/order";
+    }, 3000); 
+});
 
       
      
@@ -391,15 +403,19 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-function showToast(message, icon = "info") {
+function showToast(message, icon = "success") {
     Swal.fire({
         toast: true,
         position: "top-end",
-        icon: icon, 
+        icon: icon,
         title: message,
         showConfirmButton: false,
-        timer: 3000, 
+        timer: 3000,
         timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer);
+            toast.addEventListener('mouseleave', Swal.resumeTimer);
+        }
     });
 }
 

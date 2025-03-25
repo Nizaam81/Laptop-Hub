@@ -42,12 +42,15 @@ const loadPlaceOrder = async (req, res) => {
     const totalPrice = carts.reduce((sum, num) => {
       return (sum += num.totalPrice);
     }, 0);
+    const userid = req.session.user;
 
+    const users = await user.findOne({ _id: userid });
+    const firstLetter = users.FirstName.charAt(0);
     res.render("user/placeOrder", {
       carts,
       totalPrice,
-      firstLetter: "",
-      users: "",
+      firstLetter,
+      users,
     });
   } catch (error) {
     console.error(error);
@@ -58,7 +61,9 @@ const loadPlaceOrder = async (req, res) => {
 const placeOrder = async (req, res) => {
   try {
     const userId = req.session.user;
-    const { orderItems, totalPrice, address, paymentMethod } = req.body;
+    const { orderItems, totalPrice, address, paymentMethod, variantid } =
+      req.body;
+    console.log("nizaaaaaaaaaaaam", orderItems);
     if (paymentMethod === "cod" && totalPrice > 1000) {
       return res.json({
         alert: "Cash On  delivery is Not available for Order above Rs 1000",
@@ -71,10 +76,17 @@ const placeOrder = async (req, res) => {
       address: address,
       paymentMethod: paymentMethod,
       userId: userId,
+
       status: paymentMethod === "wallet" ? "Paid" : "Pending",
     });
 
     await newOrder.save();
+    for (let char of orderItems) {
+      await variant.findOneAndUpdate(
+        { _id: char.variantid },
+        { $inc: { quantity: -char.quantity } }
+      );
+    }
 
     const wallet = await Wallet.findOne({ userId });
 
@@ -106,8 +118,6 @@ const placeOrder = async (req, res) => {
       console.log(options);
       console.log(razorpay);
       const response = await razorpay.orders.create(options);
-      console.log(response);
-      console.log("HELOOOOOOOOOO");
 
       newOrder.razorpayOrderId = response.id;
       await newOrder.save();
@@ -169,8 +179,6 @@ const verifyPayment = async (req, res) => {
         },
         { new: true }
       );
-
-      console.log("Update result:", updateResult ? "Success" : "Failed");
 
       return res.status(400).json({
         success: false,

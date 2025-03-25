@@ -1,4 +1,6 @@
 <%- include("partials/header.ejs") %>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
     <title>Order Details</title>
      <style>
       * {
@@ -535,13 +537,15 @@
         </div>
     </div>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
-   document.querySelectorAll(".dropdownbtn").forEach(dropdown => {
+  document.querySelectorAll(".dropdownbtn").forEach(dropdown => {
     dropdown.addEventListener("change", async (event) => {
         const status = event.target.value; // Get selected status
         console.log("Status:", status);
 
-        const specificId = document.getElementById('specificId').value ;
+        const specificId = document.getElementById('specificId').value;
         const orderId = event.target.dataset.orderid;
 
         console.log("Specific ID:", specificId);
@@ -549,7 +553,11 @@
 
         if (!specificId || !orderId) {
             console.error("Missing specificId or orderId.");
-            alert("Error: Required order details not found.");
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Required order details not found.",
+            });
             return;
         }
 
@@ -565,13 +573,25 @@
             const result = await response.json();
 
             if (response.ok) {
-                alert("Order status updated successfully!");
+                Swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: "Order status updated successfully!",
+                });
             } else {
-                alert("Error: " + result.message);
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: result.message,
+                });
             }
         } catch (error) {
             console.error("Error updating order status:", error);
-            alert("Something went wrong!");
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Something went wrong!",
+            });
         }
     });
 });
@@ -582,40 +602,58 @@
 
 
 //approve return 
-    document.querySelectorAll(".approve-return-btn").forEach(button => {
-        button.addEventListener("click", async (event) => {
-            const specificId = document.getElementById('specificId').value;
-            const orderId = event.target.dataset.orderid;
+   document.querySelectorAll(".approve-return-btn").forEach(button => {
+    button.addEventListener("click", async (event) => {
+        const specificId = document.getElementById('specificId').value;
+        const orderId = event.target.dataset.orderid;
 
-            if (!specificId || !orderId) {
-                console.error("Missing specificId or orderId.");
-                alert("Error: Required order details not found.");
-                return;
-            }
+        if (!specificId || !orderId) {
+            console.error("Missing specificId or orderId.");
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Required order details not found.",
+            });
+            return;
+        }
 
-            try {
-                const response = await fetch("/admin/approveReturn", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ specificId, orderId }),
-                });
+        try {
+            const response = await fetch("/admin/approveReturn", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ specificId, orderId }),
+            });
 
-                const result = await response.json();
+            const result = await response.json();
 
-                if (response.ok) {
-                    alert("Return request approved and amount refunded to wallet!");
+            if (response.ok) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: "Return request approved and amount refunded to wallet!",
+                }).then(() => {
                     location.reload(); // Reload the page to reflect the changes
-                } else {
-                    alert("Error: " + result.message);
-                }
-            } catch (error) {
-                console.error("Error approving return request:", error);
-                alert("Something went wrong!");
+                });
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: result.message,
+                });
             }
-        });
+        } catch (error) {
+            console.error("Error approving return request:", error);
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Something went wrong!",
+            });
+        }
     });
+});
+
 
 
 </script>

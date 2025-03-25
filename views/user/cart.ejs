@@ -349,7 +349,7 @@ function showToast(message, icon = "info") {
 
             quantitySpan.innerText = newQuantity;
 
-            // Update total price if it exists
+            
             if (totalPriceSpan) {
                 let totalPrice = parseFloat(totalPriceSpan.innerText.replace("₹", "").trim());
                 totalPrice += parseFloat(price);

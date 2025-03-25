@@ -438,7 +438,9 @@
             <label class="variant-label">System Memory:</label>
             <div class="variant-options">
               <% varient.forEach(element => { %>
-                <button class="variant-btn" onclick="window.location.href='/user/productView?productId=<%= products._id %>&varientId=<%= element._id  %>'"><%= element.ramSize %></button>
+                <% if (element.quantity>0) { %>
+                 <button class="variant-btn" onclick="window.location.href='/user/productView?productId=<%= products._id %>&varientId=<%= element._id  %>'"><%= element.ramSize %></button>
+                <% } %>
               <% }) %>
             </div>
 

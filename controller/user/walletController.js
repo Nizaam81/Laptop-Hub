@@ -8,9 +8,11 @@ const loadWallet = async (req, res) => {
     const user = req.session.user;
 
     const walletData = await walletModel.findOne({ userId: user });
-    console.log(walletData);
-    console.log("walletData", walletData);
-    res.render("user/wallet", { walletData, users: "", firstLetter: "" });
+    const userid = req.session.user;
+
+    const users = await user.findOne({ _id: userid });
+    const firstLetter = users.FirstName.charAt(0);
+    res.render("user/wallet", { walletData, users, firstLetter });
   } catch (error) {
     console.error(error);
     console.log("error in loadcontroller");

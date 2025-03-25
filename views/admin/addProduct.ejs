@@ -158,22 +158,22 @@
         document.addEventListener('DOMContentLoaded', function() {
             let cropper = null;
     let currentInput = null;
-    let selectedFilename = ''; // Store the filename
+    let selectedFilename = ''; 
     const modal = document.getElementById('cropperModal');
     const cropperImage = document.getElementById('cropperImage');
 
-    // Handle file selection
+   
     document.querySelectorAll('.image-input').forEach(input => {
         input.addEventListener('change', handleFileSelect);
     });
 
-    // Handle save crop
+
     document.getElementById('saveCrop').addEventListener('click', saveCrop);
 
-    // Handle cancel
+   
     document.getElementById('cancelCrop').addEventListener('click', closeModal);
 
-    // Close modal when clicking outside
+    
     modal.addEventListener('click', function (e) {
         if (e.target === modal) {
             closeModal();
@@ -184,26 +184,26 @@
         const file = e.target.files[0];
         if (!file) return;
 
-        // Validate file
+       
         if (!file.type.startsWith('image/')) {
             alert('Please select an image file');
             return;
         }
 
-        if (file.size > 5000000) { // 5MB limit
+        if (file.size > 5000000) { 
             alert('Image size should be less than 5MB');
             return;
         }
 
         currentInput = e.target;
-        selectedFilename = file.name; // Store the filename
+        selectedFilename = file.name; 
 
         const reader = new FileReader();
         reader.onload = function (event) {
             cropperImage.src = event.target.result;
             modal.style.display = 'block';
 
-            // Initialize cropper
+           
             if (cropper) {
                 cropper.destroy();
             }
@@ -241,7 +241,7 @@
             const previewContainer = document.getElementById(previewId);
             previewContainer.innerHTML = `<img src="${canvas.toDataURL('image/jpeg', 0.9)}">`;
 
-            // Update file input field with filename only
+           
             const fileLabel = document.createElement("span");
             fileLabel.innerText = selectedFilename;
             fileLabel.style.fontSize = "14px";
@@ -265,81 +265,122 @@
         }
         cropperImage.src = '';
 
-        // Do not reset file input, only hide modal
+      
         currentInput = null;
     }
 
+})
 
-    document.getElementById('addProductForm').addEventListener('submit', async function(event) {
+
+document.getElementById('addProductForm').addEventListener('submit', async function(event) {
     event.preventDefault();
 
-    const formData = new FormData();
+    // Trim and get values
+    const productNameInput = document.getElementById('product');
+    const productName = productNameInput.value.trim();
+    
+    const descriptionInput = document.getElementById('description');
+    const description = descriptionInput.value.trim();
+    
+    const brandInput = document.getElementById('brand');
+    const brand = brandInput.value.trim();
+    
+    const categoryInput = document.getElementById('category');
+    const category = categoryInput.value.trim();
 
-    // Append text fields
-    formData.append("product", document.getElementById('product').value);
-    formData.append("description", document.getElementById('description').value);
-    formData.append("brand", document.getElementById('brand').value);
-    formData.append("category", document.getElementById('category').value);
-  
-  
-    // Append multiple files (Check if a file is selected before adding)
-    const fileInputs = document.querySelectorAll('.image-input');
-fileInputs.forEach(input => {
-    if (input.files.length > 0) {
-        formData.append("images", input.files[0]);
+    // ✅ Product Name Validation
+    const productNameRegex = /^(?=.*[a-zA-Z])[a-zA-Z0-9\s\-.,'&]{3,100}$/; // Allows numbers but requires at least 1 letter
+
+    if (!productName) {
+        Swal.fire({ title: "Error", text: "Product name cannot be empty", icon: "warning" });
+        productNameInput.focus();
+        return;
     }
-});
+    if (!productNameRegex.test(productName)) {
+        Swal.fire({ title: "Error", text: "Invalid product name. Use letters, numbers, spaces, and (- , . ' &)", icon: "warning" });
+        productNameInput.focus();
+        return;
+    }
 
-    // Send request
-    const response = await fetch('/admin/add-product', {            
-        method: "POST",
-        body: formData  
+    // ✅ Description Validation
+    if (!description) {
+        Swal.fire({ title: "Error", text: "Description cannot be empty", icon: "warning" });
+        descriptionInput.focus();
+        return;
+    }
+    if (description.length < 5 || description.length > 5000) {
+        Swal.fire({ title: "Error", text: "Description must be between 5-5000 characters", icon: "warning" });
+        descriptionInput.focus();
+        return;
+    }
+    if (/<[^>]*>|&lt;|&gt;|script/i.test(description)) {
+        Swal.fire({ title: "Error", text: "Description contains invalid HTML or script tags", icon: "warning" });
+        descriptionInput.focus();
+        return;
+    }
+
+    // ✅ Brand & Category Validation
+    if (!brand) {
+        Swal.fire({ title: "Error", text: "Brand cannot be empty", icon: "warning" });
+        brandInput.focus();
+        return;
+    }
+    if (!category) {
+        Swal.fire({ title: "Error", text: "Category cannot be empty", icon: "warning" });
+        categoryInput.focus();
+        return;
+    }
+
+    // ✅ FormData Submission
+    const formData = new FormData();
+    formData.append("product", productName);
+    formData.append("description", description);
+    formData.append("brand", brand);
+    formData.append("category", category);
+
+    // ✅ Image Validation
+    const fileInputs = document.querySelectorAll('.image-input');
+    fileInputs.forEach(input => {
+        if (input.files.length > 0) {
+            formData.append("images", input.files[0]);
+        }
     });
 
-    const result = await response.json();
-    if(result.error){
-     Swal.fire({
-     title: "Fill?",
-     text: result.error,
-      icon: "warning"
+    // ✅ Fetch API Request
+    try {
+        const response = await fetch('/admin/add-product', {
+            method: "POST",
+            body: formData
+        });
+
+        const result = await response.json();
+
+        if (result.error) {
+            Swal.fire({ title: "Fill?", text: result.error, icon: "warning" });
+        }
+        if (result.imageError) {
+            Swal.fire({ title: "Fill?", text: result.imageError, icon: "warning" });
+        }
+        if (result.existError) {
+            Swal.fire({ title: "Exist?", text: result.existError, icon: "warning" });
+        }
+        if (result.minusQty) {
+            Swal.fire({ title: "Not Possible?", text: result.minusQty, icon: "warning" });
+        }
+        if (result.success) {
+            Swal.fire({ title: "Saved", text: result.success, icon: "success" });
+            event.target.submit();
+        }
+    } catch (error) {
+        Swal.fire({ title: "Error", text: "An error occurred while submitting the form", icon: "error" });
+        console.error('Form submission error:', error);
+    }
 });
-    }
-    if(result.imageError){
-        Swal.fire({
-     title: "Fill?",
-     text: result.imageError,
-      icon: "warning"
-});
-    }
-    if(result.existError){
-        Swal.fire({
-     title: "Exist?",
-     text: result.existError,
-      icon: "warning"
-});
-    }
-    if(result.minusQty){
-        Swal.fire({
-     title: "Not Possible?",
-     text: result.minusQty,
-      icon: "warning"
-}); 
-    }
-    if(result.success){
-        Swal.fire({
-     title: "Saved",
-     text: result.success,
-      icon: "success"
-   }); 
-    event.target.submit()
-    }
+
     
-});
-
-        })
-
-
-
+           
+           
+           
     </script>
 </body>
-</html
+</html>

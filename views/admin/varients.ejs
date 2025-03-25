@@ -85,7 +85,7 @@
             border: 1px solid #ccc;
             border-radius: 5px;
         }.list-btn {
-    background-color: #dc3545; /* Red color for unlist */
+    background-color: #dc3545; 
     color: white;
     padding: 8px 15px;
     border: none;
@@ -94,7 +94,7 @@
 }
 
 .unlist-btn {
-    background-color: #28a745; /* Green color for list */
+    background-color: #28a745; 
     color: white;
     padding: 8px 15px;
     border: none;
@@ -161,7 +161,7 @@
             <input type="number" placeholder="Enter Variant Price" id="variantPrice" required>
             <input type="number" placeholder="Enter Variant Quantity" id="Quantity" required>
             <input type="hidden" id="ProductId" value="<%= products._id %>">
-            <button type="submit" class="btn btn-add">Add</button> <!-- Explicitly set type="submit" -->
+            <button type="submit" class="btn btn-add">Add</button> 
         </div>
     </form>
 </div>
@@ -217,19 +217,56 @@
     });
 
   
-    document.getElementById("addVariant").addEventListener("submit", async (event) => {
+   document.getElementById("addVariant").addEventListener("submit", async (event) => {
     event.preventDefault();
     
     const productId = document.getElementById("ProductId").value.trim();
-    const ramSize = document.getElementById("Variant").value.trim();  // Use "ramSize" instead of "variantType"
-    const variantPrice = parseFloat(document.getElementById("variantPrice").value.trim());
-    const variantQuantity = parseInt(document.getElementById("Quantity").value.trim());
+    const ramSize = document.getElementById("Variant").value.trim(); 
+    const variantPrice = document.getElementById("variantPrice").value.trim();
+    const variantQuantity = document.getElementById("Quantity").value.trim();
 
-    if (!ramSize || isNaN(variantPrice) || isNaN(variantQuantity) || variantPrice <= 0 || variantQuantity <= 0) {
+  
+    const priceRegex = /^[0-9]+(\.[0-9]{1,2})?$/; 
+    const quantityRegex = /^[1-9][0-9]*$/; 
+    
+    const minPrice = 1;
+    const maxPrice = 1000000; 
+    const minQuantity = 1;
+    const maxQuantity = 10000; 
+
+   
+    if (!ramSize || !variantPrice || !variantQuantity) {
         Swal.fire({
-            title: "Error",
-            text: "All fields are required and must be valid numbers!",
-            icon: "error",
+            toast: true,
+            position: "top-end",
+            icon: "warning",
+            title: "All fields are required!",
+            showConfirmButton: false,
+            timer: 3000
+        });
+        return;
+    }
+
+    if (!priceRegex.test(variantPrice) || parseFloat(variantPrice) < minPrice || parseFloat(variantPrice) > maxPrice) {
+        Swal.fire({
+            toast: true,
+            position: "top-end",
+            icon: "warning",
+            title: `Price must be between ${minPrice} and ${maxPrice}!`,
+            showConfirmButton: false,
+            timer: 3000
+        });
+        return;
+    }
+
+    if (!quantityRegex.test(variantQuantity) || parseInt(variantQuantity) < minQuantity || parseInt(variantQuantity) > maxQuantity) {
+        Swal.fire({
+            toast: true,
+            position: "top-end",
+            icon: "warning",
+            title: `Quantity must be between ${minQuantity} and ${maxQuantity}!`,
+            showConfirmButton: false,
+            timer: 3000
         });
         return;
     }
@@ -240,7 +277,12 @@
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ productId, ramSize, variantPrice, variantQuantity }) // Use "ramSize"
+            body: JSON.stringify({ 
+                productId, 
+                ramSize, 
+                variantPrice: parseFloat(variantPrice), 
+                variantQuantity: parseInt(variantQuantity) 
+            })
         });
 
         if (!response.ok) {
@@ -251,23 +293,36 @@
 
         if (data.message) {
             Swal.fire({
-                title: "Success",
-                text: data.message,
+                toast: true,
+                position: "top-end",
                 icon: "success",
+                title: data.message,
+                showConfirmButton: false,
+                timer: 3000
             });
 
+           
             document.querySelector(".modal").style.display = "none";
             document.getElementById("addVariant").reset();
+
+           
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
         }
 
     } catch (error) {
         Swal.fire({
-            title: "Error",
-            text: error.message,
+            toast: true,
+            position: "top-end",
             icon: "error",
+            title: error.message,
+            showConfirmButton: false,
+            timer: 3000
         });
     }
 });
+
 
 
 
@@ -341,9 +396,35 @@ document.getElementById("editVariant").addEventListener("submit", async (event) 
     const editVariant = document.getElementById("editVariant").value.trim();
     const editVariantPrice = document.getElementById("editVariantPrice").value.trim();
     const quantity = document.getElementById("editQuantity").value.trim();
-    const variantId = document.getElementById("varientId").value
+    const variantId = document.getElementById("varientId").value;
 
-    
+    // Validation for price and quantity
+    const priceRegex = /^\d+(\.\d{1,2})?$/; // Allows numbers with optional decimal point and up to 2 decimal places
+    const quantityRegex = /^\d+$/; // Allows only positive integers
+
+    if (!priceRegex.test(editVariantPrice)) {
+        Swal.fire("Error", "Please enter a valid price (positive numbers only, no letters or symbols except decimal point)", "error");
+        return;
+    }
+
+    if (!quantityRegex.test(quantity)) {
+        Swal.fire("Error", "Please enter a valid quantity (positive whole numbers only)", "error");
+        return;
+    }
+
+    // Convert to numbers to ensure they're not negative (though regex should prevent this)
+    const priceValue = parseFloat(editVariantPrice);
+    const quantityValue = parseInt(quantity);
+
+    if (priceValue <= 0) {
+        Swal.fire("Error", "Price must be greater than 0", "error");
+        return;
+    }
+
+    if (quantityValue <= 0) {
+        Swal.fire("Error", "Quantity must be greater than 0", "error");
+        return;
+    }
 
     try {
         const response = await fetch('/admin/edit-variant', {

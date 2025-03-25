@@ -14,7 +14,7 @@ const wallet = require("../controller/user/walletController");
 const coupon = require("../controller/user/couponController");
 const invoiceController = require("../controller/user/invoiceController");
 
-routes.get("/pageNotfound", usercontroller.pageNotfound);
+routes.get("/pageNotfound", userAuth.userAuth, usercontroller.pageNotfound);
 routes.get("/home", userAuth.userAuth, usercontroller.loadHomepage);
 routes.get("/login", usercontroller.loadlogin);
 routes.get("/signup", usercontroller.loadsignup);
@@ -59,9 +59,21 @@ routes.get(
 );
 
 //forgort password
-routes.get("/forgotPassword", usercontroller.loadForgotpassword);
-routes.post("/forgotpassword", usercontroller.forgotPassword);
-routes.post("/verifyreset-otp", usercontroller.verifyForgotPasswordOTP);
+routes.get(
+  "/forgotPassword",
+
+  usercontroller.loadForgotpassword
+);
+routes.post(
+  "/forgotpassword",
+
+  usercontroller.forgotPassword
+);
+routes.post(
+  "/verifyreset-otp",
+
+  usercontroller.verifyForgotPasswordOTP
+);
 routes.post("/resetpassword", usercontroller.resetPassword);
 routes.get("/setPassword", usercontroller.newPassword);
 routes.get("/fVerifyOtp", usercontroller.loadOtp);
@@ -119,38 +131,42 @@ routes.get(
   userAuth.userAuth,
   orderController.loadorderFullDetails
 );
-routes.post("/cancelOrder", orderController.cancelOrder);
-routes.post("/cancelItem", orderController.cancelItem);
+routes.post("/cancelOrder", userAuth.userAuth, orderController.cancelOrder);
+routes.post("/cancelItem", userAuth.userAuth, orderController.cancelItem);
 
 //place order
 routes.get("/PlaceOrderr", userAuth.userAuth, placeOrder.loadPlaceOrder);
 routes.post("/placeOrder", userAuth.userAuth, placeOrder.placeOrder);
 routes.post("/verifyPayment", userAuth.userAuth, placeOrder.verifyPayment);
-routes.post("/retryPayment", placeOrder.retryPayment);
+routes.post("/retryPayment", userAuth.userAuth, placeOrder.retryPayment);
 
 routes.post("/getWalletBalance", userAuth.userAuth, placeOrder.walletPayment);
 
 //wishlist
-routes.get("/wishlist", wishlist.loadWishlist);
-routes.post("/Wishlist", wishlist.Wishlist);
-routes.delete("/Wishlist/delete", wishlist.deleteWishlist);
-routes.get("/empty", wishlist.empty);
-routes.post("/wishlit-addtocart", wishlist.WishlistAddCart);
+routes.get("/wishlist", userAuth.userAuth, wishlist.loadWishlist);
+routes.post("/Wishlist", userAuth.userAuth, wishlist.Wishlist);
+routes.delete("/Wishlist/delete", userAuth.userAuth, wishlist.deleteWishlist);
+routes.get("/empty", userAuth.userAuth, wishlist.empty);
+routes.post("/wishlit-addtocart", userAuth.userAuth, wishlist.WishlistAddCart);
 
 //wallet
-routes.get("/wallet", wallet.loadWallet);
+routes.get("/wallet", userAuth.userAuth, wallet.loadWallet);
 
 //coupon
 
-routes.post("/availableCoupons", coupon.getAvailableCoupons);
-routes.post("/couponApplied", coupon.applyCoupon);
+routes.post("/availableCoupons", userAuth.userAuth, coupon.getAvailableCoupons);
+routes.post("/couponApplied", userAuth.userAuth, coupon.applyCoupon);
 
 //invoice
 
-routes.get("/download-invoice/:id", invoiceController.invoice);
-routes.post("/paymentFailed", placeOrder.paymentFailed);
+routes.get(
+  "/download-invoice/:id",
+  userAuth.userAuth,
+  invoiceController.invoice
+);
+routes.post("/paymentFailed", userAuth.userAuth, placeOrder.paymentFailed);
 //return
-routes.post("/returnItem", orderController.returnItem);
+routes.post("/returnItem", userAuth.userAuth, orderController.returnItem);
 routes.post(
   "/retryPayments",
   (req, res, next) => {
@@ -171,5 +187,9 @@ routes.post(
 //referal
 routes.get("/referal", usercontroller.referal);
 
-routes.post("/paymentFailed", placeOrder.paymentFailedorderdetails);
+routes.post(
+  "/paymentFailed",
+  userAuth.userAuth,
+  placeOrder.paymentFailedorderdetails
+);
 module.exports = routes;

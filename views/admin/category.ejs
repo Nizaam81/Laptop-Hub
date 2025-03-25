@@ -2,6 +2,12 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<!-- SweetAlert2 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
     <style>
     body {
@@ -304,58 +310,139 @@
 </div>
 
     <script>
-        function showAddForm() {
-            const form = document.getElementById('categoryForm');
-            document.getElementById('formTitle').textContent = 'Add Category';
-            document.getElementById('categoryId').value = '';
-            document.getElementById('name').value = '';
-            document.getElementById('description').value = '';
-            form.style.display = 'block';
+      function showAddForm() {
+    const form = document.getElementById('categoryForm');
+    document.getElementById('formTitle').textContent = 'Add Category';
+    document.getElementById('categoryId').value = '';
+    document.getElementById('name').value = '';
+    document.getElementById('description').value = '';
+    form.style.display = 'block';
+}
+
+function showEditForm(categoryId) {
+    const form = document.getElementById('categoryForm');
+    document.getElementById('formTitle').textContent = 'Edit Category';
+    document.getElementById('categoryId').value = categoryId;
+
+    const row = document.querySelector(`tr[data-id="${categoryId}"]`);
+    document.getElementById('name').value = row.cells[0].textContent.trim();
+    document.getElementById('description').value = row.cells[1].textContent.trim();
+
+    form.style.display = 'block';
+}
+
+async function handleSubmit(event) {
+    event.preventDefault();
+
+   
+    const categoryId = document.getElementById('categoryId').value.trim();
+    const nameInput = document.getElementById('name');
+    const name = nameInput.value.trim();
+
+    const descriptionInput = document.getElementById('description');
+    const description = descriptionInput.value.trim();
+
+    
+    const nameRegex = /^[A-Za-z\s]{3,50}$/; 
+
+    if (!name) {
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'warning',
+            title: 'Category name cannot be empty',
+            showConfirmButton: false,
+            timer: 3000
+        });
+        nameInput.focus();
+        return;
+    }
+    if (!nameRegex.test(name)) {
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'warning',
+            title: 'Invalid category name. Only letters and spaces allowed (3-50 chars)',
+            showConfirmButton: false,
+            timer: 3000
+        });
+        nameInput.focus();
+        return;
+    }
+
+   
+    if (!description) {
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'warning',
+            title: 'Description cannot be empty',
+            showConfirmButton: false,
+            timer: 3000
+        });
+        descriptionInput.focus();
+        return;
+    }
+    if (description.length < 5 || description.length > 1000) {
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'warning',
+            title: 'Description must be between 5-1000 characters',
+            showConfirmButton: false,
+            timer: 3000
+        });
+        descriptionInput.focus();
+        return;
+    }
+
+    try {
+        const url = categoryId ? '/admin/category/update' : '/admin/category/add';
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                id: categoryId,
+                name,
+                description
+            }),
+        });
+
+        if (response.ok) {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Category saved successfully!',
+                showConfirmButton: false,
+                timer: 3000
+            });
+            setTimeout(() => window.location.reload(), 2000);
+        } else {
+            const data = await response.json();
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'error',
+                title: data.error || 'Something went wrong',
+                showConfirmButton: false,
+                timer: 3000
+            });
         }
+    } catch (error) {
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'error',
+            title: 'An error occurred',
+            showConfirmButton: false,
+            timer: 3000
+        });
+    }
+}
 
-        function showEditForm(categoryId) {
-            const form = document.getElementById('categoryForm');
-            document.getElementById('formTitle').textContent = 'Edit Category';
-            document.getElementById('categoryId').value = categoryId;
-            
-           
-            const row = document.querySelector(`tr[data-id="${categoryId}"]`);
-            document.getElementById('name').value = row.cells[0].textContent;
-            document.getElementById('description').value = row.cells[1].textContent;
-            
-            form.style.display = 'block';
-        }
-
-        async function handleSubmit(event) {
-            event.preventDefault();
-            const categoryId = document.getElementById('categoryId').value;
-            const name = document.getElementById('name').value;
-            const description = document.getElementById('description').value;
-
-            try {
-                const url = categoryId ? '/admin/category/update' : '/admin/category/add';
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        id: categoryId,
-                        name,
-                        description
-                    }),
-                });
-
-                if (response.ok) {
-                    window.location.reload();
-                } else {
-                    const data = await response.json();
-                    alert(data.error || 'Something went wrong');
-                }
-            } catch (error) {
-                alert('An error occurred');
-            }
-        }
 
         async function toggleList(categoryId) {
             try {

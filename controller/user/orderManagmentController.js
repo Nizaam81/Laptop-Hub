@@ -13,7 +13,6 @@ const loadOrder = async (req, res) => {
     const userId = req.session.user;
     const userData = await user.findById(userId);
 
-    console.log("userData", userData);
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 5;
     const skip = (page - 1) * limit;
@@ -50,14 +49,18 @@ const loadOrder = async (req, res) => {
       userId: new ObjectId(userId),
     });
     const totalPages = Math.ceil(totalOrders / limit);
+    const userid = req.session.user;
+
+    const users = await user.findOne({ _id: userid });
+    const firstLetter = users.FirstName.charAt(0);
 
     res.render("user/orderDetails", {
       orders,
       currentPage: page,
       totalPages,
       limit,
-      firstLetter: "",
-      users: "",
+      firstLetter,
+      users,
       user: userData,
     });
   } catch (error) {

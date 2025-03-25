@@ -1,4 +1,4 @@
-const mongoose = require("mongoose"); // Import mongoose
+const mongoose = require("mongoose");
 const user = require("../../model/usersSchema");
 const address = require("../../model/addressSchema");
 const order = require("../../model/orderSchema");
@@ -6,6 +6,12 @@ const Wallet = require("../../model/walletSchema");
 
 const loadOrder = async (req, res) => {
   try {
+    let page = parseInt(req.query.page) || 1;
+    let limit = 5;
+    let skip = (page - 1) * limit;
+
+    const totalOrders = await order.countDocuments();
+
     const Order = await order.aggregate([
       {
         $lookup: {
@@ -60,7 +66,12 @@ const loadOrder = async (req, res) => {
           paymentStatus: { $first: "$paymentStatus" },
         },
       },
+      { $sort: { createdOn: -1 } },
+      { $skip: skip },
+      { $limit: limit },
     ]);
+
+    const totalPages = Math.ceil(totalOrders / limit);
 
     const status = [
       "pending",
@@ -72,10 +83,10 @@ const loadOrder = async (req, res) => {
       "Returned",
     ];
 
-    res.render("admin/orderManagment", { Order, status });
+    res.render("admin/orderManagment", { Order, status, page, totalPages });
   } catch (error) {
     console.error(error);
-    console.log("error in loadOrder Controller");
+    console.log("Error in loadOrder Controller");
   }
 };
 

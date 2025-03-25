@@ -26,7 +26,41 @@
         background-color: var(--background-color);
         line-height: 1.6;
         color: var(--text-color);
-      }
+      }/* Pagination Styles */
+.pagination {
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+}.pagination-ellipsis {
+  padding: 8px 12px;
+  color: #666;
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pagination-btn {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  text-decoration: none;
+  color: var(--primary-color);
+  transition: all 0.3s;
+}
+
+.pagination-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.pagination-btn.active {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
 
     
       .container {
@@ -252,7 +286,7 @@
       <section class="stats">
         <div class="card">
           <h3>Total Sales</h3>
-          <p>$<%= totalSale %></p>
+         <p>$<%= totalSale.toFixed(2) %></p>
         </div>
         <div class="card">
           <h3>Total Orders</h3>
@@ -297,8 +331,7 @@
       </section>
       </div>
 
-      <!-- Export Buttons -->
-     <!-- Export Buttons -->
+     
 <div class="export-buttons">
    <a
     href="/admin/SalesReport/pdf?dateRange=<%= dateRange %>&startDate=<%= startDate %>&endDate=<%= endDate %>"
@@ -313,78 +346,266 @@
     <i class="fas fa-file-excel"></i> Export Excel
   </a>
 </div>
+<!-- Pagination -->
+<div class="pagination">
+  <% if (pagination.totalPages > 1) { %>
+    <div class="pagination-controls">
+      <% if (pagination.hasPrevPage) { %>
+        <a 
+          href="/admin/SalesReport?dateRange=<%= dateRange %>&startDate=<%= startDate %>&endDate=<%= endDate %>&page=<%= pagination.currentPage - 1 %>&limit=<%= pagination.limit %>" 
+          class="pagination-btn"
+        >
+          &laquo; Previous
+        </a>
+      <% } %>
+
+      <% for (let i = 1; i <= pagination.totalPages; i++) { %>
+        <a 
+          href="/admin/SalesReport?dateRange=<%= dateRange %>&startDate=<%= startDate %>&endDate=<%= endDate %>&page=<%= i %>&limit=<%= pagination.limit %>"
+          class="pagination-btn <%= i === pagination.currentPage ? 'active' : '' %>"
+        >
+          <%= i %>
+        </a>
+      <% } %>
+
+      <% if (pagination.hasNextPage) { %>
+        <a 
+          href="/admin/SalesReport?dateRange=<%= dateRange %>&startDate=<%= startDate %>&endDate=<%= endDate %>&page=<%= pagination.currentPage + 1 %>&limit=<%= pagination.limit %>" 
+          class="pagination-btn"
+        >
+          Next &raquo;
+        </a>
+      <% } %>
+    </div>
+  <% } %>
+</div>
     </div>
   </body>
   <script>
-   
- function filterReport() {
-  const dateRange = document.getElementById('dateRange').value;
-  const startDate = document.getElementById('startDate').value;
-  const endDate = document.getElementById('endDate').value;
-  
-  fetch('/admin/SalesReport/filter', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ dateRange, startDate, endDate }),
-  })
-    .then(response => response.json())
-    .then(data => {
-      // Update table with the orders data
-      updateTable(data.orders);
-      
-      // Update the stats cards
-      updateStats(data.totalSale, data.totalOrder);
-      
-      // Update export links with new parameters
-      updateExportLinks(dateRange, startDate, endDate);
-    })
-    .catch(error => console.error('Error:', error));
-}
+  // Initialize date inputs and event listeners
+  document.addEventListener('DOMContentLoaded', () => {
+    // Set initial dates based on default range (1 week)
+    const today = new Date();
+    const endDate = new Date(today);
+    const startDate = new Date(today);
+    startDate.setDate(today.getDate() - 7);
+    
+    document.getElementById('startDate').valueAsDate = startDate;
+    document.getElementById('endDate').valueAsDate = endDate;
+    
+    // Load initial data
+    filterReport(1);
+    
+    // Add event listeners
+    document.getElementById('dateRange').addEventListener('change', handleDateRangeChange);
+  });
 
-function updateTable(orders) {
-  const tbody = document.querySelector('.report tbody');
-  tbody.innerHTML = ''; 
-
-  if (orders.length === 0) {
-    const row = document.createElement('tr');
-    row.innerHTML = '<td colspan="6">No orders found for the selected date range.</td>';
-    tbody.appendChild(row);
-    return;
+  // Handle date range selection changes
+  function handleDateRangeChange() {
+    const range = this.value;
+    const today = new Date();
+    const endDate = new Date(today);
+    const startDate = new Date(today);
+    
+    switch(range) {
+      case '1day':
+        startDate.setDate(today.getDate() - 1);
+        break;
+      case '1week':
+        startDate.setDate(today.getDate() - 7);
+        break;
+      case '1month':
+        startDate.setMonth(today.getMonth() - 1);
+        break;
+      case 'custom':
+        // Don't auto-set dates for custom range
+        return;
+      default:
+        startDate.setDate(today.getDate() - 7);
+    }
+    
+    document.getElementById('startDate').valueAsDate = startDate;
+    document.getElementById('endDate').valueAsDate = endDate;
+    
+    // Trigger filter after changing dates
+    filterReport(1);
   }
 
-  orders.forEach(order => {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${new Date(order.createdOn).toLocaleDateString()}</td>
-      <td>#${order._id}</td>
-      <td>${order.userId.FirstName} ${order.userId.LastName}</td>
-      <td>$ ${order.totalPrice}</td>
-      <td>${order.paymentMethod}</td>
-      <td class="${order.paymentStatus}">${order.paymentStatus}</td>
-    `;
-    tbody.appendChild(row);
-  });
-}
+  // Main filter function
+  function filterReport(page = 1) {
+    const dateRange = document.getElementById('dateRange').value;
+    let startDate = document.getElementById('startDate').value;
+    let endDate = document.getElementById('endDate').value;
+    const limit = 10;
+    
+    // Validate dates
+    if (!startDate || !endDate) {
+      alert('Please select valid dates');
+      return;
+    }
+    
+    // Adjust end date to include the entire day
+    if (endDate) {
+      endDate = new Date(endDate);
+      endDate.setHours(23, 59, 59, 999);
+      endDate = endDate.toISOString();
+    }
+    
+    showLoading(true);
+    
+    fetch('/admin/SalesReport/filter', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        dateRange, 
+        startDate, 
+        endDate,
+        page,
+        limit 
+      }),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        updateTable(data.orders);
+        updateStats(data.totalSale, data.totalOrder);
+        updateExportLinks(dateRange, startDate, endDate);
+        updatePagination(data.pagination, dateRange, startDate, endDate);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error loading data. Please try again.');
+      })
+      .finally(() => {
+        showLoading(false);
+      });
+  }
 
-function updateStats(totalSale, totalOrder) {
-  // Update the stats cards with new values
-  document.querySelector('.card:nth-child(1) p').textContent = '$' + totalSale;
-  document.querySelector('.card:nth-child(2) p').textContent = totalOrder;
-}
+  // Update table with new data
+  function updateTable(orders) {
+    const tbody = document.querySelector('.report tbody');
+    tbody.innerHTML = '';
+    
+    if (!orders || orders.length === 0) {
+      const row = document.createElement('tr');
+      row.innerHTML = '<td colspan="6" class="no-orders">No orders found for the selected date range.</td>';
+      tbody.appendChild(row);
+      return;
+    }
 
-function updateExportLinks(dateRange, startDate, endDate) {
-  // Update the href of export links to include the new filter parameters
-  const pdfLink = document.querySelector('.export-btn-pdf');
-  const excelLink = document.querySelector('.export-btn-excel');
-  
-  pdfLink.href = `/admin/SalesReport/pdf?dateRange=${dateRange}&startDate=${startDate}&endDate=${endDate}`;
-  excelLink.href = `/admin/SalesReport/excel?dateRange=${dateRange}&startDate=${startDate}&endDate=${endDate}`;
-}
+    orders.forEach(order => {
+      const row = document.createElement('tr');
+      const orderDate = new Date(order.createdOn);
+      
+      // Format date as YYYY-MM-DD for consistency
+      const formattedDate = orderDate.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+      
+      // Format price with 2 decimal places
+      const formattedPrice = order.totalPrice.toFixed(2);
+      
+      row.innerHTML = `
+        <td>${formattedDate}</td>
+        <td>#${order._id}</td>
+        <td>${order.userId?.FirstName || 'N/A'} ${order.userId?.LastName || ''}</td>
+        <td>$ ${formattedPrice}</td>
+        <td>${order.paymentMethod || 'N/A'}</td>
+        <td class="${order.paymentStatus}">${order.paymentStatus}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
 
+  // Update statistics cards
+  function updateStats(totalSale, totalOrder) {
+    const totalSaleElement = document.querySelector('.card:nth-child(1) p');
+    const totalOrderElement = document.querySelector('.card:nth-child(2) p');
+    
+    if (totalSaleElement) {
+      totalSaleElement.textContent = '$' + parseFloat(totalSale || 0).toFixed(2);
+    }
+    
+    if (totalOrderElement) {
+      totalOrderElement.textContent = totalOrder || 0;
+    }
+  }
 
+  // Update export links with current filters
+  function updateExportLinks(dateRange, startDate, endDate) {
+    const pdfLink = document.querySelector('.export-btn-pdf');
+    const excelLink = document.querySelector('.export-btn-excel');
+    
+    if (pdfLink) {
+      pdfLink.href = `/admin/SalesReport/pdf?dateRange=${encodeURIComponent(dateRange)}&startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
+    }
+    
+    if (excelLink) {
+      excelLink.href = `/admin/SalesReport/excel?dateRange=${encodeURIComponent(dateRange)}&startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
+    }
+  }
 
+  // Update pagination controls
+  function updatePagination(pagination, dateRange, startDate, endDate) {
+    const paginationContainer = document.querySelector('.pagination-controls');
+    
+    if (!paginationContainer || !pagination) return;
+    
+    let html = '';
+    const { currentPage, totalPages, hasPrevPage, hasNextPage } = pagination;
+    
+    if (hasPrevPage) {
+      html += `<a href="#" onclick="filterReport(${currentPage - 1}); return false;" class="pagination-btn">&laquo; Previous</a>`;
+    }
 
-  </script>
+    // Show page numbers with limits (ellipsis for many pages)
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    if (startPage > 1) {
+      html += `<a href="#" onclick="filterReport(1); return false;" class="pagination-btn">1</a>`;
+      if (startPage > 2) {
+        html += `<span class="pagination-ellipsis">...</span>`;
+      }
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      html += `<a href="#" onclick="filterReport(${i}); return false;" class="pagination-btn ${i === currentPage ? 'active' : ''}">${i}</a>`;
+    }
+    
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        html += `<span class="pagination-ellipsis">...</span>`;
+      }
+      html += `<a href="#" onclick="filterReport(${totalPages}); return false;" class="pagination-btn">${totalPages}</a>`;
+    }
+
+    if (hasNextPage) {
+      html += `<a href="#" onclick="filterReport(${currentPage + 1}); return false;" class="pagination-btn">Next &raquo;</a>`;
+    }
+    
+    paginationContainer.innerHTML = html;
+  }
+
+  // Show/hide loading indicator
+  function showLoading(show) {
+    const loadingElement = document.getElementById('loadingIndicator');
+    if (loadingElement) {
+      loadingElement.style.display = show ? 'block' : 'none';
+    }
+  }
+</script>
 </html>

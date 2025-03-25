@@ -15,9 +15,12 @@ const loadWishlist = async (req, res) => {
       },
       { $unwind: "$products" },
     ]);
-    console.log("wish", wish);
+    const userid = req.session.user;
 
-    res.render("user/wishlist", { wish, firstLetter: "", users: "" });
+    const users = await user.findOne({ _id: userid });
+    const firstLetter = users.FirstName.charAt(0);
+
+    res.render("user/wishlist", { wish, firstLetter, users });
   } catch (error) {
     console.log("error in wishlist get route");
     console.error(error);
@@ -129,7 +132,11 @@ const deleteWishlist = async (req, res) => {
 
 const empty = async (req, res) => {
   try {
-    res.render("user/EmptyWishlist", { firstLetter: "", users: "" });
+    const userid = req.session.user;
+
+    const users = await user.findOne({ _id: userid });
+    const firstLetter = users.FirstName.charAt(0);
+    res.render("user/EmptyWishlist", { firstLetter, users });
   } catch (error) {
     console.log("error in empty wishlist");
     console.error(error);

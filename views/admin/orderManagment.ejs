@@ -1,5 +1,10 @@
 <%- include("partials/header.ejs") %>
     <title>Orders Table</title>
+
+
+
+
+
     <style>
         * {
             margin: 0;
@@ -105,7 +110,27 @@
         }.customer-info div {
     margin-bottom: 8px;
 }
-
+ .pagination {
+        text-align: center;
+        margin-top: 20px;
+    }
+    .pagination a {
+        display: inline-block;
+        padding: 10px 15px;
+        margin: 5px;
+        text-decoration: none;
+        color: #333;
+        background-color: #f0f0f0;
+        border-radius: 5px;
+    }
+    .pagination a.active {
+        background-color: #1976d2;
+        color: white;
+        font-weight: bold;
+    }
+    .pagination a:hover {
+        background-color: #ddd;
+    }
 
         /* Responsive styles */
         @media screen and (max-width: 768px) {
@@ -138,6 +163,10 @@
     </style>
 </head>
 <body>
+
+
+
+
   <div class="container">
     <div class="header">
         <h1>Orders</h1>
@@ -154,6 +183,7 @@
                 </tr>
             </thead>
            <tbody>
+    <% Order.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn)); %>
     <% Order.forEach(element => { %>
     <tr class="clickable-row" data-href="/admin/OrderDetails/<%= element._id %>">
         <td>LAPTOP-HUB- <%= element._id %></td>
@@ -171,8 +201,27 @@
     <% }) %>
 </tbody>
 
+
         </table>
     </div>
+
+    
+</div>
+
+
+
+<div class="pagination">
+    <% if (page > 1) { %>
+        <a href="?page=<%= page - 1 %>" class="prev-btn">Previous</a>
+    <% } %>
+    
+    <% for (let i = 1; i <= totalPages; i++) { %>
+        <a href="?page=<%= i %>" class="page-number <%= i === page ? 'active' : '' %>"><%= i %></a>
+    <% } %>
+    
+    <% if (page < totalPages) { %>
+        <a href="?page=<%= page + 1 %>" class="next-btn">Next</a>
+    <% } %>
 </div>
 <script>
    
