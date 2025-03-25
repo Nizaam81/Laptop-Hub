@@ -372,6 +372,7 @@ document.getElementById('addProductForm').addEventListener('submit', async funct
             event.target.submit();
         }
     } catch (error) {
+        console.log(error)
         Swal.fire({ title: "Error", text: "An error occurred while submitting the form", icon: "error" });
         console.error('Form submission error:', error);
     }
