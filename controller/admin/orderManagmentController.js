@@ -97,6 +97,9 @@ const loadFulldetailsOrder = async (req, res) => {
         $match: { _id: new mongoose.Types.ObjectId(req.params.id) },
       },
       {
+        $unwind: "$orderItem",
+      },
+      {
         $lookup: {
           from: "users",
           localField: "userId",
@@ -124,6 +127,7 @@ const loadFulldetailsOrder = async (req, res) => {
           preserveNullAndEmptyArrays: true,
         },
       },
+
       {
         $lookup: {
           from: "addresses",
@@ -137,9 +141,6 @@ const loadFulldetailsOrder = async (req, res) => {
           path: "$addressDetails",
           preserveNullAndEmptyArrays: true,
         },
-      },
-      {
-        $unwind: "$orderItem",
       },
     ]);
 

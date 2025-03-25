@@ -284,7 +284,10 @@
         </div>
 
         <div class="buttons">
-           <button class="btn cancel-btn" data-order-id="<%= orders[0]._id %>" data-item-id="<%= orders[0].orderItem._id %>">❌ Cancel Item</button>
+            <% if ( orders[0].orderItem.status != "cancel" ) { %>
+                        <button class="btn cancel-btn" data-order-id="<%= orders[0]._id %>" data-item-id="<%= orders[0].orderItem._id %>">❌ Cancel Item</button>
+
+            <% } %>
            <button class="btn return-btn" id="returnBtn" data-order-id="<%= orders[0]._id %>" data-item-id="<%= orders[0].orderItem._id %>">↩ Request Return</button>
 
         
