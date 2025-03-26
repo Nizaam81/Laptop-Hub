@@ -63,7 +63,7 @@ const placeOrder = async (req, res) => {
     const userId = req.session.user;
     const { orderItems, totalPrice, address, paymentMethod, variantid } =
       req.body;
-    console.log("nizaaaaaaaaaaaam", orderItems);
+
     if (paymentMethod === "cod" && totalPrice > 1000) {
       return res.json({
         alert: "Cash On  delivery is Not available for Order above Rs 1000",
@@ -186,8 +186,6 @@ const verifyPayment = async (req, res) => {
       });
     }
 
-    console.log("Signature valid, marking payment as paid");
-
     const updateResult = await order.findOneAndUpdate(
       { razorpayOrderId },
       {
@@ -200,12 +198,6 @@ const verifyPayment = async (req, res) => {
         },
       },
       { new: true }
-    );
-
-    console.log(
-      "Update result:",
-      updateResult ? "Success" : "Failed",
-      updateResult
     );
 
     res.json({ success: true });
@@ -413,7 +405,6 @@ const paymentFailedorderdetails = async (req, res) => {
         },
         { new: true, select: "-__v -paymentHistory._id" }
       );
-      console.log("🛠️ Creating Razorpay order with options:", options);
 
       if (!updatedOrder) {
         return res.status(404).json({ error: "Order not found" });

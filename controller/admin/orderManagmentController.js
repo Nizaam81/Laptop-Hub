@@ -230,10 +230,12 @@ const approveRequest = async (req, res) => {
 
     const refundAmount = item.price * item.quantity;
 
-    const wallet = await Wallet.findOne({ userId: Order.userId });
+    let wallet = await Wallet.findOne({ userId: Order.userId });
     if (!wallet) {
-      const newWallet = new Wallet({
-        userId,
+      wallet = new Wallet({
+        userId: Order.userId,
+        totalBalance: 0,
+        transactions: [],
       });
     }
 
@@ -249,7 +251,7 @@ const approveRequest = async (req, res) => {
 
     item.returnRequest.status = "Approved";
     item.returnRequest.returnDate = new Date();
-    item.returnRequest.refundStatus = "Completed";
+    item.returnRequest.refundStatus = "Amount Refunded";
 
     await Order.save();
 
@@ -261,6 +263,7 @@ const approveRequest = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 module.exports = {
   loadOrder,
   updateOrderStatus,

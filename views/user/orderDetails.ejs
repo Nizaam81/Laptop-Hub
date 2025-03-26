@@ -535,10 +535,15 @@
                 </div>
                 <div class="item-action">
                   <a href="/user/orderDetailss/<%= order._id %>?product=<%= item._id %>">
-                    <button class="btn btn-primary">
-                      View Details <span style="margin-left: 5px">›</span>
-                      
+                   
+                    <% if (item.status != 'cancel') { %>
+                      <button class="btn btn-primary">
+                      View Details <span style="margin-left: 5px">›</span>      
                     </button>
+                   
+                    <% } %>
+           
+                    
                   </a>
                 </div>
               </div>
@@ -547,11 +552,25 @@
          
 
           <div class="card-footer">
-            <button class="btn btn-danger cancel-order-btn" data-order-id="<%= order._id %>">
+            <% let x=0 %>
+           <% for( let index = 0; index < order.orderItem.length; index++ ) { %>
+              <% if (order.orderItem[index].status !== "cancel") { %>
+                <% x=1 %>
+              <% } %>
+           <% } %>
+           <% if (x==0) { %>
+            <button class="btn btn-secondary cancel-order-btn" data-order-id="<%= order._id %>" disabled>
+              Cancelled
+            </button>
+              
+            <% } else { %>
+               <button class="btn btn-danger cancel-order-btn" data-order-id="<%= order._id %>">
               Cancel Order
             </button>
+           <% } %>
+          
             <button class="btn btn-support">Need Help?</button>
-            <% if (order.paymentStatus==="Paid") { %>
+            <% if (order.paymentStatus==="Paid" && x==1) { %>
              <button class="btn download-btn" onclick="downloadInvoice('<%= order._id %>')">📥 Download Invoice</button>
             <% } %>
             

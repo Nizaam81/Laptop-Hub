@@ -246,7 +246,7 @@
 
         <div class="order-header">
             <h3>Order Details</h3>
-            <span>Order ID: <%= orders[0]._id %></span>
+            <span>Order ID: <%= orders[0].orderItem._id %></span>
             <span><%= new Date(orders[0].createdOn).toLocaleDateString("en-US", { day: '2-digit', month: 'long', year: 'numeric' }) %></span>
         </div>
 
@@ -267,14 +267,14 @@
             </div>
         </div>
 
-        <% Addres.forEach(element => { %>
+        <% orders.forEach(element => { %>
             <div class="section">
                 <h4>Shipping Address</h4>
-                <p><strong><%= element.name %></strong></p>
-                <p><%= element.addressType %></p>
-                <p><%= element.state %></p>
-                <p><%= element.city %></p>
-                <p><%= element.phone %></p>
+                <p><strong><%= element.addressDetails[0].name %></strong></p>
+                <p><%= element.addressDetails[0].addressType %></p>
+                <p><%= element.addressDetails[0].state %></p>
+                <p><%= element.addressDetails[0].city %></p>
+                <p><%= element.addressDetails[0].phone %></p>
             </div>
         <% }) %>
        
@@ -282,13 +282,17 @@
             <h4>Order Status</h4>
             <span class="status"><%= orders[0].orderItem.status %></span>
         </div>
+        
 
         <div class="buttons">
-            <% if ( orders[0].orderItem.status != "cancel" ) { %>
+            <% if ( orders[0].orderItem.status != "cancel" &&  orders[0].orderItem.status !== "delivered" && orders[0].orderItem.status!=="Return Request" ) { %>
                         <button class="btn cancel-btn" data-order-id="<%= orders[0]._id %>" data-item-id="<%= orders[0].orderItem._id %>">❌ Cancel Item</button>
 
             <% } %>
-           <button class="btn return-btn" id="returnBtn" data-order-id="<%= orders[0]._id %>" data-item-id="<%= orders[0].orderItem._id %>">↩ Request Return</button>
+            <% if (orders[0].orderItem.status !="Return Request") { %>
+                        <button class="btn return-btn" id="returnBtn" data-order-id="<%= orders[0]._id %>" data-item-id="<%= orders[0].orderItem._id %>">↩ Request Return</button>
+
+            <% } %>
 
         
         </div>

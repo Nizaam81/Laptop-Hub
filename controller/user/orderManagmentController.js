@@ -53,7 +53,7 @@ const loadOrder = async (req, res) => {
 
     const users = await user.findOne({ _id: userid });
     const firstLetter = users.FirstName.charAt(0);
-
+    console.log("order data", orders);
     res.render("user/orderDetails", {
       orders,
       currentPage: page,
@@ -82,6 +82,7 @@ const loadorderFullDetails = async (req, res) => {
       {
         $unwind: "$orderItem",
       },
+
       {
         $match: { "orderItem._id": new ObjectId(productId) },
       },
@@ -93,6 +94,14 @@ const loadorderFullDetails = async (req, res) => {
           as: "productDetails",
         },
       },
+      {
+        $lookup: {
+          from: "addresses",
+          localField: "address",
+          foreignField: "_id",
+          as: "addressDetails",
+        },
+      },
     ]);
 
     if (orders.length === 0) {
@@ -102,7 +111,7 @@ const loadorderFullDetails = async (req, res) => {
     const Addres = await address.find({ userId: userId });
 
     const totalPrice = orders[0].orderItem.price * orders[0].orderItem.quantity;
-
+    console.log("hai nizam", orders);
     res.render("user/orderFullDetails", {
       orders,
       totalPrice,
@@ -111,6 +120,7 @@ const loadorderFullDetails = async (req, res) => {
       Addres,
     });
   } catch (error) {
+    console.log(error);
     console.error("Error in loadorderFullDetails controller", error);
     res.status(500).send("Internal Server Error");
   }

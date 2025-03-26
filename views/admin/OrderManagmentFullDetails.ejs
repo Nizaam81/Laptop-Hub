@@ -542,7 +542,7 @@
 <script>
   document.querySelectorAll(".dropdownbtn").forEach(dropdown => {
     dropdown.addEventListener("change", async (event) => {
-        const status = event.target.value; // Get selected status
+        const status = event.target.value;
         console.log("Status:", status);
 
         const specificId = document.getElementById('specificId').value;
@@ -572,13 +572,15 @@
 
             const result = await response.json();
 
-            if (response.ok) {
+               if (response.ok) {
                 Swal.fire({
                     icon: "success",
                     title: "Success",
                     text: "Order status updated successfully!",
+                }).then(() => {
+                    location.reload(); 
                 });
-            } else {
+            }else {
                 Swal.fire({
                     icon: "error",
                     title: "Error",
@@ -634,7 +636,7 @@
                     title: "Success",
                     text: "Return request approved and amount refunded to wallet!",
                 }).then(() => {
-                    location.reload(); // Reload the page to reflect the changes
+                    location.reload(); 
                 });
             } else {
                 Swal.fire({

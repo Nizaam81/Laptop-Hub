@@ -573,6 +573,149 @@
                 font-size: 14px;
             }
         }
+
+                .available-coupons {
+            background-color: #f9fafb;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .coupon-carousel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .coupon-carousel-header h4 {
+            font-size: 18px;
+            color: #2563eb;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .coupon-carousel-header h4 i {
+            color: #10b981;
+        }
+
+        .coupon-scroll-container {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            gap: 15px;
+            padding-bottom: 15px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: #2563eb #e5e7eb;
+        }
+
+        .coupon-scroll-container::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .coupon-scroll-container::-webkit-scrollbar-track {
+            background: #e5e7eb;
+            border-radius: 10px;
+        }
+
+        .coupon-scroll-container::-webkit-scrollbar-thumb {
+            background-color: #2563eb;
+            border-radius: 10px;
+        }
+
+        .coupon-card {
+            flex: 0 0 280px;
+            scroll-snap-align: start;
+            background: linear-gradient(135deg, #ffffff, #f0f4ff);
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .coupon-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.15);
+        }
+
+        .coupon-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .coupon-code {
+            background-color: #10b981;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .coupon-details {
+            text-align: left;
+        }
+
+        .coupon-details h5 {
+            margin: 0;
+            font-size: 16px;
+            color: #2563eb;
+        }
+
+        .coupon-details p {
+            margin: 5px 0 0;
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .coupon-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .coupon-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #10b981;
+        }
+
+        .apply-coupon-btn {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .apply-coupon-btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        .apply-coupon-btn:disabled {
+            background-color: #93c5fd;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 600px) {
+            .coupon-card {
+                flex: 0 0 250px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -685,27 +828,50 @@
     </div>
 
  
-  <!-- Available Coupons Section -->
-<div class="available-coupons">
-    <h4>💳 Available Coupons</h4>
-    <div class="coupon-list">
-        <% availableCoupons.forEach(element => { %>
-            <% if (!element.expireOn || new Date(element.expireOn) >= new Date()) { %>
-                <div class="coupon-card">
-                    <div class="coupon-left">
-                        <h5><%= element.name %></h5>
-                        <p>Minimum Purchase: $<%= element.minimumPrice %></p>
+    <!-- Available Coupons Section -->
+    <div class="available-coupons">
+        <div class="coupon-carousel-header">
+            <h4>
+                <i class="fas fa-ticket-alt"></i> 
+                Available Coupons
+            </h4>
+        </div>
+        
+        <div class="coupon-scroll-container" id="couponCarousel">
+            <% availableCoupons.forEach(element => { %>
+                <% if (!element.expireOn || new Date(element.expireOn) >= new Date()) { %>
+                    <div class="coupon-card">
+                        <div class="coupon-header">
+                            <span class="coupon-code"><%= element.name %></span> 
+                            <% if (element.expireOn) { %>
+                               <small>Expires: <%= new Date(element.expireOn).toLocaleDateString() %></small>
+                            <% } %>
+                        </div>
+                         
+                        <div class="coupon-details">
+                           
+                            <p>Minimum Purchase: $<%= element.minimumPrice %></p>
+                        </div>
+                        
+                        <div class="coupon-footer">
+                            <div class="coupon-value">
+                                ₹<%= element.offerPrice %> OFF
+                            </div>
+                            <% if (totalPrice >= element.minimumPrice) { %>
+                                <button class="apply-coupon-btn" onclick="applyCoupon('<%= element.name %>')">
+                                    Apply Coupon
+                                </button>
+                            <% } else { %>
+                                <button class="apply-coupon-btn" disabled>
+                                    Not Eligible
+                                </button>
+                            <% } %>
+                        </div>
                     </div>
-                    <% if (totalPrice >= element.minimumPrice) { %>
-                        <button class="copy-btn" onclick="applyCoupon('<%= element.name %>')">Apply</button>
-                    <% } else { %>
-                        <button class="copy-btn" disabled>Not Eligible</button>
-                    <% } %>
-                </div>
-            <% } %>
-        <% }) %>
+                <% } %>
+            <% }) %>
+        </div>
     </div>
-</div>
 
 
 </div>
@@ -1164,7 +1330,18 @@ document.getElementById("applyCoupon").addEventListener("click", function() {
     const couponCode = document.getElementById("couponCode").value.trim();
     applyCoupon(couponCode);
 });
-
+        document.addEventListener('DOMContentLoaded', () => {
+            const carousel = document.getElementById('couponCarousel');
+            
+            // Add scroll buttons if needed
+            const scrollLeft = () => {
+                carousel.scrollBy({ left: -280, behavior: 'smooth' });
+            };
+            
+            const scrollRight = () => {
+                carousel.scrollBy({ left: 280, behavior: 'smooth' });
+            };
+        });
 
         
 

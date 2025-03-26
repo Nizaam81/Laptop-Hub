@@ -44,10 +44,11 @@ const orderSchema = new Schema({
         returnDate: { type: Date, default: null },
         refundStatus: {
           type: String,
-          enum: ["Pending", "Completed", "Failed"],
+          enum: ["Pending", "Completed", "Failed", "Amount Refunded"],
           default: "Pending",
         },
       },
+      refundedAmount: { type: Number, default: 0 },
     },
   ],
   totalPrice: { type: Number, required: true },
