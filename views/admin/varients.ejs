@@ -329,7 +329,7 @@
 function handleEdit(event) {
     const editModal = document.getElementById("editModal");
     const row = event.target.closest("tr");
-    console.log("row",row)
+   
     
    document.getElementById("varientId").value=row.cells[0].textContent
     document.getElementById("editProductName").value = row.cells[1].textContent;

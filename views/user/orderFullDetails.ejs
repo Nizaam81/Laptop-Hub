@@ -282,10 +282,18 @@
             <h4>Order Status</h4>
             <span class="status"><%= orders[0].orderItem.status %></span>
         </div>
+        <% if (orders[0].orderItem.status =="Return Request") { %>
+           <div class="section">
+            <h4>Return Request  Status</h4>
+
+            <span class="status"><%= orders[0].orderItem.returnRequest.refundStatus %></span>
+        </div>
+        <% } %>
+        
         
 
         <div class="buttons">
-            <% if ( orders[0].orderItem.status != "cancel" &&  orders[0].orderItem.status !== "delivered" && orders[0].orderItem.status!=="Return Request" ) { %>
+            <% if ( orders[0].orderItem.status != "cancel" &&  orders[0].orderItem.status !== "Delivered" && orders[0].orderItem.status!=="Return Request" && orders[0].orderItem.status!=="shipped" ) { %>
                         <button class="btn cancel-btn" data-order-id="<%= orders[0]._id %>" data-item-id="<%= orders[0].orderItem._id %>">❌ Cancel Item</button>
 
             <% } %>

@@ -107,15 +107,13 @@ const loadlogin = async (req, res) => {
     }
   } catch (error) {
     res.redirect("user/pageNotfound");
-    console.log("user login is error");
   }
 };
 const loadsignup = async (req, res) => {
   try {
-    console.log(req.query);
     const { ref } = req.query;
     req.session.ref = ref;
-    console.log(req.session.ref);
+
     res.render("user/signup");
   } catch (error) {
     console.log(error);
@@ -344,7 +342,6 @@ const login = async (req, res) => {
     }
 
     const passwordMatch = await bcrypt.compare(password, findUser.password);
-    console.log(passwordMatch);
 
     if (!passwordMatch) {
       return res.render("user/login", { message: "Incorrect password" });
@@ -531,7 +528,6 @@ const loadForgotpassword = async (req, res) => {
 const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
-    console.log(req.body);
 
     // Check if email exists
     const existingUser = await user.findOne({ email });
@@ -690,7 +686,7 @@ const profile = async (req, res) => {
     res.render("user/profile", { users, firstLetter });
   } catch (error) {
     res.render("user/pageNotfound.ejs");
-    console.log("profile error");
+
     console.error(error);
   }
 };

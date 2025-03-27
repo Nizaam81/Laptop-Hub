@@ -54,7 +54,6 @@ const loadPlaceOrder = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    console.log("Error in place order GET function");
   }
 };
 
@@ -76,7 +75,6 @@ const placeOrder = async (req, res) => {
       address: address,
       paymentMethod: paymentMethod,
       userId: userId,
-
       status: paymentMethod === "wallet" ? "Paid" : "Pending",
     });
 
@@ -115,8 +113,7 @@ const placeOrder = async (req, res) => {
         receipt: `order_rcptid_${userId}`,
         payment_capture: 1,
       };
-      console.log(options);
-      console.log(razorpay);
+
       const response = await razorpay.orders.create(options);
 
       newOrder.razorpayOrderId = response.id;
@@ -145,11 +142,8 @@ const verifyPayment = async (req, res) => {
   try {
     const { razorpayOrderId, razorpayPaymentId, razorpaySignature } = req.body;
 
-    console.log("Verification attempt for order:", razorpayOrderId);
-
     const orderExists = await order.findOne({ razorpayOrderId });
     if (!orderExists) {
-      console.log("Order not found:", razorpayOrderId);
       return res.status(404).json({
         success: false,
         error: "Order not found",
@@ -161,13 +155,7 @@ const verifyPayment = async (req, res) => {
       .update(`${razorpayOrderId}|${razorpayPaymentId}`)
       .digest("hex");
 
-    console.log("Signature comparison:");
-    console.log("Generated:", generatedSignature);
-    console.log("Received:", razorpaySignature);
-
     if (generatedSignature !== razorpaySignature) {
-      console.log("Invalid signature detected, marking payment as failed");
-
       const updateResult = await order.findOneAndUpdate(
         { razorpayOrderId },
         {
@@ -213,12 +201,8 @@ const paymentFailed = async (req, res) => {
   try {
     const { razorpayOrderId, errorMessage } = req.body;
 
-    console.log("Payment failed for order:", razorpayOrderId);
-    console.log("Error message:", errorMessage);
-
     const orderExists = await order.findOne({ razorpayOrderId });
     if (!orderExists) {
-      console.log("Order not found:", razorpayOrderId);
       return res.status(404).json({
         success: false,
         error: "Order not found",

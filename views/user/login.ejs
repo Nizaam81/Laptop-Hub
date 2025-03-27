@@ -503,17 +503,17 @@
         const error2 = document.getElementById("error2");
         const togglePassword = document.getElementById('togglePassword');
 
-        // Password toggle functionality
+        
         togglePassword.addEventListener('click', function() {
-            // Toggle the type attribute
+           
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
             
-            // Toggle the eye / eye-slash icon
+            
             this.querySelector('i').classList.toggle('fa-eye');
             this.querySelector('i').classList.toggle('fa-eye-slash');
             
-            // Toggle active class for styling
+        
             this.classList.toggle('active');
         });
 
@@ -521,7 +521,7 @@
             event.preventDefault();
             const emailValue = emailInput.value.trim();
             const passwordValue = passwordInput.value.trim();
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regular expression for email validation
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
             if (!emailValue) {
                 error1.style.display="block";
@@ -560,17 +560,17 @@
             }, 3000); 
         }
         
-        // Function to check viewport size and make adjustments if needed
+       
         function checkViewportSize() {
             if (window.matchMedia("(max-width: 768px)").matches) {
-                // Additional mobile-specific adjustments can be made here
+              
             }
         }
         
-        // Run on page load
+      
         checkViewportSize();
         
-        // Run when window is resized
+        
         window.addEventListener('resize', checkViewportSize);
     });
     </script>

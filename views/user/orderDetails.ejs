@@ -554,13 +554,13 @@
           <div class="card-footer">
             <% let x=0 %>
            <% for( let index = 0; index < order.orderItem.length; index++ ) { %>
-              <% if (order.orderItem[index].status !== "cancel") { %>
+              <% if (order.orderItem[index].status !== "cancel" && order.orderItem[index].status !=="Return Request") { %>
                 <% x=1 %>
               <% } %>
            <% } %>
            <% if (x==0) { %>
             <button class="btn btn-secondary cancel-order-btn" data-order-id="<%= order._id %>" disabled>
-              Cancelled
+              Cancel Order
             </button>
               
             <% } else { %>
@@ -594,19 +594,19 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Prevent multiple initializations
+ 
   if (window.razorpayInitialized) return;
   window.razorpayInitialized = true;
   
-  // Load Razorpay script if not already loaded
+  
   if (typeof Razorpay === 'undefined') {
-    console.log('Loading Razorpay script...');
+ 
     const script = document.createElement('script');
     script.src = 'https://checkout.razorpay.com/v1/checkout.js';
     script.async = true;
     document.head.appendChild(script);
     script.onload = function() {
-      console.log('Razorpay script loaded');
+      ;
       initializeButtons();
     };
   } else {
@@ -616,9 +616,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function initializeButtons() {
    
-    console.log('Initializing retry buttons');
+   
     const retryButtons = document.querySelectorAll('.retry-btn');
-    console.log('Found retry buttons:', retryButtons.length);
+  
     
     retryButtons.forEach(button => {
      
@@ -626,13 +626,13 @@ document.addEventListener('DOMContentLoaded', function() {
       button.parentNode.replaceChild(newButton, button);
       
       newButton.addEventListener('click', async function() {
-        console.log('Retry button clicked');
+       
         const orderId = this.getAttribute('data-order-id');
-        console.log('Order ID:', orderId);
+        
         
        
         const originalText = this.innerHTML;
-          console.log('Sending fetch request to /user/retryPayment with orderId:', orderId);
+         
 
         try {
          
@@ -644,7 +644,7 @@ document.addEventListener('DOMContentLoaded', function() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ orderId })
           });
-          console.log("✅ Received response from server:", response);
+         
 
           if (!response.ok) {
             const errorData = await response.json();
@@ -652,7 +652,7 @@ document.addEventListener('DOMContentLoaded', function() {
           }
           
           const data = await response.json();
-          console.log('Razorpay init response:', data);
+         
           
           const options = {
             key: data.key,
@@ -662,7 +662,7 @@ document.addEventListener('DOMContentLoaded', function() {
             name: "Laptop Hub",
             description: "Payment for order",
             handler: async function(response) {
-              console.log('Payment successful:', response);
+            
               try {
                 const verifyResponse = await fetch('/user/verifyPayment', {
                   method: 'POST',
@@ -699,14 +699,14 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             modal: {
               ondismiss: function() {
-                console.log('Modal dismissed');
+               
                 newButton.disabled = false;
                 newButton.innerHTML = originalText;
               }
             }
           };
           
-          console.log('Opening Razorpay with options:', options);
+         
           const rzp = new Razorpay(options);
           
           rzp.on('payment.failed', async function(response) {
@@ -741,10 +741,9 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     });
 
-    // Initialize cancel order buttons
-    console.log('Initializing cancel buttons');
+  
     const cancelButtons = document.querySelectorAll('.cancel-order-btn');
-    console.log('Found cancel buttons:', cancelButtons.length);
+   
     
     cancelButtons.forEach(button => {
       // Remove existing event listeners to prevent duplicates
@@ -753,7 +752,7 @@ document.addEventListener('DOMContentLoaded', function() {
       
       newButton.addEventListener('click', async function() {
         const orderId = this.getAttribute('data-order-id');
-        console.log('Cancel button clicked for order:', orderId);
+       
         
         try {
           const response = await fetch('/user/cancelOrder', {
@@ -796,7 +795,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function showToast(message, icon = 'info') {
-  console.log('Showing toast:', message, icon);
+  
   if (typeof Swal !== 'undefined') {
     Swal.fire({
       toast: true,

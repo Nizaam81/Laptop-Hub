@@ -208,7 +208,7 @@
 </body>
 <script>
     async function deleteCategory(addressId) {
-        console.log("Trying to delete address with ID:", addressId);
+       
         
         const result = await Swal.fire({
             title: 'Delete Address?',
@@ -233,7 +233,7 @@
                 });
                 
                 const data = await response.json();
-                console.log("Server Response:", data);
+                
                 
                 if (response.ok) {
                     await Swal.fire({

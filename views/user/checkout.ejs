@@ -800,15 +800,17 @@
 
         <!-- Order Items -->
         <% carts.forEach(element => { %>
-            <div class="order-item">
+            <% if (element.variantDetails.quantity > 0) { %>
+             <div class="order-item">
                 <img src="<%= element.productDetails[0].images[0] %>" alt="Product Image">
                 <div class="order-item-details">
                     <p><strong><%= element.productDetails[0].name %></strong></p>
                     <p class="price">₹<%= element.price %></p>
                     <p><i class="fas fa-box"></i> Qty: <%= element.quantity %></p>
-                    <input type="hidden" id="varianId" value="<%= element.variantDetails[0]._id %>">
+                    <input type="hidden" id="varianId" value="<%= element.variantDetails._id %>">
                 </div>
             </div>
+            <% } %>
         <% }) %>
 
        <!-- Coupon Section -->
@@ -936,14 +938,14 @@ let appliedCoupon = null;
 
 
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("Original Price on Load:", originalPrice);
+  
     fetchAvailableCoupons(originalPrice);
 });
 
 
 async function fetchAvailableCoupons(totalPrice) {
     try {
-        console.log("Fetching coupons for totalPrice:", totalPrice);
+       
 
         const response = await fetch("/user/availableCoupons", {
             method: "POST",
@@ -952,7 +954,7 @@ async function fetchAvailableCoupons(totalPrice) {
         });
 
         const result = await response.json();
-        console.log("Coupons received:", result);
+     
 
         if (response.ok) {
             displayCoupons(result.coupons);
@@ -1000,7 +1002,7 @@ document.getElementById("applyCoupon").addEventListener("click", async function(
     }
 
     try {
-        console.log("Applying coupon:", couponCode);
+      
 
         const response = await fetch("/user/couponApplied", {
             method: "POST",
@@ -1009,7 +1011,7 @@ document.getElementById("applyCoupon").addEventListener("click", async function(
         });
 
         const result = await response.json();
-        console.log("Apply Coupon Response:", result);
+       
 
         if (response.ok) {
             const discount = result.discount || 0;
@@ -1064,8 +1066,8 @@ document.getElementById("applyCoupon").addEventListener("click", async function(
     let cartItems = <%- JSON.stringify((carts || []).map(element => ({
         product: element?.productDetails?.[0]?._id || "",
         quantity: element?.quantity || 0,
-        price: element?.variantDetails?.[0]?.price || 0,
-        variantid:element?.variantDetails?.[0]._id|| ""
+        price: element?.variantDetails?.price || 0,
+        variantid:element?.variantDetails?._id|| ""
     }))) %>;
 
     let orderData = {
@@ -1200,7 +1202,7 @@ document.getElementById("applyCoupon").addEventListener("click", async function(
 });
 
 async function handlePaymentFailure(orderId, errorMessage) {
-    console.log("Payment failed:", errorMessage);
+  
     
     try {
         // Notify backend about payment failure
@@ -1277,7 +1279,7 @@ async function handlePaymentFailure(orderId, errorMessage) {
 
 async function applyCoupon(couponCode) {
     try {
-        console.log("Applying coupon:", couponCode);
+      
 
         // Validate coupon code
         if (!couponCode) {
@@ -1293,7 +1295,7 @@ async function applyCoupon(couponCode) {
         });
 
         const result = await response.json();
-        console.log("Apply Coupon Response:", result);
+        
 
         if (response.ok) {
            

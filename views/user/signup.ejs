@@ -6,6 +6,15 @@
     <title>Sign Up Page</title>
     <!-- SweetAlert CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- SweetAlert2 CSS (for styling) -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+    />
+
+    <!-- SweetAlert2 JS (for functionality) -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Font Awesome for the eye icon -->
     <link
       rel="stylesheet"
@@ -623,9 +632,8 @@
           return true;
         }
 
-        // Form submission handler
         signUpForm.addEventListener("submit", function (e) {
-          e.preventDefault(); // Prevent form submission for validation
+          e.preventDefault();
 
           const isFnameValid = FnameValidateChecking();
           const isLnameValid = LnameValidateChecking();
@@ -650,6 +658,7 @@
             });
           }
         });
+        const data = Response.json();
 
         function checkViewportSize() {
           if (window.matchMedia("(max-width: 768px)").matches) {

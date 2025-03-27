@@ -811,7 +811,7 @@
 
  async function toggleWishlist(event,element) {
     event.stopPropagation()
-    console.log("haiii function is working ")
+   
         const variantId = element.getAttribute("data-product-id");
     
         
@@ -841,7 +841,7 @@
     }
 
     function getProductViewPage(productId,varientId){
-        console.log("working2")
+        
         window.location.href = `/user/productView?productId=${productId}&varientId=${varientId}`;
     }
 

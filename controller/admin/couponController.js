@@ -86,8 +86,6 @@ const toggleBlockCoupon = async (req, res) => {
 
 const editCoupon = async (req, res) => {
   try {
-    console.log("Edit data in coupon:", req.body);
-
     const { id, name, startDate, endDate, offerPrice, minimumPrice } = req.body;
 
     if (!id) {

@@ -53,7 +53,7 @@ const loadOrder = async (req, res) => {
 
     const users = await user.findOne({ _id: userid });
     const firstLetter = users.FirstName.charAt(0);
-    console.log("order data", orders);
+
     res.render("user/orderDetails", {
       orders,
       currentPage: page,
@@ -111,7 +111,7 @@ const loadorderFullDetails = async (req, res) => {
     const Addres = await address.find({ userId: userId });
 
     const totalPrice = orders[0].orderItem.price * orders[0].orderItem.quantity;
-    console.log("hai nizam", orders);
+
     res.render("user/orderFullDetails", {
       orders,
       totalPrice,
@@ -184,9 +184,8 @@ const cancelItem = async (req, res) => {
     const refund = await order.findById(orderId);
     const itemFind = refund.orderItem.id(specificItemId);
     const refundAmount = itemFind.price;
-    console.log(itemFind);
+
     const user = req.session.user;
-    console.log("User:", user);
 
     const walletUpdate = await wallet.updateOne(
       { userId: req.session.user },
@@ -216,6 +215,7 @@ const cancelItem = async (req, res) => {
 const returnItem = async (req, res) => {
   try {
     const { orderId, itemId, reason } = req.body;
+    console.log("nizam", req.body);
 
     if (!orderId || !itemId || !reason) {
       return res.status(400).json({
@@ -231,12 +231,13 @@ const returnItem = async (req, res) => {
 
     // Find the specific item in the order
     const item = Order.orderItem.find((item) => item._id.toString() === itemId);
+    console.log("item", item);
     if (!item) {
       return res.status(404).json({ message: "Item not found in the order" });
     }
 
     // Check if the item is already delivered
-    if (item.status !== "delivered") {
+    if (item.status !== "Delivered") {
       return res
         .status(400)
         .json({ message: "Item is not delivered and cannot be returned" });
@@ -252,13 +253,15 @@ const returnItem = async (req, res) => {
       returnDate: null,
       refundStatus: "Pending",
     };
+    console.log("aai pranav");
 
     // Save the updated order
     await Order.save();
-
-    res
-      .status(200)
-      .json({ message: "Return request submitted successfully", order });
+    console.log("haai nizam", Order);
+    res.status(200).json({
+      message: "Return request submitted successfully",
+      order: Order, // Fixed variable reference
+    });
   } catch (error) {
     console.error("Error in returnItem:", error);
     res.status(500).json({ message: "Internal server error" });

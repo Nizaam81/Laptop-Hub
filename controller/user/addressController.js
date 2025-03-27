@@ -10,7 +10,7 @@ const loadAddress = async (req, res) => {
     }
 
     const addreses = await Address.find({ userId });
-    console.log("address fata ", addreses);
+
     const user = await User.findById(userId); // Fetch user details
 
     const userid = req.session.user;
@@ -39,9 +39,8 @@ const editAddress = async (req, res) => {
   try {
     const userId = req.session.user;
     const addressId = req.params.id;
-    console.log("adressId", addressId);
+
     const address = await Address.findOne({ userId: userId });
-    console.log("edit address data", address);
 
     res.render("user/editAddress", {
       firstLetter: "",
@@ -67,7 +66,6 @@ const updateAddress = async (req, res) => {
       phone,
       altPhone,
     } = req.body;
-    console.log(req.body);
 
     await Address.findOneAndUpdate(
       { _id: addressId },

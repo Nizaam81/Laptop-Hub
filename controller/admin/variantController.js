@@ -30,8 +30,6 @@ const loadvarient = async (req, res) => {
 
 const addVarient = async (req, res) => {
   try {
-    console.log("Request Body:", req.body);
-
     const { productId, ramSize, variantPrice, variantQuantity } = req.body;
 
     if (!productId || !ramSize || !variantPrice || !variantQuantity) {
@@ -77,7 +75,7 @@ const updatevariant = async (req, res) => {
   try {
     const { productName, editVariant, editVariantPrice, quantity, variantId } =
       req.body;
-    console.log("variant data", req.body);
+
     if (
       !productName ||
       !editVariant ||

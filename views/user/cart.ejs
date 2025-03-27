@@ -243,7 +243,8 @@
         
         <% if (carts.length > 0) { %>
             <% carts.forEach(element => { %>
-                <div class="cart-item">
+                <% if (element.variantDetails[0].quantity>0) { %>
+                 <div class="cart-item">
                     <img src="<%=element.productDetails[0].images[0] %>" alt="<%= element.productDetails[0].name %>">
                     <div class="info">
                         <h3><%= element.productDetails[0].name %></h3>
@@ -261,6 +262,7 @@
                         <button class="remove-btn" onclick="deleteCart('<%=element._id %>')">Remove</button>
                     </div>
                 </div>
+                <% } %>
             <% }) %>
         <% } else { %>
             <div class="empty-cart">
@@ -269,7 +271,13 @@
         <% } %>
         
         <div class="summary">
-            <% if (carts.length > 0) { %>
+            <% let x=0 %>
+            <% for( let index = 0; index < carts.length; index++ ) { %>
+                <% if (carts[index].variantDetails[0].quantity !=0) { %>
+                 <% x=1 %>
+                <% } %>
+            <% } %>
+            <% if (carts.length > 0 && x==1) { %>
                 <a href="/user/checkout"><button class="checkout-btn">Proceed to Checkout</button></a> 
             <% } else { %>
                 <a href="/user/checkout"><button class="checkout-btn" disabled>Checkout</button></a> 
@@ -368,7 +376,7 @@ function showToast(message, icon = "info") {
             })
             .then(response => response.json())
             .then(data => {
-                console.log("Updated successfully", data);
+               
             })
             .catch(error => {
                 console.error("Error updating quantity:", error);
@@ -404,7 +412,7 @@ function showToast(message, icon = "info") {
             })
             .then(response => response.json())
             .then(data => {
-                console.log("Updated successfully", data);
+               
             })
             .catch(error => {
                 console.error("Error updating quantity:", error);

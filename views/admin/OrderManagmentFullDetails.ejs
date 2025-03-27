@@ -491,21 +491,21 @@
             </div>
               <div class="item-status">
     <div class="select-wrapper">
-        <select class="custom-select dropdownbtn" data-specificid="<%= item._id %>" data-orderid="<%= Orderr[0]._id %>">
+        <select   class="custom-select dropdownbtn" data-specificid="<%= item.orderItem._id %>" data-orderid="<%= Orderr[0]._id %>">
             <option value="<%= item.orderItem.status %>" selected><%= item.orderItem.status %></option>
-            <% if (item.orderItem.status != "cancel" && item.orderItem.status != "delivered") { %>
+            <% if (item.orderItem.status != "cancel" && item.orderItem.status != "Delivered") { %>
                 <% if (item.orderItem.status == "processing") { %>
-                    <% ['shipped', 'delivered'].forEach(status => { %>
+                    <% ['shipped', 'Delivered'].forEach(status => { %>
                         <option value="<%= status %>"><%= status %></option>
                     <% }) %>
                 <% } else if (item.orderItem.status == "shipped") { %>
-                    <option value="delivered">delivered</option>
+                    <option value="Delivered">delivered</option>
                 <% } %>
             <% } %>
         </select>
     </div>
     <% if (item.orderItem.status === "Return Request" && item.orderItem.returnRequest.status === "Pending") { %>
-        <button class="approve-return-btn" data-specificid="<%= item._id %>" data-orderid="<%= Orderr[0]._id %>">Approve Return</button>
+        <button class="approve-return-btn" data-specificid="<%= item.orderItem._id %>" data-orderid="<%= Orderr[0]._id %>">Approve Return</button>
     <% } %>
 </div>
 
@@ -542,14 +542,17 @@
 <script>
   document.querySelectorAll(".dropdownbtn").forEach(dropdown => {
     dropdown.addEventListener("change", async (event) => {
-        const status = event.target.value;
+          const status = event.target.value;
         console.log("Status:", status);
-
-        const specificId = document.getElementById('specificId').value;
-        const orderId = event.target.dataset.orderid;
-
+        
+      
+        const specificId = event.target.getAttribute("data-specificid");
         console.log("Specific ID:", specificId);
+        
+        const orderId = event.target.getAttribute("data-orderid");
         console.log("Order ID:", orderId);
+
+        
 
         if (!specificId || !orderId) {
             console.error("Missing specificId or orderId.");
@@ -606,7 +609,7 @@
 //approve return 
    document.querySelectorAll(".approve-return-btn").forEach(button => {
     button.addEventListener("click", async (event) => {
-        const specificId = document.getElementById('specificId').value;
+        const specificId = event.target.getAttribute("data-specificid");
         const orderId = event.target.dataset.orderid;
 
         if (!specificId || !orderId) {

@@ -285,27 +285,52 @@
     return d.toISOString().split('T')[0]; 
 }
 
-    function openModal(id,name,createdOn,expireOn,offerPrice,minimumPrice) {
-        document.getElementById("editCouponId").value = id;
-        document.getElementById("editCouponName").value = name;
-        document.getElementById("editCouponDate").value = formatDate(createdOn);
-        document.getElementById("editCouponEndDate").value = formatDate(expireOn);
-        document.getElementById("editOfferPrice").value = offerPrice;
-        document.getElementById("editMinimumPrice").value = minimumPrice;
-        document.getElementById("editModal").style.display = "block";
-    }
-    function closeModal() {
-        document.getElementById("editModal").style.display = "none";
-    }
-    document.getElementById("editCouponForm").addEventListener("submit", async (event) => {
+  function openModal(id, name, createdOn, expireOn, offerPrice, minimumPrice) {
+    document.getElementById("editCouponId").value = id;
+    document.getElementById("editCouponName").value = name;
+    document.getElementById("editCouponDate").value = formatDate(createdOn);
+    document.getElementById("editCouponEndDate").value = formatDate(expireOn);
+    document.getElementById("editOfferPrice").value = offerPrice;
+    document.getElementById("editMinimumPrice").value = minimumPrice;
+    document.getElementById("editModal").style.display = "block";
+}
+
+function closeModal() {
+    document.getElementById("editModal").style.display = "none";
+}
+
+document.getElementById("editCouponForm").addEventListener("submit", async (event) => {
     event.preventDefault();
-    
+
     const id = document.getElementById("editCouponId").value;
-    const name = document.getElementById("editCouponName").value;
-    const startDate = document.getElementById("editCouponDate").value;
-    const endDate = document.getElementById("editCouponEndDate").value;
-    const offerPrice = document.getElementById("editOfferPrice").value;
-    const minimumPrice = document.getElementById("editMinimumPrice").value;
+    const name = document.getElementById("editCouponName").value.trim();
+    const startDate = document.getElementById("editCouponDate").value.trim();
+    const endDate = document.getElementById("editCouponEndDate").value.trim();
+    const offerPrice = document.getElementById("editOfferPrice").value.trim();
+    const minimumPrice = document.getElementById("editMinimumPrice").value.trim();
+
+    if (!name || !startDate || !endDate || !offerPrice || !minimumPrice) {
+        showToast("Please fill all fields", "error");
+        return;
+    }
+
+    // Validate offer price - must be a positive number and at least 10
+    if (!/^\d+$/.test(offerPrice) || parseInt(offerPrice) < 10) {
+        showToast("Offer price must be a positive number starting from 10", "error");
+        return;
+    }
+
+    // Validate minimum price - must be a positive number and at least 10
+    if (!/^\d+$/.test(minimumPrice) || parseInt(minimumPrice) < 10) {
+        showToast("Minimum price must be a positive number starting from 10", "error");
+        return;
+    }
+
+    // Ensure minimum price is greater than offer price
+    if (parseInt(minimumPrice) <= parseInt(offerPrice)) {
+        showToast("Minimum price must be greater than offer price", "error");
+        return;
+    }
 
     try {
         const response = await fetch("/admin/EditCoupon", {
@@ -316,17 +341,18 @@
 
         const result = await response.json();
 
-        if (response.ok) {  // Check if the request was successful
-            showToast(result.message || "Coupon edited successfully");
+        if (response.ok) {  
+            showToast(result.message || "Coupon edited successfully", "success");
             setTimeout(() => window.location.reload(), 2000);
         } else {
-            showToast(result.message || "Failed to update coupon");
+            showToast(result.message || "Failed to update coupon", "error");
         }
     } catch (error) {
         console.error("Error updating coupon:", error);
-        showToast("An error occurred while updating the coupon");
+        showToast("An error occurred while updating the coupon", "error");
     }
 });
+
 
 </script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
@@ -348,15 +374,21 @@ document.getElementById("couponForm").addEventListener("submit", async (event) =
         return;
     }
 
-    // Validate offer price - must be positive number and at least 10
+    // Validate offer price - must be a positive number and at least 10
     if (!/^\d+$/.test(offer) || parseInt(offer) < 10) {
         showToast("Offer price must be a positive number starting from 10", "error");
         return;
     }
 
-    // Validate minimum price - must be positive number and at least 10
+    // Validate minimum price - must be a positive number and at least 10
     if (!/^\d+$/.test(minimum) || parseInt(minimum) < 10) {
         showToast("Minimum price must be a positive number starting from 10", "error");
+        return;
+    }
+
+    // Ensure minimum price is greater than offer price
+    if (parseInt(minimum) <= parseInt(offer)) {
+        showToast("Minimum price must be greater than offer price", "error");
         return;
     }
 
@@ -386,6 +418,7 @@ document.getElementById("couponForm").addEventListener("submit", async (event) =
         showToast("An error occurred while adding the coupon.", "error");
     }
 });
+
 
 
 

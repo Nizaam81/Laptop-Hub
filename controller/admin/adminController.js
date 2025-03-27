@@ -74,21 +74,24 @@ const loadDashboard = async (req, res) => {
     let startDate;
     switch (period) {
       case "last7days":
-        startDate = new Date(currentDate.setDate(currentDate.getDate() - 7));
+        startDate = new Date(currentDate.getTime());
+        startDate.setDate(currentDate.getDate() - 7);
         break;
       case "last30days":
-        startDate = new Date(currentDate.setDate(currentDate.getDate() - 30));
+        startDate = new Date(currentDate.getTime());
+        startDate.setDate(currentDate.getDate() - 30);
         break;
       case "last3months":
-        startDate = new Date(currentDate.setMonth(currentDate.getMonth() - 3));
+        startDate = new Date(currentDate.getTime());
+        startDate.setMonth(currentDate.getMonth() - 3);
         break;
       case "lastyear":
-        startDate = new Date(
-          currentDate.setFullYear(currentDate.getFullYear() - 1)
-        );
+        startDate = new Date(currentDate.getTime());
+        startDate.setFullYear(currentDate.getFullYear() - 1);
         break;
       default:
-        startDate = new Date(currentDate.setDate(currentDate.getDate() - 7));
+        startDate = new Date(currentDate.getTime());
+        startDate.setDate(currentDate.getDate() - 7);
     }
 
     const totalCustomers = await user.countDocuments({ isBlocked: false });
@@ -332,9 +335,13 @@ const loadDashboard = async (req, res) => {
       bestBrands,
       formattedOrders,
       salesByCategory: salesByCategoryWithPercentage,
+      selectedPeriod: period,
     };
 
-    res.render("admin/dashboard", { dashboardData });
+    res.render("admin/dashboard", {
+      dashboardData,
+      currentPeriod: period,
+    });
   } catch (error) {
     console.log("Error in dashboard controller:", error);
     res

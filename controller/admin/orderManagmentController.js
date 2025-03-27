@@ -153,7 +153,8 @@ const loadFulldetailsOrder = async (req, res) => {
       "Return Request",
       "Returnedd",
     ];
-    console.log("orderDataaaaaaaaaaaaaaaaa", Orderr);
+    console.log("jcfyxdrtcfyvgj", Orderr);
+
     res.render("admin/OrderManagmentFullDetails", {
       status,
       Orderr: Orderr,
@@ -166,9 +167,9 @@ const loadFulldetailsOrder = async (req, res) => {
 
 const updateOrderStatus = async (req, res) => {
   try {
-    console.log("Received Update Request:", req.body);
-
     const { status, specificId, orderId } = req.body;
+
+    console.log("nizaam status data", req.body);
     if (!orderId || !status) {
       return res.status(400).json({ success: false, message: "Missing data" });
     }
@@ -183,8 +184,6 @@ const updateOrderStatus = async (req, res) => {
       },
       { new: true }
     );
-
-    console.log(updatedOrder);
 
     if (!updatedOrder) {
       return res
@@ -202,6 +201,7 @@ const updateOrderStatus = async (req, res) => {
 const approveRequest = async (req, res) => {
   try {
     const { orderId, specificId } = req.body;
+    console.log("naviyaaaaaaaaa", req.body);
 
     if (!orderId || !specificId) {
       return res.status(400).json({ message: "Missing orderId or specificId" });
@@ -218,6 +218,7 @@ const approveRequest = async (req, res) => {
     if (!item) {
       return res.status(404).json({ message: "Item not found in the order" });
     }
+    console.log("pranav nithya", item);
 
     if (
       item.status !== "Return Request" ||

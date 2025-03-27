@@ -49,7 +49,7 @@ const loadSaleReportPage = async (req, res) => {
     const totalSale = orderData.reduce((sum, num) => {
       return (sum += num.totalPrice);
     }, 0);
-    console.log("price", totalSale);
+
     res.render("admin/salesReport", {
       dateRange: dateRange || "last7days",
       startDate: parsedStartDate.toISOString().split("T")[0],

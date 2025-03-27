@@ -29,7 +29,16 @@ const loadcheckout = async (req, res) => {
           as: "variantDetails",
         },
       },
+      {
+        $unwind: "$variantDetails",
+      },
+      {
+        $match: {
+          "variantDetails.quantity": { $gt: 0 },
+        },
+      },
     ]);
+    console.log(carts);
 
     const Adress = await address.find({ userId: userId });
 
