@@ -75,10 +75,46 @@ const updateProduct = async (req, res) => {
       regularPrice,
       salePrice,
       quantity,
+      indexes,
     } = req.body;
-    const existproduct = await Product.findOne({ name: product });
-    if (existproduct) {
-      return res.json({ existError: "This productname Already Exist" });
+
+    const existingProduct = await Product.findById(productId);
+    if (!existingProduct) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    if (indexes && indexes.length > 0 && req.files && req.files.length > 0) {
+      for (let i = 0; i < indexes.length; i++) {
+        const oldImagePath = existingProduct.images[indexes[i]];
+
+        if (oldImagePath) {
+          const fullPath = Path.join(
+            __dirname,
+            "../../public/uploads",
+            Path.basename(oldImagePath)
+          );
+
+          if (fs.existsSync(fullPath)) {
+            try {
+              fs.unlinkSync(fullPath);
+              console.log(`Deleted old image: ${fullPath}`);
+            } catch (err) {
+              console.error(`Failed to delete image at ${fullPath}:`, err);
+            }
+          } else {
+            console.log(`File not found at ${fullPath}`);
+          }
+        }
+
+        await Product.updateOne(
+          { _id: productId },
+          {
+            $set: {
+              [`images.${indexes[i]}`]: `/uploads/${req.files[i].filename}`,
+            },
+          }
+        );
+      }
     }
 
     await Product.findByIdAndUpdate(
@@ -93,9 +129,11 @@ const updateProduct = async (req, res) => {
         quantity: quantity,
       }
     );
+
     return res.status(200).json({ success: "Product edited successfully" });
   } catch (error) {
     console.error("Error updating product:", error);
+    return res.status(500).json({ error: "Failed to update product" });
   }
 };
 

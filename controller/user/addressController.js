@@ -28,8 +28,12 @@ const loadAddress = async (req, res) => {
 const addAddres = async (req, res) => {
   try {
     const userId = req.session.user;
+    const userid = req.session.user;
 
-    res.render("user/addAddress", { firstLetter: "", userId, users: "" });
+    const users = await User.findOne({ _id: userid });
+    const firstLetter = users.FirstName.charAt(0);
+
+    res.render("user/addAddress", { firstLetter, userId, users });
   } catch (error) {
     console.log("error in addAddress route ");
   }
@@ -41,10 +45,14 @@ const editAddress = async (req, res) => {
     const addressId = req.params.id;
 
     const address = await Address.findOne({ userId: userId });
+    const userid = req.session.user;
+
+    const users = await User.findOne({ _id: userid });
+    const firstLetter = users.FirstName.charAt(0);
 
     res.render("user/editAddress", {
-      firstLetter: "",
-      users: "",
+      firstLetter,
+      users,
       address: address,
     });
   } catch (error) {

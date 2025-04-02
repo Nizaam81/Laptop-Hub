@@ -379,60 +379,63 @@ const logout = async (req, res) => {
 
 const loadproductDetails = async (req, res) => {
   try {
+    // Pagination setup
     const page = parseInt(req.query.page) || 1;
     const limit = 6;
     const skip = (page - 1) * limit;
 
+    // Sorting and filtering parameters
     const value = req.query.value || "default";
+
+    // Handle category filtering
     const selectedCategories = req.query.categories
       ? Array.isArray(req.query.categories)
         ? req.query.categories
         : [req.query.categories]
       : [];
+
+    // Handle brand filtering
     const selectedBrands = req.query.brands
       ? Array.isArray(req.query.brands)
         ? req.query.brands
         : [req.query.brands]
       : [];
 
-    const catagories = await catagory.find({});
-    const brands = await brand.find({});
+    // Fetch non-blocked categories and brands
+    const catagories = await catagory.find({ isBlocked: { $ne: true } });
+    const brands = await brand.find({ isBlocked: { $ne: true } });
 
-    const filterQuery = {};
+    // Base product filter query
+    const productFilterQuery = {
+      isBlocked: { $ne: true },
+    };
 
+    // Apply category filter if categories are selected
     if (selectedCategories.length > 0) {
-      const productsWithCategory = await product.find(
-        { category: { $in: selectedCategories } },
-        { _id: 1 }
-      );
-
-      const productIds = productsWithCategory.map((p) => p._id);
-      filterQuery.product = { $in: productIds };
+      productFilterQuery.category = { $in: selectedCategories };
     }
 
+    // Apply brand filter if brands are selected
     if (selectedBrands.length > 0) {
-      const productsWithBrand = await product.find(
-        { brand: { $in: selectedBrands } },
-        { _id: 1 }
-      );
-
-      const productIds = productsWithBrand.map((p) => p._id);
-
-      if (filterQuery.product) {
-        filterQuery.product = {
-          $in: productIds.filter((id) =>
-            filterQuery.product.$in.some((existingId) => existingId.equals(id))
-          ),
-        };
-      } else {
-        filterQuery.product = { $in: productIds };
-      }
+      productFilterQuery.brand = { $in: selectedBrands };
     }
 
-    const totalProducts = await variant.countDocuments(filterQuery);
+    // Find non-blocked product IDs that match the filters
+    const filteredProducts = await product.find(productFilterQuery, { _id: 1 });
+    const productIds = filteredProducts.map((p) => p._id);
 
+    // Create filter query for variants
+    const variantFilterQuery = {
+      product: { $in: productIds },
+      isBlocked: { $ne: true }, // Ensure variant is not blocked
+    };
+
+    // Count total non-blocked products
+    const totalProducts = await variant.countDocuments(variantFilterQuery);
+
+    // Aggregation pipeline to fetch non-blocked products
     let aggregationPipeline = [
-      { $match: filterQuery },
+      { $match: variantFilterQuery },
       { $match: { ramSize: "8GB" } },
       {
         $lookup: {
@@ -442,23 +445,38 @@ const loadproductDetails = async (req, res) => {
           as: "productDetails",
         },
       },
+      // Additional filter to ensure product is not blocked
+      {
+        $match: {
+          "productDetails.isBlocked": { $ne: true },
+        },
+      },
     ];
 
-    if (value === "ltoH") {
-      aggregationPipeline.push({ $sort: { price: 1 } });
-    } else if (value === "htoL") {
-      aggregationPipeline.push({ $sort: { price: -1 } });
-    } else if (value === "atoZ") {
-      aggregationPipeline.push({ $sort: { "productDetails.0.name": 1 } });
-    } else if (value === "ztoA") {
-      aggregationPipeline.push({ $sort: { "productDetails.0.name": -1 } });
+    // Sorting logic
+    switch (value) {
+      case "ltoH":
+        aggregationPipeline.push({ $sort: { price: 1 } });
+        break;
+      case "htoL":
+        aggregationPipeline.push({ $sort: { price: -1 } });
+        break;
+      case "atoZ":
+        aggregationPipeline.push({ $sort: { "productDetails.0.name": 1 } });
+        break;
+      case "ztoA":
+        aggregationPipeline.push({ $sort: { "productDetails.0.name": -1 } });
+        break;
     }
 
+    // Pagination
     aggregationPipeline.push({ $skip: skip });
     aggregationPipeline.push({ $limit: limit });
 
+    // Fetch products
     const Products = await variant.aggregate(aggregationPipeline);
 
+    // Wishlist logic
     if (req.session.user) {
       const userId = req.session.user._id;
       const userWishlist = (await wishlist.findOne({ user: userId })) || {
@@ -472,9 +490,11 @@ const loadproductDetails = async (req, res) => {
       });
     }
 
+    // Calculate total pages
     const totalPages = Math.ceil(totalProducts / limit);
     const User = req.session.user;
 
+    // Render the page with filtered products
     res.render("user/ProductsDetails", {
       User,
       Products,
@@ -487,7 +507,7 @@ const loadproductDetails = async (req, res) => {
       selectedBrands,
     });
   } catch (error) {
-    console.log("error", error);
+    console.error("Error in loadproductDetails:", error);
     res.status(500).send("Internal Server Error");
   }
 };
@@ -681,6 +701,7 @@ const profile = async (req, res) => {
     const userid = req.session.user;
 
     const users = await user.findOne({ _id: userid });
+
     const firstLetter = users.FirstName.charAt(0);
 
     res.render("user/profile", { users, firstLetter });

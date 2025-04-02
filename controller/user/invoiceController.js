@@ -52,7 +52,7 @@ const invoice = async (req, res) => {
       margins: { top: 50, bottom: 50, left: 50, right: 50 },
       size: "A4",
     });
-    const filename = `invoice-${orderId}.pdf`;
+    const filename = `invoice-fgbtth.pdf`;
 
     res.setHeader("Content-disposition", `attachment; filename="${filename}"`);
     res.setHeader("Content-type", "application/pdf");
@@ -88,20 +88,20 @@ const invoice = async (req, res) => {
       .fillColor(primaryColor)
       .text("INVOICE", 450, 50, { align: "right" });
 
-    doc.moveTo(50, 100).lineTo(550, 100).lineWidth(1).stroke(borderColor);
+    doc.moveTo(50, 110).lineTo(550, 110).lineWidth(1).stroke(borderColor);
 
     doc
       .fontSize(10)
       .font("Helvetica-Bold")
       .fillColor(primaryColor)
-      .text("Invoice Number:", 50, 120)
+      .text("Order ID:", 50, 120)
       .text("Date:", 50, 135)
       .text("Payment Method:", 50, 150);
 
     doc
       .fontSize(10)
       .font("Helvetica")
-      .text(order._id.toString(), 150, 120)
+      .text(order.orderId, 150, 120)
       .text(new Date(order.createdOn).toLocaleDateString(), 150, 135)
       .text(order.paymentMethod || "Online Payment", 150, 150);
 
@@ -200,31 +200,50 @@ const invoice = async (req, res) => {
       .fillColor(primaryColor)
       .fontSize(12)
       .font("Helvetica-Bold")
-      .text("SHIPPING INFORMATION", 50, yPosition);
+      .text("BILLING & SHIPPING INFORMATION", 50, yPosition);
 
     yPosition += 20;
-    doc.rect(50, yPosition, 500, 100).lineWidth(0.5).stroke(borderColor);
+    doc.rect(50, yPosition, 500, 180).lineWidth(0.5).stroke(borderColor);
 
-    if (address && Object.keys(address).length > 0) {
-      doc
-        .fontSize(10)
-        .font("Helvetica-Bold")
-        .text("Shipping Address:", 60, yPosition + 10)
-        .font("Helvetica")
-        .text(`${address.name || user.FirstName || "N/A"}`, 60, yPosition + 25)
-        .text(`${address.landMark || "N/A"}`, 60, yPosition + 40)
-        .text(
-          `${address.city || "N/A"}, ${address.state || "N/A"} - ${address.pincode || "N/A"}`,
-          60,
-          yPosition + 55
-        )
-        .text(`Phone: ${address.phone || "N/A"}`, 60, yPosition + 70);
-    } else {
-      doc
-        .fontSize(10)
-        .font("Helvetica")
-        .text("Shipping Address: Not provided", 60, yPosition + 15);
-    }
+    // Seller Address
+    doc
+      .fontSize(10)
+      .font("Helvetica-Bold")
+      .text("Seller:", 60, yPosition + 10)
+      .font("Helvetica")
+      .text("Laptop Hub Pvt Ltd", 60, yPosition + 25)
+      .text("123, Tech Park, Electronic City", 60, yPosition + 40)
+      .text("Bangalore, Karnataka - 560100", 60, yPosition + 55)
+      .text("Phone: +91 8943136698", 60, yPosition + 70)
+      .text("GSTIN: 07AAPCA1234C1Z5", 60, yPosition + 85);
+
+    // Customer Address
+    doc
+      .fontSize(10)
+      .font("Helvetica-Bold")
+      .text("Bill To:", 350, yPosition + 10)
+      .font("Helvetica")
+      .text(
+        `${user.FirstName || "N/A"} ${user.LastName || "N/A"}`,
+        350,
+        yPosition + 25
+      )
+      .text(`${address.landMark || "N/A"}`, 350, yPosition + 40)
+      .text(
+        `${address.city || "N/A"}, ${address.state || "N/A"}`,
+        350,
+        yPosition + 55
+      )
+      .text(
+        `${address.pincode ? `PIN: ${address.pincode}` : ""}`,
+        350,
+        yPosition + 70
+      )
+      .text(
+        `Phone: ${address.phone || user.phone || "N/A"}`,
+        350,
+        yPosition + 85
+      );
 
     doc.end();
   } catch (error) {

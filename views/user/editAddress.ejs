@@ -35,6 +35,7 @@
         form {
             display: flex;
             flex-direction: column;
+            margin-right: 550px;
         }
 
         .form-group {
@@ -99,26 +100,31 @@
         <div class="form-group">
             <label>Address Type:</label>
             <input type="text" name="address_type" id="addressType" value="<%= address.addressType %>">
+            <div id="error1" class="error-message"></div>
         </div>
     
         <div class="form-group">
             <label>Name:</label>
             <input type="text" name="name"  id="name" value="<%= address.name %>">
+            <div id="error2" class="error-message"></div>
         </div>
     
         <div class="form-group">
             <label>City:</label>
             <input type="text" name="city"  id="city" value="<%= address.city %>">
+            <div id="error3" class="error-message"></div>
         </div>
     
         <div class="form-group">
             <label>Landmark:</label>
             <input type="text" name="landmark" id="landmark" value="<%=address.landMark %>">
+            <div id="error4" class="error-message"></div>
         </div>
     
         <div class="form-group">
             <label>State:</label>
             <input type="text" name="state"  id="state" value="<%= address.state %>">
+            
         </div>
     
         <div class="form-group">
@@ -157,8 +163,67 @@
     const pincode = document.getElementById("pincode").value.trim();
     const phone = document.getElementById("phone").value.trim();
     const altPhone = document.getElementById("alternatePhone").value.trim();
-  
 
+    // Validation regex patterns
+    const nameRegex = /^[A-Za-z\s]+$/;
+    const cityStateRegex = /^[A-Za-z\s]+$/;
+    const landmarkRegex = /^[A-Za-z0-9\s,.-]+$/;
+    const pincodeRegex = /^\d{6}$/;
+    const phoneRegex = /^[6-9]\d{9}$/;
+
+    // Required fields validation
+    if (!addressType || !name || !city || !state || !pincode || !phone) {
+        Swal.fire("Error", "Please fill all required fields.", "error");
+        return;
+    }
+
+    // Name validation
+    if (!nameRegex.test(name)) {
+        Swal.fire("Error", "Name should only contain alphabets and spaces.", "error");
+        return;
+    }
+
+    // City and State validation
+    if (!cityStateRegex.test(city)) {
+        Swal.fire("Error", "City should only contain alphabets.", "error");
+        return;
+    }
+    if (!cityStateRegex.test(state)) {
+        Swal.fire("Error", "State should only contain alphabets.", "error");
+        return;
+    }
+
+    // Landmark validation (optional, but should match the pattern if filled)
+    if (landmark && !landmarkRegex.test(landmark)) {
+        Swal.fire("Error", "Landmark can contain alphabets, numbers, and limited special characters.", "error");
+        return;
+    }
+
+    // Pincode validation
+    if (!pincodeRegex.test(pincode)) {
+        Swal.fire("Error", "Pincode must be exactly 6 digits.", "error");
+        return;
+    }
+
+    // Phone number validation
+    if (!phoneRegex.test(phone)) {
+        Swal.fire("Error", "Phone number must be 10 digits and start with 6, 7, 8, or 9.", "error");
+        return;
+    }
+
+    // Alternate phone validation (optional, but should match the pattern if filled and be different from phone)
+    if (altPhone) {
+        if (!phoneRegex.test(altPhone)) {
+            Swal.fire("Error", "Alternate phone number must be 10 digits and start with 6, 7, 8, or 9.", "error");
+            return;
+        }
+        if (altPhone === phone) {
+            Swal.fire("Error", "Alternate phone number should be different from the primary phone number.", "error");
+            return;
+        }
+    }
+
+    // Data to send
     const data = {
         userId,
         addressId,
@@ -171,7 +236,6 @@
         phone,
         altPhone
     };
-  
 
     try {
         const response = await fetch("/user/updateAddress", {
@@ -182,28 +246,39 @@
             body: JSON.stringify(data)
         });
 
-      
-            if (response.ok) {
-    Swal.fire({
-        title: "Success!",
-        text: "Edited Successfully",
-        icon: "success",
-        showConfirmButton: true
-    }).then(()=>{
-        window.location.href = "/user/address"; 
-    })
-
-
-   
-
+        if (response.ok) {
+            Swal.fire({
+                title: "Success!",
+                text: "Edited Successfully",
+                icon: "success",
+                showConfirmButton: true
+            }).then(() => {
+                window.location.href = "/user/address";
+            });
         } else {
-            alert("Failed to update address.");
+            Swal.fire("Error", "Failed to update address.", "error");
         }
     } catch (error) {
         console.error("Error:", error);
-        alert("Something went wrong.");
+        Swal.fire("Error", "Something went wrong.", "error");
     }
 });
+
+// Button Enable/Disable Logic
+const formInputs = document.querySelectorAll("#editAddress input, #editAddress select");
+const submitButton = document.querySelector("#editAddress button[type='submit']");
+
+function validateForm() {
+    const requiredFields = ["addressType", "name", "city", "state", "pincode", "phone"];
+    const isValid = requiredFields.every(id => document.getElementById(id).value.trim() !== "");
+    submitButton.disabled = !isValid;
+}
+
+formInputs.forEach(input => {
+    input.addEventListener("input", validateForm);
+});
+
+validateForm();
 
     </script>
     

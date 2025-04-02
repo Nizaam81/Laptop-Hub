@@ -268,10 +268,34 @@ const returnItem = async (req, res) => {
   }
 };
 
+const noOrder = async (req, res) => {
+  try {
+    const userid = req.session.user;
+
+    if (!userid) {
+      return res.status(400).send("User not logged in");
+    }
+
+    const users = await user.findOne({ _id: userid });
+
+    if (!users) {
+      return res.status(404).send("User not found");
+    }
+
+    const firstLetter = users.FirstName ? users.FirstName.charAt(0) : "";
+
+    res.render("user/noOrder", { users, firstLetter });
+  } catch (error) {
+    console.error("Error in noOrder Controller:", error);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
 module.exports = {
   loadorderFullDetails,
   loadOrder,
   cancelOrder,
   cancelItem,
   returnItem,
+  noOrder,
 };

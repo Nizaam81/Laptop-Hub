@@ -1,4 +1,6 @@
 <%- include("partials/profileHeader.ejs") %>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <title>Shopping Cart</title>
     <style>
         body {
@@ -16,6 +18,7 @@
             border-radius: 15px;
             width: 90%;
             transition: all 0.3s ease;
+            margin-right: 250px;
         }
         .cart-header {
             display: flex;
@@ -24,7 +27,27 @@
             padding-bottom: 15px;
             border-bottom: 2px solid #eaeaea;
             margin-bottom: 10px;
-        }
+        }    .remove-btn {
+        margin: 10px 0 0 0;
+        width: 40px; /* Adjust size */
+        height: 40px; /* Adjust size */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #ff4d4d;
+        border: none;
+        color: white;
+        padding: 8px;
+        border-radius: 50%; /* Make it round */
+        cursor: pointer;
+        transition: 0.3s;
+        font-size: 16px;
+    }
+
+    .remove-btn:hover {
+        background-color: #e04141;
+        transform: translateY(-2px);
+    }
         .cart-header h2 {
             font-size: 1.8rem;
             color: #333;
@@ -120,21 +143,7 @@
             min-width: 25px;
             text-align: center;
         }
-        .remove-btn {
-            background-color: #ff4d4d;
-            border: none;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-left: 10px;
-            font-weight: 500;
-        }
-        .remove-btn:hover {
-            background-color: #e04141;
-            transform: translateY(-2px);
-        }
+        
         .summary {
             background: #f9f9f9;
             padding: 20px;
@@ -209,10 +218,7 @@
                 align-items: center;
                 width: 100%;
             }
-            .remove-btn {
-                margin: 10px 0 0 0;
-                width: 100%;
-            }
+            
         }
         
         @media (min-width: 769px) and (max-width: 992px) {
@@ -259,7 +265,9 @@
                             <span id="quantity-<%=element._id%>"><%= element.quantity %></span>
                             <button onclick="updateQuantity('<%=element._id%>', '<%= element.price %>', '<%= element.variantDetails[0].quantity %>')">+</button>
                         </div>
-                        <button class="remove-btn" onclick="deleteCart('<%=element._id %>')">Remove</button>
+                        <button class="remove-btn" onclick="deleteCart('<%=element._id %>')">
+    <i class="fas fa-trash"></i>
+</button>
                     </div>
                 </div>
                 <% } %>
@@ -339,49 +347,68 @@ function showToast(message, icon = "info") {
 }
 
 
-        function updateQuantity(elementId, price, maxQuantity) {
-            let quantitySpan = document.getElementById(`quantity-${elementId}`);
-            let totalPriceSpan = document.getElementById(`total-price`);
-            let currentQuantity = parseInt(quantitySpan.innerText);
-            let newQuantity = currentQuantity + 1; 
-            
-            if (newQuantity > maxQuantity) {
-                Swal.fire({
-                    icon: "warning",
-                    title: "Stock limit reached!",
-                    text: "You cannot add more of this item.",
-                    confirmButtonColor: '#4a6cfa'
-                });
-                return;
-            }
+      function updateQuantity(elementId, price, maxQuantity) {
+    let quantitySpan = document.getElementById(`quantity-${elementId}`);
+    let totalPriceSpan = document.getElementById(`total-price`);
+    let currentQuantity = parseInt(quantitySpan.innerText);
+    let newQuantity = currentQuantity + 1; 
 
-            quantitySpan.innerText = newQuantity;
+    const userMaxQuantity = 5; // Maximum quantity a user can buy
 
-            
-            if (totalPriceSpan) {
-                let totalPrice = parseFloat(totalPriceSpan.innerText.replace("₹", "").trim());
-                totalPrice += parseFloat(price);
-                totalPriceSpan.innerText = `₹${totalPrice.toFixed(2)}`;
-            }
+    if (newQuantity > maxQuantity) {
+        Swal.fire({
+            icon: "warning",
+            title: "Stock limit reached!",
+            text: "You cannot add more of this item.",
+            confirmButtonColor: '#4a6cfa'
+        });
+        return;
+    }
 
-            fetch(`/update-cart`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    cartId: elementId,
-                    newQuantity: newQuantity
-                }),
-            })
-            .then(response => response.json())
-            .then(data => {
-               
-            })
-            .catch(error => {
-                console.error("Error updating quantity:", error);
-            });
-        }
+    if (newQuantity > userMaxQuantity) {
+        Swal.fire({
+            toast: true,
+            position: "top-end",
+            icon: "warning",
+            title: "You can buy a maximum of 5 items",
+            showConfirmButton: false,
+            timer: 2000, 
+            timerProgressBar: true
+        });
+        return;
+    }
+
+    quantitySpan.innerText = newQuantity;
+
+   
+
+    if (totalPriceSpan) {
+        let totalPrice = parseFloat(totalPriceSpan.innerText.replace("₹", "").trim());
+        totalPrice += parseFloat(price);
+        totalPriceSpan.innerText = `₹${totalPrice.toFixed(2)}`;
+    }
+
+    fetch(`/user/update-cart`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            cartId: elementId,
+            newQuantity: newQuantity
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+       
+    })
+    .catch(error => {
+        console.error("Error updating quantity:", error);
+    });
+}
+
+
+
 
         function decreaseQuantity(elementId, price) {
             let quantitySpan = document.getElementById(`quantity-${elementId}`);
@@ -400,7 +427,7 @@ function showToast(message, icon = "info") {
                 totalPriceSpan.innerText = `₹${totalPrice.toFixed(2)}`;
             }
 
-            fetch(`/update-cart`, {
+            fetch(`/user/update-cart`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

@@ -11,7 +11,7 @@ const wishlistSchema = new Schema({
     {
       productId: {
         type: Schema.Types.ObjectId,
-        ref: "Product", // Ensure consistency with your Product model
+        ref: "Product",
         required: true,
       },
       varientId: {

@@ -403,30 +403,32 @@
             <span class="text-muted ms-2"><%= products.reviews %> Reviews</span>
           </div>
 
-          <!-- Price Section -->
-          <div class="pricing">
-            <input type="hidden" id="variantId" value="<%= Variants._id %>">
-            <input type="hidden" value="<% if (products.offerPercentage ==0 && category.offerPercentage==0) { %>
-              <%= Variants.price %>
-              <% } else if (products.offerPercentage > category.offerPercentage) { %>
-                <%= Variants.price - Variants.price*products.offerPercentage/100 %>
-                <% } else { %>
-                <%= Variants.price - Variants.price*category.offerPercentage/100 %>
-              <% } %>" id="priceValue">
+         <!-- Price Section -->
+<div class="pricing">
+  <input type="hidden" id="variantId" value="<%= Variants._id %>">
+  <input type="hidden" value="<% if (products.offerPercentage == 0 && category.offerPercentage == 0) { %>
+    <%= Math.round(Variants.price) %>
+    <% } else if (products.offerPercentage > category.offerPercentage) { %>
+      <%= Math.round(Variants.price - Variants.price * products.offerPercentage / 100) %>
+    <% } else { %>
+      <%= Math.round(Variants.price - Variants.price * category.offerPercentage / 100) %>
+    <% } %>" id="priceValue">
 
-            <div class="current-price">
-              ₹ <% if (products.offerPercentage ==0 && category.offerPercentage==0) { %>
-                <%= Variants.price %>
-              <% } else if (products.offerPercentage > category.offerPercentage) { %>
-                <%= Variants.price - Variants.price*products.offerPercentage/100 %>
-                <span class="original-price">₹<%= Variants.price %></span>
-                <span class="discount-tag"><%= products.offerPercentage %>% OFF</span>
-              <% } else { %>
-                <%= Variants.price - Variants.price*category.offerPercentage/100 %>
-                <span class="original-price">₹<%= Variants.price %></span>
-                <span class="discount-tag"><%= category.offerPercentage %>% OFF</span>
-              <% } %>
-            </div>
+  <div class="current-price">
+    ₹ <% if (products.offerPercentage == 0 && category.offerPercentage == 0) { %>
+      <%= Math.round(Variants.price) %>
+    <% } else if (products.offerPercentage > category.offerPercentage) { %>
+      <%= Math.round(Variants.price - Variants.price * products.offerPercentage / 100) %>
+      <span class="original-price">₹<%= Math.round(Variants.price) %></span>
+      <span class="discount-tag"><%= products.offerPercentage %>% OFF</span>
+    <% } else { %>
+      <span class="discounted-price">₹<%= Math.round(Variants.price - Variants.price * category.offerPercentage / 100) %></span>
+      <span class="original-price">₹<%= Math.round(Variants.price) %></span>
+      <span class="discount-tag"><%= category.offerPercentage %>% OFF</span>
+    <% } %>
+  </div>
+</div>
+
 
             <div class="stock-info">
               <i class="fas fa-check-circle"></i> In Stock: <%= Variants.quantity %> units available

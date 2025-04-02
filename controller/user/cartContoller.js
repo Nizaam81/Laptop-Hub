@@ -53,6 +53,7 @@ const AddCart = async (req, res) => {
       userId,
       VariantId: varientId,
     });
+    console.log("exisiting", existingCartItem);
 
     if (existingCartItem) {
       return res.json({
@@ -67,6 +68,7 @@ const AddCart = async (req, res) => {
     }
 
     const TotalPrice = quantities * price;
+    console.log("total price ", TotalPrice);
 
     let NewCart = new cart({
       userId: userId,
@@ -105,8 +107,42 @@ const deleteCart = async (req, res) => {
   }
 };
 
+const updateCartQty = async (req, res) => {
+  try {
+    console.log(req.body);
+
+    const { cartId, newQuantity } = req.body;
+
+    if (!cartId || !newQuantity || newQuantity < 1) {
+      return res.status(400).json({ message: "Invalid quantity or cart ID" });
+    }
+
+    const Cart = await cart.findById(cartId);
+
+    const TotalPrice = newQuantity * Cart.price;
+
+    const updatedCart = await cart.findByIdAndUpdate(
+      cartId,
+      { $set: { quantity: newQuantity, totalPrice: TotalPrice } },
+      { new: true }
+    );
+
+    if (!updatedCart) {
+      return res.status(404).json({ message: "Cart item not found" });
+    }
+
+    res
+      .status(200)
+      .json({ message: "Quantity updated successfully", updatedCart });
+  } catch (error) {
+    console.error("Error updating cart quantity:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   loadCart,
   AddCart,
   deleteCart,
+  updateCartQty,
 };

@@ -37,6 +37,7 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        
       }
 
       .wishlist-container img {
@@ -45,6 +46,7 @@
         object-fit: cover; /* Ensures images fit properly */
         border-radius: 8px;
         transition: transform 0.3s ease-in-out;
+       
       }
 
       .wishlist-container img:hover {
@@ -112,7 +114,8 @@
 
           <img src="<%= product.products.productImage %>" alt="<%= product.products.productName %>" />
           <p class="product-name"><%= product.products.productName %></p>
-          <p class="price"><%= product.products.Price %></p>
+          <p class="price"><%= product. variantsDatas.price %></p>
+          <p class="price">System Memory: <%= product. variantsDatas.ramSize %></p>
            <a href="#" class="add-to-cart" id="addToCartt">
             Add to Cart
           </a>

@@ -3,6 +3,18 @@ const { Schema } = mongoose;
 const User = require("./usersSchema");
 
 const orderSchema = new Schema({
+  orderId: {
+    type: String,
+    unique: true,
+    default: function () {
+      const date = new Date();
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      const randomNum = Math.floor(Math.random() * 1000);
+      return `LAPTOP-HUB-${year}${month}${day}-${randomNum}`;
+    },
+  },
   userId: {
     type: Schema.Types.ObjectId,
     ref: "user",

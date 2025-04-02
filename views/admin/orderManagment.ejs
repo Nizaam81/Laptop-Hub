@@ -1,10 +1,6 @@
 <%- include("partials/header.ejs") %>
     <title>Orders Table</title>
 
-
-
-
-
     <style>
         * {
             margin: 0;
@@ -26,18 +22,78 @@
             margin: 0 auto;
             max-width: 1200px;
             margin-top: 70px;
-            
         }
 
         .header {
             padding: 20px;
             border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .header h1 {
             font-size: 24px;
             color: #333;
             font-weight: bold;
+            margin: 0;
+        }
+
+        .filters-container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-dropdown {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: white;
+            cursor: pointer;
+        }
+
+        .search-input {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 250px;
+            font-size: 14px;
+        }
+
+        .search-btn, .clear-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .search-btn {
+            background-color: #1976d2;
+            color: white;
+        }
+
+        .search-btn:hover {
+            background-color: #1565c0;
+        }
+
+        .clear-btn {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .clear-btn:hover {
+            background-color: #d32f2f;
         }
 
         .table-container {
@@ -107,35 +163,63 @@
 
         .amount {
             font-weight: bold;
-        }.customer-info div {
-    margin-bottom: 8px;
-}
- .pagination {
-        text-align: center;
-        margin-top: 20px;
-    }
-    .pagination a {
-        display: inline-block;
-        padding: 10px 15px;
-        margin: 5px;
-        text-decoration: none;
-        color: #333;
-        background-color: #f0f0f0;
-        border-radius: 5px;
-    }
-    .pagination a.active {
-        background-color: #1976d2;
-        color: white;
-        font-weight: bold;
-    }
-    .pagination a:hover {
-        background-color: #ddd;
-    }
+        }
+
+        .customer-info div {
+            margin-bottom: 8px;
+        }
+
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .pagination a {
+            display: inline-block;
+            padding: 10px 15px;
+            margin: 5px;
+            text-decoration: none;
+            color: #333;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+        }
+
+        .pagination a.active {
+            background-color: #1976d2;
+            color: white;
+            font-weight: bold;
+        }
+
+        .pagination a:hover {
+            background-color: #ddd;
+        }
+
+        .no-orders {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 16px;
+        }
 
         /* Responsive styles */
         @media screen and (max-width: 768px) {
             .header {
                 padding: 15px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .filters-container {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .search-container {
+                width: 100%;
+            }
+
+            .search-input {
+                width: 100%;
             }
 
             th, td {
@@ -164,12 +248,31 @@
 </head>
 <body>
 
-
-
-
-  <div class="container">
+<div class="container">
     <div class="header">
         <h1>Orders</h1>
+        <div class="filters-container">
+            <select class="filter-dropdown" id="dateFilter">
+                <option value="">All Orders</option>
+                <option value="7days" <%= dateFilter === '7days' ? 'selected' : '' %>>Last 7 Days</option>
+                <option value="30days" <%= dateFilter === '30days' ? 'selected' : '' %>>Last 30 Days</option>
+                <option value="3months" <%= dateFilter === '3months' ? 'selected' : '' %>>Last 3 Months</option>
+                <option value="1year" <%= dateFilter === '1year' ? 'selected' : '' %>>Last 1 Year</option>
+            </select>
+            <form class="search-container" id="searchForm">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    placeholder="Search orders..." 
+                    name="search"
+                    value="<%= searchQuery || '' %>"
+                >
+                <button type="submit" class="search-btn">Search</button>
+                <% if (searchQuery || dateFilter) { %>
+                    <a href="/admin/orderManagment" class="clear-btn">Clear</a>
+                <% } %>
+            </form>
+        </div>
     </div>
     <div class="table-container">
         <table>
@@ -182,58 +285,96 @@
                     <th>Amount</th>
                 </tr>
             </thead>
-           <tbody>
-    <% Order.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn)); %>
-    <% Order.forEach(element => { %>
-    <tr class="clickable-row" data-href="/admin/OrderDetails/<%= element._id %>">
-        <td>LAPTOP-HUB- <%= element._id %></td>
-        <td>
-            <div class="customer-info">
-                <div class="customer-name"><%= element.userDetails[0].FirstName %></div>
-                <div class="customer-email"><%= element.userDetails[0].email %></div>
-                <div class="customer-phone"><%= element.userDetails[0].phone %></div>
-            </div>
-        </td>
-        <td><%= new Date(element.createdOn).toLocaleDateString("en-US", { month: 'short', day: '2-digit', year: 'numeric' }) %></td>
-        <td><span class="payment-badge payment-wallet"><%= element.paymentMethod.toUpperCase() %></span></td>
-        <td class="amount">₹<%= element.totalPrice.toLocaleString() %></td>
-    </tr>
-    <% }) %>
-</tbody>
-
-
+            <tbody>
+                <% if (Order.length > 0) { %>
+                    <% Order.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn)); %>
+                    <% Order.forEach(element => { %>
+                    <tr class="clickable-row" data-href="/admin/OrderDetails/<%= element._id %>">
+                        <td>LAPTOP-HUB-<%= element._id %></td>
+                        <td>
+                            <div class="customer-info">
+                                <div class="customer-name"><%= element.userDetails.FirstName %></div>
+                                <div class="customer-email"><%= element.userDetails.email %></div>
+                                <div class="customer-phone"><%= element.userDetails.phone %></div>
+                            </div>
+                        </td>
+                        <td><%= new Date(element.createdOn).toLocaleDateString("en-US", { month: 'short', day: '2-digit', year: 'numeric' }) %></td>
+                        <td><span class="payment-badge payment-wallet"><%= element.paymentMethod.toUpperCase() %></span></td>
+                        <td class="amount">₹<%= element.totalPrice.toLocaleString() %></td>
+                    </tr>
+                    <% }) %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="5" class="no-orders">
+                            <% if (searchQuery || dateFilter) { %>
+                                No orders found matching your criteria.
+                            <% } else { %>
+                                No orders available.
+                            <% } %>
+                        </td>
+                    </tr>
+                <% } %>
+            </tbody>
         </table>
     </div>
-
-    
 </div>
-
-
 
 <div class="pagination">
     <% if (page > 1) { %>
-        <a href="?page=<%= page - 1 %>" class="prev-btn">Previous</a>
+        <a href="?page=<%= page - 1 %><%= searchQuery ? `&search=${searchQuery}` : '' %><%= dateFilter ? `&dateFilter=${dateFilter}` : '' %>" class="prev-btn">Previous</a>
     <% } %>
     
     <% for (let i = 1; i <= totalPages; i++) { %>
-        <a href="?page=<%= i %>" class="page-number <%= i === page ? 'active' : '' %>"><%= i %></a>
+        <a href="?page=<%= i %><%= searchQuery ? `&search=${searchQuery}` : '' %><%= dateFilter ? `&dateFilter=${dateFilter}` : '' %>" class="page-number <%= i === page ? 'active' : '' %>"><%= i %></a>
     <% } %>
     
     <% if (page < totalPages) { %>
-        <a href="?page=<%= page + 1 %>" class="next-btn">Next</a>
+        <a href="?page=<%= page + 1 %><%= searchQuery ? `&search=${searchQuery}` : '' %><%= dateFilter ? `&dateFilter=${dateFilter}` : '' %>" class="next-btn">Next</a>
     <% } %>
 </div>
+
 <script>
-   
     document.addEventListener("DOMContentLoaded", function() {
+        // Clickable rows
         document.querySelectorAll(".clickable-row").forEach(row => {
             row.addEventListener("click", function() {
                 window.location.href = this.dataset.href;
             });
         });
+
+        // Search form handling
+        const searchForm = document.getElementById("searchForm");
+        if (searchForm) {
+            searchForm.addEventListener("submit", function(e) {
+                e.preventDefault();
+                const searchInput = this.querySelector("input[name='search']");
+                const searchValue = searchInput.value.trim();
+                const dateFilter = document.getElementById("dateFilter").value;
+                
+                let queryParams = [];
+                if (searchValue) queryParams.push(`search=${encodeURIComponent(searchValue)}`);
+                if (dateFilter) queryParams.push(`dateFilter=${encodeURIComponent(dateFilter)}`);
+                
+                window.location.href = `?page=1${queryParams.length ? '&' + queryParams.join('&') : ''}`;
+            });
+        }
+
+        // Date filter handling
+        const dateFilter = document.getElementById("dateFilter");
+        if (dateFilter) {
+            dateFilter.addEventListener("change", function() {
+                const searchInput = document.querySelector("input[name='search']");
+                const searchValue = searchInput ? searchInput.value.trim() : '';
+                const selectedFilter = this.value;
+                
+                let queryParams = [];
+                if (searchValue) queryParams.push(`search=${encodeURIComponent(searchValue)}`);
+                if (selectedFilter) queryParams.push(`dateFilter=${encodeURIComponent(selectedFilter)}`);
+                
+                window.location.href = `?page=1${queryParams.length ? '&' + queryParams.join('&') : ''}`;
+            });
+        }
     });
-
-
 </script>
 </body>
 </html>

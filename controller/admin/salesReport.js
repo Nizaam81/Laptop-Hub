@@ -30,9 +30,13 @@ const loadSaleReportPage = async (req, res) => {
       },
     });
 
-    const totalPages = Math.ceil(totalDocs / limit);
-    const currentPage = Math.min(Math.max(1, parseInt(page)), totalPages);
-    const skip = (currentPage - 1) * limit;
+    // Ensure values are valid numbers
+    const parsedLimit = Math.max(1, parseInt(limit) || 10);
+    const totalPages = Math.max(1, Math.ceil(totalDocs / parsedLimit));
+    const parsedPage = Math.max(1, Math.min(parseInt(page) || 1, totalPages));
+
+    // Now skip will always be non-negative
+    const skip = Math.max(0, (parsedPage - 1) * parsedLimit);
 
     const orderData = await order
       .find({
@@ -43,7 +47,7 @@ const loadSaleReportPage = async (req, res) => {
       })
       .sort({ createdOn: -1 })
       .skip(skip)
-      .limit(parseInt(limit))
+      .limit(parsedLimit)
       .populate("userId", "FirstName LastName");
 
     const totalSale = orderData.reduce((sum, num) => {
@@ -58,11 +62,11 @@ const loadSaleReportPage = async (req, res) => {
       totalSale,
       totalOrder: totalDocs,
       pagination: {
-        currentPage,
+        currentPage: parsedPage,
         totalPages,
-        hasNextPage: currentPage < totalPages,
-        hasPrevPage: currentPage > 1,
-        limit: parseInt(limit),
+        hasNextPage: parsedPage < totalPages,
+        hasPrevPage: parsedPage > 1,
+        limit: parsedLimit,
       },
     });
   } catch (error) {
@@ -331,6 +335,7 @@ const generatePDF = async (req, res) => {
     res.status(500).send("Error generating PDF");
   }
 };
+
 const generateExcel = async (req, res) => {
   try {
     const { dateRange, startDate, endDate } = req.query;
@@ -397,6 +402,7 @@ const generateExcel = async (req, res) => {
     res.status(500).send("Error generating Excel");
   }
 };
+
 const filterSalesReport = async (req, res) => {
   try {
     const { dateRange, startDate, endDate, page = 1, limit = 10 } = req.body;
@@ -473,8 +479,8 @@ const filterSalesReport = async (req, res) => {
     // Get total count for pagination
     const totalDocs = await order.countDocuments(query);
     const totalPages = Math.ceil(totalDocs / limit);
-    const currentPage = Math.max(1, Math.min(page, totalPages));
-    const skip = (currentPage - 1) * limit;
+    const currentPage = Math.max(1, Math.min(page, totalPages || 1));
+    const skip = Math.max(0, (currentPage - 1) * limit);
 
     // Fetch orders with pagination
     const orders = await order
@@ -507,11 +513,7 @@ const filterSalesReport = async (req, res) => {
     });
   } catch (error) {
     console.error("Error filtering sales report:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-      error: error.message,
-    });
+    res.status(500).redirect("/admin/pageNotFound");
   }
 };
 

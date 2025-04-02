@@ -14,11 +14,23 @@ const loadWishlist = async (req, res) => {
         $match: { userId: new ObjectId(userId) },
       },
       { $unwind: "$products" },
+
+      {
+        $lookup: {
+          from: "variants",
+          localField: "products.varientId",
+          foreignField: "_id",
+          as: "variantsDatas",
+        },
+      },
+      { $unwind: "$variantsDatas" },
     ]);
     const userid = req.session.user;
 
     const users = await user.findOne({ _id: userid });
     const firstLetter = users.FirstName.charAt(0);
+
+    console.log("wishlist data", wish);
 
     res.render("user/wishlist", { wish, firstLetter, users });
   } catch (error) {

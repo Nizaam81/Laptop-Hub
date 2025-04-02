@@ -122,8 +122,21 @@ const Addaddress = async (req, res) => {
   }
 };
 
+const userPersonalInformation = async (req, res) => {
+  try {
+    const userid = req.session.user;
+    const userData = await user.findById(userid);
+    const users = await user.findById({ _id: userid });
+    const firstLetter = users.FirstName.charAt(0);
+    res.render("user/Personalnformation.ejs", { users, firstLetter, userData });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   userprofile,
   Addaddress,
   changeProfile,
+  userPersonalInformation,
 };

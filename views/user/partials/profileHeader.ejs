@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>User Profile</title>
+    <title>Laptop Hub - Home</title>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
@@ -16,241 +16,244 @@
         font-family: "Poppins", sans-serif;
       }
       body {
-        background: linear-gradient(135deg, #ffffff, #ffffff);
+        background: #f3f4f6;
         display: flex;
         height: 100vh;
       }
 
-      /* Sidebar */
       .sidebar {
         width: 250px;
-        background: #fff;
+        background: #0d3b66; /* Changed to match your site's blue theme */
         padding: 20px;
-        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
         display: flex;
         flex-direction: column;
         align-items: center;
-        position: fixed; /* ✅ Sidebar stays fixed */
+        position: fixed;
         left: 0;
         top: 0;
         bottom: 0;
-        overflow-y: auto;
-      }
-
-      .profile-header {
-        text-align: center;
-        margin-bottom: 20px;
-      }
-
-      .profile-image {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        background: #6200ea;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 30px;
         color: white;
-        margin-bottom: 10px;
+        box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
       }
 
-      .username {
-        font-size: 20px;
-        font-weight: 600;
-        color: #333;
+      .sidebar-header {
+        text-align: center;
+        margin-bottom: 30px;
+        width: 100%;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 15px;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 15px;
+      }
+
+      .logo i {
+        font-size: 28px;
+        margin-right: 10px;
+        color: #58a6ff;
+      }
+
+      .logo-text {
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
       }
 
       .menu {
         width: 100%;
         list-style: none;
-        padding: 0;
+      }
+
+      .menu-header {
+        font-size: 12px;
+        text-transform: uppercase;
+        color: #8b949e;
+        margin: 10px 0 5px 10px;
+        letter-spacing: 1px;
       }
 
       .option {
         display: flex;
         align-items: center;
-        padding: 12px;
+        padding: 12px 15px;
         text-decoration: none;
-        color: #333;
-        font-size: 16px;
+        color: #f0f6fc;
+        font-size: 15px;
         border-radius: 8px;
-        transition: all 0.3s ease-in-out;
-        margin-bottom: 10px;
+        transition: all 0.2s ease-in-out;
+        margin-bottom: 8px;
         width: 100%;
       }
 
       .option i {
         margin-right: 12px;
         font-size: 18px;
+        min-width: 24px;
+        text-align: center;
       }
 
       .option:hover {
-        background: #14203c;
+        background: rgba(88, 166, 255, 0.15);
+        color: #58a6ff;
+      }
+
+      .option.active {
+        background: #58a6ff;
         color: white;
+        font-weight: 500;
+      }
+
+      .user-section {
+        margin-top: auto;
+        width: 100%;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 15px;
+      }
+
+      .user-info {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        margin-bottom: 10px;
+      }
+
+      .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #58a6ff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 16px;
+        color: white;
+        margin-right: 10px;
+      }
+
+      .user-details {
+        flex: 1;
+      }
+
+      .user-name {
+        font-size: 15px;
+        font-weight: 500;
+      }
+
+      .user-email {
+        font-size: 12px;
+        color: #8b949e;
       }
 
       .logout {
-        background: #ff4d4d;
-        color: white;
+        background: #f44336;
+        font-weight: 500;
       }
 
       .logout:hover {
-        background: #e60000;
+        background: #e53935;
+        color: white;
       }
 
-      /* Content Section */
+      .badge {
+        background: #ff7b72;
+        color: white;
+        font-size: 11px;
+        border-radius: 10px;
+        padding: 2px 6px;
+        margin-left: auto;
+      }
+
+      /* Main content area styling */
       .content {
         flex: 1;
         padding: 30px;
-        margin-left: 250px; /* Ensures content is pushed correctly */
-        color: rgb(0, 0, 0);
-        font-size: 24px;
+        margin-left: 250px;
         width: calc(100% - 250px);
-        display: block; /* Change from flex to block */
-      }
-      .option.referral {
-        position: relative;
-      }
-
-      .option.referral:hover::after {
-        position: absolute;
-        left: 100%;
-        top: 50%;
-        transform: translateY(-50%);
-        background: #000;
-        color: #fff;
-        padding: 5px 10px;
-        border-radius: 5px;
-        white-space: nowrap;
-      }
-
-      /* Mobile Responsive Sidebar */
-      @media (max-width: 768px) {
-        .sidebar {
-          width: 70px;
-          padding: 10px;
-        }
-        .username {
-          display: none;
-        }
-        .option {
-          justify-content: center;
-          font-size: 0;
-        }
-        .option i {
-          font-size: 22px;
-          margin: 0;
-        }
-        .content {
-          margin-left: 70px; /* ✅ Adjust content width when sidebar is smaller */
-          width: calc(100% - 70px);
-        }
       }
     </style>
   </head>
   <body>
     <div class="sidebar">
-      <div class="profile-header">
-        <div class="profile-image"><%= firstLetter %></div>
-        <div class="username"><%= users.FirstName %><%= users.LastName %></div>
+      <div class="sidebar-header">
+        <div class="logo">
+          <i class="fas fa-laptop"></i>
+          <span class="logo-text">Laptop Hub</span>
+        </div>
       </div>
+
       <ul class="menu">
+        <li class="menu-header">Shopping</li>
         <li>
-          <a href="userprofile" class="option"
-            ><i class="fas fa-user"></i> Account</a
-          >
-        </li>
-
-        <li>
-          <a href="address" class="option"
-            ><i class="fas fa-map-marker-alt"></i> Address</a
-          >
-        </li>
-        <li>
-          <a href="/user/order" class="option"
-            ><i class="fas fa-list"></i> Orders</a
-          >
-        </li>
-        <li>
-          <a href="/user/wishlist" class="option"
-            ><i class="fas fa-heart"></i> Wishlist</a
-          >
-        </li>
-        <li>
-          <a href="cart" class="option"
-            ><i class="fas fa-shopping-cart"></i> Cart</a
-          >
-        </li>
-
-        <li>
-          <a href="/user/wallet" class="option"
-            ><i class="fas fa-wallet"></i> Wallet</a
-          >
-        </li>
-        <li>
-          <a href="/user/productsDetails" class="option"
-            ><i class="fas fa-home"></i> Home</a
-          >
-        </li>
-        <li>
-          <a href="/user/referal" class="option referral">
-            <i class="fas fa-user-plus"></i> Invite Your Friends
+          <a href="/user/PersonalInformation" class="option">
+            <i class="fas fa-user"></i> Account
           </a>
         </li>
 
         <li>
-          <a href="/user/logout" class="option logout"
-            ><i class="fas fa-sign-out-alt"></i> Logout</a
-          >
+          <a href="/user/productsDetails" class="option">
+            <i class="fas fa-home"></i> Home
+          </a>
+        </li>
+
+        <li class="menu-header">My Account</li>
+        <li>
+          <a href="cart" class="option">
+            <i class="fas fa-shopping-cart"></i> Cart
+            <!-- <span class="badge">3</span> -->
+          </a>
+        </li>
+        <li>
+          <a href="/user/wishlist" class="option">
+            <i class="fas fa-heart"></i> Wishlist
+          </a>
+        </li>
+        <li>
+          <a href="/user/order" class="option">
+            <i class="fas fa-box"></i> My Orders
+          </a>
+        </li>
+
+        <li>
+          <a href="/user/wallet" class="option">
+            <i class="fas fa-wallet"></i> Wallet
+          </a>
+        </li>
+        <li>
+         <li>
+  <a href="address" class="option">
+    <i class="fas fa-map-marker-alt"></i> Address
+  </a>
+</li>
+
+          <a href="/user/referal" class="option">
+            <i class="fas fa-user-friends"></i> Invite Friends
+          </a>
         </li>
       </ul>
+
+      <div class="user-section">
+        <div class="user-info">
+          <div class="user-avatar"><%= firstLetter %></div>
+          <div class="user-details">
+            <div class="user-name">
+              <%= users.FirstName %> <%= users.LastName %>
+            </div>
+            <div class="user-email"><%= users.email %></div>
+          </div>
+        </div>
+        <a href="/user/logout" class="option logout">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+      </div>
+    </div>
+
+    <!-- Main content would go here -->
+    <div class="content">
+      <!-- Your website content here -->
     </div>
   </body>
-  <script>
-    document.querySelectorAll(".cancel-btn").forEach((button) => {
-      button.addEventListener("click", async (event) => {
-        event.preventDefault();
-
-        const row = event.target.closest("tr");
-        const orderId = row.querySelector(".orderId").value;
-        const materialId = row.querySelector(".materialId").value;
-
-        const confirmCancel = await Swal.fire({
-          title: "Are you sure?",
-          text: "You won't be able to revert this!",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonText: "Yes, cancel it!",
-          cancelButtonText: "No, keep it",
-        });
-
-        if (confirmCancel.isConfirmed) {
-          try {
-            const response = await fetch("/user/cancelOrder", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ orderId, materialId }),
-            });
-
-            const result = await response.json();
-            if (result.success) {
-              Swal.fire(
-                "Cancelled!",
-                "Your order has been cancelled.",
-                "success"
-              ).then(() => {
-                window.location.reload();
-              });
-            } else {
-              Swal.fire("Error!", "Something went wrong. Try again.", "error");
-            }
-          } catch (error) {
-            console.error(error);
-            Swal.fire("Error!", "Failed to cancel the order.", "error");
-          }
-        }
-      });
-    });
-  </script>
 </html>

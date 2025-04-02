@@ -1,0 +1,142 @@
+  <%- include("partials/profileHeader.ejs") %>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>No Orders UI</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background-color: #f5f7fa;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .empty-container {
+        background-color: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+        padding: 50px 40px;
+        width: 100%;
+        max-width: 550px;
+        text-align: center;
+        transition: transform 0.3s ease;
+        margin-right: 550px;
+      }
+
+      .empty-container:hover {
+        transform: translateY(-5px);
+      }
+
+      .cart-icon {
+        font-size: 80px;
+        margin-bottom: 25px;
+        color: #333;
+        animation: float 3s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-15px);
+        }
+        100% {
+          transform: translateY(0px);
+        }
+      }
+
+      h1 {
+        font-size: 28px;
+        color: #333;
+        margin-bottom: 15px;
+        font-weight: 600;
+      }
+
+      p {
+        font-size: 16px;
+        color: #707070;
+        margin-bottom: 30px;
+        line-height: 1.6;
+      }
+
+      .shop-btn {
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        padding: 14px 32px;
+        border-radius: 30px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(26, 115, 232, 0.3);
+      }
+
+      .shop-btn:hover {
+        background-color: #0d62d0;
+        box-shadow: 0 6px 20px rgba(26, 115, 232, 0.4);
+        transform: translateY(-2px);
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 600px) {
+        .empty-container {
+          padding: 40px 25px;
+        }
+
+        .cart-icon {
+          font-size: 60px;
+        }
+
+        h1 {
+          font-size: 24px;
+        }
+
+        p {
+          font-size: 15px;
+        }
+
+        .shop-btn {
+          padding: 12px 25px;
+          font-size: 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="empty-container">
+      <div class="cart-icon">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="1em"
+          height="1em"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M9 17V11l-4 4 4 4v-6"></path>
+          <path d="M15 7v6l4-4-4-4v6"></path>
+          <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+        </svg>
+      </div>
+      <h1>You have no orders yet</h1>
+      <p>
+        It looks like you haven't placed any orders with us. Browse our products
+        and start shopping today!
+      </p>
+     <button class="shop-btn" onclick="window.location.href='/user/productsDetails'">Start shopping</button>
+
+    </div>
+  </body>
+</html>

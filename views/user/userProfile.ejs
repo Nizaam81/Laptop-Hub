@@ -32,6 +32,7 @@
             width: 500px;
             animation: fadeInUp 0.6s ease-in-out;
             transition: transform 0.3s ease-in-out;
+            margin-right: 550px;
         }
 
         h2 {
@@ -64,6 +65,13 @@
             box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
             outline: none;
         }
+         .error-message {
+        color: red;
+        font-size: 14px;
+        margin-top: 5px;
+        display: none;
+        line-height: 1.5;
+      }
 
         .buttons {
             display: flex;
@@ -141,15 +149,19 @@
         
         <label for="current-password">Current Password</label>
         <input type="password" id="current-password" placeholder="Enter current password">
+         <div id="error1" class="error-message"></div>
         
         <label for="new-password">New Password</label>
         <input type="password" id="new-password" placeholder="Enter new password">
+         <div id="error2" class="error-message"></div>
         
         <label for="confirm-password">Confirm New Password</label>
         <input type="password" id="confirm-password" placeholder="Confirm new password">
+         <div id="error2" class="error-message"></div>
         
         <div class="buttons">
-            <button class="btn cancel">Cancel</button>
+            <button class="btn cancel" onclick="window.location.href='/user/PersonalInformation'">Cancel</button>
+
             <button type="submit" class="btn save">Save Changes</button>
         </div>
     </form>
@@ -177,6 +189,7 @@
         });
 
         const data = await response.json();
+        console.log("heyyyyyyyyyyyyyy",data)
 
         if (data.success) {
             Swal.fire({
@@ -203,6 +216,8 @@
         });
     }
 });
+
+
 
 </script>
     

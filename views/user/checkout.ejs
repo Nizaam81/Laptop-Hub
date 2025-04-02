@@ -722,9 +722,7 @@
     <%- include("partials/profileHeader.ejs") %>
     
     <!-- Checkout header -->
-    <div class="checkout-header">
-        <span><i class="fas fa-shopping-cart"></i> Checkout</span>
-    </div>
+    
     
     <div class="container">
         <div class="checkout-section">
@@ -1026,7 +1024,7 @@ document.getElementById("applyCoupon").addEventListener("click", async function(
 
             Swal.fire({ icon: 'success', title: 'Coupon Applied!', text: `You've got ₹${discount} off!` });
 
-            fetchAvailableCoupons(originalPrice); // Refresh available coupons
+            fetchAvailableCoupons(originalPrice); 
         } else {
             Swal.fire({ icon: 'error', title: 'Invalid Coupon', text: result.message });
         }
@@ -1129,7 +1127,7 @@ document.getElementById("applyCoupon").addEventListener("click", async function(
                                     text: 'Your order has been placed successfully.',
                                     confirmButtonText: 'OK'
                                 }).then(() => {
-                                    window.location.href = "/user/profile";
+                                    window.location.href = "/user/order";
                                 });
                             } else {
                                 Swal.fire({
@@ -1180,7 +1178,7 @@ document.getElementById("applyCoupon").addEventListener("click", async function(
                     text: 'Your order has been placed successfully.',
                     confirmButtonText: 'OK'
                 }).then(() => {
-                    window.location.href = "/user/profile";
+                    window.location.href = "/user/order";
                 });
             }
         } else {
@@ -1205,7 +1203,7 @@ async function handlePaymentFailure(orderId, errorMessage) {
   
     
     try {
-        // Notify backend about payment failure
+      
         const response = await fetch("/user/paymentFailed", {
             method: "POST",
             headers: {
@@ -1219,7 +1217,7 @@ async function handlePaymentFailure(orderId, errorMessage) {
         
         const result = await response.json();
         
-        // Show failure message to user
+      
         Swal.fire({
             icon: 'error',
             title: 'Payment Failed',
@@ -1281,13 +1279,13 @@ async function applyCoupon(couponCode) {
     try {
       
 
-        // Validate coupon code
+       
         if (!couponCode) {
             Swal.fire({ icon: 'warning', title: 'Empty Coupon', text: 'Please enter a coupon code' });
             return;
         }
 
-        // Send request to apply coupon
+      
         const response = await fetch("/user/couponApplied", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -1310,13 +1308,25 @@ async function applyCoupon(couponCode) {
             document.querySelector(".coupon-code").textContent = couponCode;
             document.getElementById("couponCode").value = "";
 
-            // Show success message
+           
+            localStorage.setItem('appliedCoupon', JSON.stringify({
+                code: couponCode,
+                discount: discount,
+                timestamp: new Date().getTime()
+            }));
+
+
+
+         
             Swal.fire({ icon: 'success', title: 'Coupon Applied!', text: `You've got ₹${discount} off!` });
 
-            // Refresh available coupons
+           
             fetchAvailableCoupons(originalPrice);
         } else {
-            // Show error message if the coupon is invalid
+           
+            localStorage.removeItem('appliedCoupon');
+
+           
             Swal.fire({ icon: 'error', title: 'Invalid Coupon', text: result.message });
         }
     } catch (error) {
@@ -1325,6 +1335,33 @@ async function applyCoupon(couponCode) {
     }
 }
 
+
+function checkStoredCoupon() {
+    const storedCoupon = localStorage.getItem('appliedCoupon');
+    if (storedCoupon) {
+        try {
+            const couponData = JSON.parse(storedCoupon);
+            
+           
+            document.getElementById("couponCode").value = couponData.code;
+            applyCoupon(couponData.code);
+        } catch (e) {
+            console.error("Error parsing stored coupon:", e);
+            localStorage.removeItem('appliedCoupon');
+        }
+    }
+}
+
+
+  function clearAppliedCoupon() {
+    console.log("remove")
+   console.log(localStorage.getItem('appliedCoupon'))
+    localStorage.removeItem('appliedCoupon');
+
+    document.getElementById("discountRow").style.display = "none";
+    document.getElementById("appliedCoupon").style.display = "none";
+    document.getElementById("finalPrice").textContent = originalPrice;
+}
 
 
 
@@ -1335,7 +1372,7 @@ document.getElementById("applyCoupon").addEventListener("click", function() {
         document.addEventListener('DOMContentLoaded', () => {
             const carousel = document.getElementById('couponCarousel');
             
-            // Add scroll buttons if needed
+          
             const scrollLeft = () => {
                 carousel.scrollBy({ left: -280, behavior: 'smooth' });
             };

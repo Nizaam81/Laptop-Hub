@@ -9,9 +9,61 @@ const loadOrder = async (req, res) => {
     let page = parseInt(req.query.page) || 1;
     let limit = 5;
     let skip = (page - 1) * limit;
+    let searchQuery = req.query.search || "";
+    let dateFilter = req.query.dateFilter || "";
 
-    const totalOrders = await order.countDocuments();
+    // Base query conditions
+    let matchConditions = {};
 
+    // Add search conditions if search query exists
+    if (searchQuery) {
+      matchConditions.$or = [
+        { "userDetails.FirstName": { $regex: searchQuery, $options: "i" } },
+        { "userDetails.email": { $regex: searchQuery, $options: "i" } },
+        { "userDetails.phone": { $regex: searchQuery, $options: "i" } },
+        { paymentMethod: { $regex: searchQuery, $options: "i" } },
+        { _id: { $regex: searchQuery, $options: "i" } },
+      ];
+    }
+
+    // Add date filter conditions if date filter exists
+    if (dateFilter) {
+      let dateRange = new Date();
+      switch (dateFilter) {
+        case "7days":
+          dateRange.setDate(dateRange.getDate() - 7);
+          break;
+        case "30days":
+          dateRange.setDate(dateRange.getDate() - 30);
+          break;
+        case "3months":
+          dateRange.setMonth(dateRange.getMonth() - 3);
+          break;
+        case "1year":
+          dateRange.setFullYear(dateRange.getFullYear() - 1);
+          break;
+      }
+      matchConditions.createdOn = { $gte: dateRange };
+    }
+
+    // Count total orders (with search and date filters if applicable)
+    const totalOrders = await order.aggregate([
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "userDetails",
+        },
+      },
+      { $unwind: "$userDetails" },
+      { $match: matchConditions },
+      { $count: "total" },
+    ]);
+
+    const totalCount = totalOrders.length > 0 ? totalOrders[0].total : 0;
+
+    // Main query to get orders
     const Order = await order.aggregate([
       {
         $lookup: {
@@ -21,6 +73,8 @@ const loadOrder = async (req, res) => {
           as: "userDetails",
         },
       },
+      { $unwind: "$userDetails" },
+      { $match: matchConditions },
       {
         $unwind: {
           path: "$orderItem",
@@ -71,7 +125,7 @@ const loadOrder = async (req, res) => {
       { $limit: limit },
     ]);
 
-    const totalPages = Math.ceil(totalOrders / limit);
+    const totalPages = Math.ceil(totalCount / limit);
 
     const status = [
       "pending",
@@ -83,7 +137,14 @@ const loadOrder = async (req, res) => {
       "Returned",
     ];
 
-    res.render("admin/orderManagment", { Order, status, page, totalPages });
+    res.render("admin/orderManagment", {
+      Order,
+      status,
+      page,
+      totalPages,
+      searchQuery,
+      dateFilter,
+    });
   } catch (error) {
     console.error(error);
     console.log("Error in loadOrder Controller");
@@ -153,7 +214,6 @@ const loadFulldetailsOrder = async (req, res) => {
       "Return Request",
       "Returnedd",
     ];
-    console.log("jcfyxdrtcfyvgj", Orderr);
 
     res.render("admin/OrderManagmentFullDetails", {
       status,
@@ -169,7 +229,6 @@ const updateOrderStatus = async (req, res) => {
   try {
     const { status, specificId, orderId } = req.body;
 
-    console.log("nizaam status data", req.body);
     if (!orderId || !status) {
       return res.status(400).json({ success: false, message: "Missing data" });
     }

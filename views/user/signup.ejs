@@ -484,41 +484,32 @@
         const passwordInput = document.getElementById("password");
         const confirmPasswordInput = document.getElementById("confirmPassword");
 
-        // Password toggle functionality for password field
         togglePassword.addEventListener("click", function () {
-          // Toggle the type attribute
           const type =
             passwordInput.getAttribute("type") === "password"
               ? "text"
               : "password";
           passwordInput.setAttribute("type", type);
 
-          // Toggle the eye / eye-slash icon
           this.querySelector("i").classList.toggle("fa-eye");
           this.querySelector("i").classList.toggle("fa-eye-slash");
 
-          // Toggle active class for styling
           this.classList.toggle("active");
         });
 
-        // Password toggle functionality for confirm password field
         toggleConfirmPassword.addEventListener("click", function () {
-          // Toggle the type attribute
           const type =
             confirmPasswordInput.getAttribute("type") === "password"
               ? "text"
               : "password";
           confirmPasswordInput.setAttribute("type", type);
 
-          // Toggle the eye / eye-slash icon
           this.querySelector("i").classList.toggle("fa-eye");
           this.querySelector("i").classList.toggle("fa-eye-slash");
 
-          // Toggle active class for styling
           this.classList.toggle("active");
         });
 
-        // Validation functions
         function showAlert(message) {
           Swal.fire({
             icon: "error",
@@ -531,7 +522,7 @@
         function hideErrorAfterDelay(element) {
           setTimeout(() => {
             element.style.display = "none";
-          }, 3000); // Hide error after 3 seconds
+          }, 3000);
         }
 
         function FnameValidateChecking() {

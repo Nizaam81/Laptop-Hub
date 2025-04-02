@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Navbar</title>
+    <title>Laptop Hub - Navbar</title>
     <!-- Font Awesome for Icons -->
     <link
       rel="stylesheet"
@@ -15,7 +15,7 @@
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-        font-family: Arial, sans-serif;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       }
 
       body {
@@ -26,50 +26,139 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        background: #222;
-        padding: 15px 40px;
+        background: #1a3d5f; /* Deep Navy Blue */
+        padding: 0 30px;
         color: white;
-        height: 55px;
-        position: relative;
+        height: 70px;
+        position: sticky;
+        top: 0;
         width: 100%;
+        z-index: 1000;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       }
 
-      .nav-left,
-      .nav-right {
+      .navbar-content {
         display: flex;
+        justify-content: space-between;
         align-items: center;
-        gap: 20px;
+        width: 100%;
+        max-width: 1400px;
+        margin: 0 auto;
       }
 
-      .nav-left a,
-      .nav-right a {
+      .brand {
+        font-size: 1.5rem;
+        font-weight: bold;
         color: white;
         text-decoration: none;
-        font-size: 1.1rem;
+        letter-spacing: 1px;
+        margin-right: 30px;
         display: flex;
         align-items: center;
-        gap: 5px;
-        padding: 8px 12px;
-        transition: all 0.3s ease;
-        border-radius: 5px;
-      }
-
-      .nav-left a:hover,
-      .nav-right a:hover {
-        background: rgba(255, 255, 255, 0.2);
-        transform: scale(1.05);
-      }
-
-      .nav-right .logout {
-        color: red;
-      }
-
-      .nav-right a i {
+        gap: 10px;
         transition: transform 0.3s ease;
       }
 
+      .brand:hover {
+        transform: scale(1.05);
+        color: #50bfe6; /* Lighter Sky Blue on hover */
+      }
+
+      .brand i {
+        font-size: 1.8rem;
+        color: #50bfe6; /* Lighter Sky Blue */
+      }
+
+      .nav-left {
+        display: flex;
+        align-items: center;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+      }
+
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .nav-links a,
+      .nav-right a {
+        color: white;
+        text-decoration: none;
+        font-size: 1rem;
+        padding: 0 15px;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        position: relative;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .nav-links a span,
+      .nav-right a span {
+        transition: all 0.3s ease;
+      }
+
+      .nav-links a:hover,
+      .nav-right a:hover {
+        background: rgba(
+          80,
+          191,
+          230,
+          0.2
+        ); /* Lighter Sky Blue with transparency */
+        color: #50bfe6; /* Lighter Sky Blue */
+      }
+
+      .nav-links a:hover i,
       .nav-right a:hover i {
         transform: scale(1.2);
+        color: #50bfe6; /* Lighter Sky Blue */
+      }
+
+      .nav-right a i {
+        transition: all 0.3s ease;
+      }
+
+      .nav-right .logout i {
+        color: #ff6b6b;
+      }
+
+      .nav-links a i {
+        font-size: 1.3rem;
+        transition: all 0.3s ease;
+      }
+
+      /* Active nav item styling */
+      .nav-links a.active,
+      .nav-right a.active {
+        background: rgba(
+          80,
+          191,
+          230,
+          0.1
+        ); /* Lighter Sky Blue with transparency */
+        color: #50bfe6; /* Lighter Sky Blue */
+      }
+
+      .nav-links a.active:after,
+      .nav-right a.active:after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60%;
+        height: 3px;
+        background: #50bfe6; /* Lighter Sky Blue */
+        border-radius: 3px 3px 0 0;
       }
 
       .menu-toggle {
@@ -77,101 +166,208 @@
         background: none;
         border: none;
         color: white;
-        font-size: 1.5rem;
+        font-size: 1.8rem;
         cursor: pointer;
+        transition: transform 0.3s ease;
+        padding: 10px;
+        border-radius: 50%;
+      }
+
+      .menu-toggle:hover {
+        background: rgba(
+          80,
+          191,
+          230,
+          0.2
+        ); /* Lighter Sky Blue with transparency */
+        transform: rotate(90deg);
+        color: #50bfe6; /* Lighter Sky Blue */
+      }
+
+      /* Notification badge */
+      .badge {
+        position: absolute;
+        top: 15px;
+        right: 5px;
+        background: #e74c3c;
+        color: white;
+        border-radius: 50%;
+        padding: 2px 6px;
+        font-size: 0.7rem;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+        100% {
+          transform: scale(1);
+        }
       }
 
       /* Responsive Styles */
+      @media (max-width: 992px) {
+        .nav-links a span,
+        .nav-right a span {
+          display: none;
+        }
+
+        .nav-links a,
+        .nav-right a {
+          padding: 0 12px;
+        }
+
+        .brand span {
+          display: none;
+        }
+      }
+
       @media (max-width: 768px) {
         .navbar {
-          flex-wrap: wrap;
+          padding: 0 15px;
           height: auto;
-          padding: 15px 20px;
+          min-height: 70px;
+        }
+
+        .navbar-content {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .nav-left {
+          width: 100%;
+          justify-content: space-between;
+          padding: 15px 0;
+        }
+
+        .nav-links {
+          display: none;
+          flex-direction: column;
+          width: 100%;
+          align-items: stretch;
+          gap: 5px;
+          padding: 10px 0;
+        }
+
+        .nav-right {
+          display: none;
+          flex-direction: column;
+          width: 100%;
+          align-items: stretch;
+          gap: 5px;
+          padding: 10px 0;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-links.active,
+        .nav-right.active {
+          display: flex;
+        }
+
+        .nav-links a,
+        .nav-right a {
+          width: 100%;
+          height: 50px;
+          padding: 0 20px;
+          border-radius: 0;
+        }
+
+        .nav-links a span,
+        .nav-right a span {
+          display: inline;
+        }
+
+        .brand span {
+          display: inline;
         }
 
         .menu-toggle {
           display: block;
-          position: absolute;
-          right: 20px;
-          top: 15px;
         }
 
-        .nav-left,
-        .nav-right {
-          width: 100%;
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 10px;
-          display: none;
-        }
-
-        .nav-left.active,
-        .nav-right.active {
-          display: flex;
-          margin-top: 10px;
-        }
-
-        .nav-left a,
-        .nav-right a {
-          width: 100%;
+        .nav-links a.active:after,
+        .nav-right a.active:after {
+          left: 0;
+          transform: none;
+          width: 5px;
+          height: 100%;
+          border-radius: 0 3px 3px 0;
+          background: #50bfe6; /* Lighter Sky Blue */
         }
       }
 
       /* Small devices (phones) */
       @media (max-width: 480px) {
         .navbar {
-          padding: 15px 10px;
+          padding: 0 10px;
         }
 
-        .nav-left a,
-        .nav-right a {
-          font-size: 1rem;
-          padding: 6px 8px;
+        .brand {
+          font-size: 1.3rem;
         }
-      }
 
-      /* Extra small devices */
-      @media (max-width: 320px) {
-        .nav-left a,
-        .nav-right a {
-          font-size: 0.9rem;
-          padding: 5px 6px;
+        .brand i {
+          font-size: 1.5rem;
         }
       }
     </style>
   </head>
   <body>
     <nav class="navbar">
-      <button class="menu-toggle" id="menuToggle">
-        <i class="fas fa-bars"></i>
-      </button>
-      <div class="nav-left" id="navLeft">
-        <a href="/user/home">Home</a>
-        <a href="/user/ProductsDetails">Products</a>
-      </div>
-      <div class="nav-right" id="navRight">
-        <a href="cart">
-          <i class="fa fa-shopping-cart" aria-hidden="true"></i>
-          <span>Cart</span>
-        </a>
-        <a href="/user/wishlist" class="wishlist">
-          <i class="fa fa-heart" aria-hidden="true"></i>
-        </a>
-        <a href="profile">
-          <i class="fa fa-user" aria-hidden="true"></i>
-          <span>Profile</span>
-        </a>
-        <a href="/user/logout" class="logout">Logout</a>
+      <div class="navbar-content">
+        <div class="nav-left">
+          <a href="/user/home" class="brand">
+            <i class="fas fa-laptop"></i>
+            <span>Laptop Hub</span>
+          </a>
+          <button class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+          </button>
+          <div class="nav-links" id="navLinks">
+            <a href="/user/home" class="active">
+              <i class="fas fa-home"></i>
+              <span>Home</span>
+            </a>
+            <a href="/user/ProductsDetails">
+              <i class="fas fa-laptop-code"></i>
+              <span>Products</span>
+            </a>
+          </div>
+        </div>
+        <div class="nav-right" id="navRight">
+          <a href="cart">
+            <i class="fas fa-shopping-cart"></i>
+            <span></span>
+            <!-- <span class="badge">3</span> -->
+          </a>
+          <a href="/user/wishlist" class="wishlist">
+            <i class="fas fa-heart"></i>
+            <span></span>
+            <!-- <span class="badge">5</span> -->
+          </a>
+          <a href="/user/PersonalInformation">
+            <i class="fas fa-user-circle"></i>
+            <span></span>
+          </a>
+          <a href="/user/logout" class="logout">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+          </a>
+        </div>
       </div>
     </nav>
 
     <script>
       const menuToggle = document.getElementById("menuToggle");
-      const navLeft = document.getElementById("navLeft");
+      const navLinks = document.getElementById("navLinks");
       const navRight = document.getElementById("navRight");
 
       menuToggle.addEventListener("click", function () {
-        navLeft.classList.toggle("active");
+        navLinks.classList.toggle("active");
         navRight.classList.toggle("active");
 
         const icon = this.querySelector("i");
@@ -182,6 +378,22 @@
           icon.classList.remove("fa-times");
           icon.classList.add("fa-bars");
         }
+      });
+
+      // Set active nav item based on current URL
+      document.addEventListener("DOMContentLoaded", function () {
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll(
+          ".nav-links a, .nav-right a"
+        );
+
+        navLinks.forEach((link) => {
+          if (currentPath.includes(link.getAttribute("href"))) {
+            link.classList.add("active");
+          } else {
+            link.classList.remove("active");
+          }
+        });
       });
     </script>
   </body>

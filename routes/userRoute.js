@@ -58,6 +58,12 @@ routes.get(
   }
 );
 
+//Personal Information
+routes.get(
+  "/PersonalInformation",
+  userProfileController.userPersonalInformation
+);
+
 //forgort password
 routes.get(
   "/forgotPassword",
@@ -83,7 +89,7 @@ routes.get("/profile", userAuth.userAuth, usercontroller.profile);
 
 //user profile
 routes.get(
-  "/userprofile",
+  "/editProfile",
   userAuth.userAuth,
   userProfileController.userprofile
 );
@@ -112,6 +118,7 @@ routes.post(
 routes.get("/cart", userAuth.userAuth, cartController.loadCart);
 routes.post("/add-Cart", userAuth.userAuth, cartController.AddCart);
 routes.post("/cart-delete", userAuth.userAuth, cartController.deleteCart);
+routes.post("/update-cart", userAuth.userAuth, cartController.updateCartQty);
 
 //chnage email in userProfile  and password
 
@@ -192,4 +199,8 @@ routes.post(
   userAuth.userAuth,
   placeOrder.paymentFailedorderdetails
 );
+
+//empty order
+routes.get("/noOrder", orderController.noOrder);
+
 module.exports = routes;
